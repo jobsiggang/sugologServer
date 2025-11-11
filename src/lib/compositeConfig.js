@@ -10,6 +10,8 @@ export const canvasConfig = {
     borderWidth: 1,
     font: "bold 20px 'Malgun Gothic'",
     textColor: "#000",
-    col1Ratio: 0.36
+    col1Ratio: 0.36,
+    cellPaddingX: 4,   // 좌우 패딩 4px로 축소
+    cellPaddingY: 0    // 상하 패딩 0px
   }
 };

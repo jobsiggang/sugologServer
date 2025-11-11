@@ -28,6 +28,7 @@ function makeOverlayCanvas(entries) {
   // 글자 길이에 따라 테이블 너비 동적 계산
   ctx.font = canvasConfig.table.font;
   let maxWidth = 0;
+  const cellPaddingX = canvasConfig.table.cellPaddingX || 4;
 
   for (const entry of entries) {
     const field = entry.field || "";
@@ -37,9 +38,9 @@ function makeOverlayCanvas(entries) {
     const fieldMetrics = ctx.measureText(field);
     const valueMetrics = ctx.measureText(value);
     
-    // 여유분(패딩) 추가: 좌우 각 8px
-    const fieldWidth = fieldMetrics.width + 16;
-    const valueWidth = valueMetrics.width + 16;
+    // 여유분(패딩) 추가: 좌우 각 cellPaddingX (기본 4px)
+    const fieldWidth = fieldMetrics.width + cellPaddingX * 2;
+    const valueWidth = valueMetrics.width + cellPaddingX * 2;
     
     // 두 컬럼 합산 (col1 : 36%, col2 : 64%)
     const totalRowWidth = fieldWidth / col1Ratio + valueWidth / (1 - col1Ratio);
@@ -71,9 +72,9 @@ function makeOverlayCanvas(entries) {
     const col1Width = tableWidth * col1Ratio;
     const col2Width = tableWidth * (1 - col1Ratio);
 
-    // 컬럼 1: 필드명
-    ctx.textAlign = "center";
-    ctx.fillText(entry.field || "", tableX + col1Width / 2, rowY + rowHeight / 2);
+    // 컬럼 1: 필드명 (왼쪽 정렬)
+    ctx.textAlign = "left";
+    ctx.fillText(entry.field || "", tableX + cellPaddingX, rowY + rowHeight / 2);
 
     // 컬럼 경계선
     ctx.strokeStyle = canvasConfig.table.borderColor;
@@ -82,9 +83,9 @@ function makeOverlayCanvas(entries) {
     ctx.lineTo(tableX + col1Width, rowY + rowHeight);
     ctx.stroke();
 
-    // 컬럼 2: 값
-    ctx.textAlign = "center";
-    ctx.fillText(entry.value || "", tableX + col1Width + col2Width / 2, rowY + rowHeight / 2);
+    // 컬럼 2: 값 (왼쪽 정렬)
+    ctx.textAlign = "left";
+    ctx.fillText(entry.value || "", tableX + col1Width + cellPaddingX, rowY + rowHeight / 2);
 
     // 행 경계선
     if (i < entries.length - 1) {

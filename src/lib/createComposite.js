@@ -1,8 +1,11 @@
 import { canvasConfig } from "./compositeConfig";
 
+// 캐시 맵 추가 (상단에)
 const overlayCache = new Map();
 
 function makeOverlayCanvas(entries) {
+  // 캐시 키 생성: entries를 기반으로 고유한 키 만들기
+  const key = JSON.stringify(entries.map(e => ({ field: e.field, value: e.value })));
   if (overlayCache.has(key)) return overlayCache.get(key);
 
   const width = canvasConfig.width;

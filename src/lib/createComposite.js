@@ -16,8 +16,6 @@ function makeOverlayCanvas(entries) {
 
   const minTableWidthRatio = canvasConfig.table.widthRatio; // 최소 0.20 (캔버스 너비의 20%)
   const tableHeightRatio = canvasConfig.table.heightRatio;
-  const col1Ratio = 0.35; // 첫 번째 열: 35%
-  const col2Ratio = 0.65; // 두 번째 열: 65%
   const cellPaddingX = canvasConfig.table.cellPaddingX || 4;
 
   // 테이블 높이는 고정
@@ -27,6 +25,9 @@ function makeOverlayCanvas(entries) {
 
   // 최소 테이블 너비
   let minTableWidth = width * minTableWidthRatio; // 캔버스 너비의 20%
+
+  // 첫 번째 열: 고정 너비 계산 (캔버스 너비의 약 7%)
+  const col1Width = width * 0.07; // 고정 픽셀값
 
   // 두 번째 열에 들어갈 글자 길이 계산
   ctx.font = canvasConfig.table.font;
@@ -41,9 +42,8 @@ function makeOverlayCanvas(entries) {
   // 두 번째 열의 필요한 너비 계산 (패딩 포함)
   const requiredCol2Width = maxCol2TextWidth + cellPaddingX * 2;
 
-  // 두 번째 열이 전체 테이블의 65%이므로, 필요한 테이블 너비 역산
-  // col2Width = tableWidth * 0.65 => tableWidth = col2Width / 0.65
-  const requiredTableWidth = requiredCol2Width / col2Ratio;
+  // 필요한 테이블 너비: 첫 번째 열(고정) + 두 번째 열(동적)
+  const requiredTableWidth = col1Width + requiredCol2Width;
 
   // 최소 너비보다 크면 늘림, 작으면 최소 너비 유지
   let tableWidth = Math.max(minTableWidth, requiredTableWidth);
@@ -52,8 +52,7 @@ function makeOverlayCanvas(entries) {
   tableWidth = Math.min(tableWidth, width * 0.95);
 
   // 실제 열 너비
-  const col1Width = tableWidth * col1Ratio;
-  const col2Width = tableWidth * col2Ratio;
+  const col2Width = tableWidth - col1Width; // 두 번째 열: 나머지
 
   // 테이블 배경 및 테두리 그리기
   ctx.fillStyle = canvasConfig.table.backgroundColor;
@@ -72,7 +71,7 @@ function makeOverlayCanvas(entries) {
     const entry = entries[i];
     const rowY = tableY + i * rowHeight;
 
-    // 컬럼 1: 필드명 (왼쪽 정렬)
+    // 컬럼 1: 필드명 (왼쪽 정렬, 고정 너비)
     ctx.textAlign = "left";
     ctx.fillText(entry.field || "", tableX + cellPaddingX, rowY + rowHeight / 2);
 
@@ -83,7 +82,7 @@ function makeOverlayCanvas(entries) {
     ctx.lineTo(tableX + col1Width, rowY + rowHeight);
     ctx.stroke();
 
-    // 컬럼 2: 값 (왼쪽 정렬)
+    // 컬럼 2: 값 (왼쪽 정렬, 동적 너비)
     ctx.textAlign = "left";
     ctx.fillText(entry.value || "", tableX + col1Width + cellPaddingX, rowY + rowHeight / 2);
 

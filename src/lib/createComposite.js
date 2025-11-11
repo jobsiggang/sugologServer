@@ -14,9 +14,10 @@ function makeOverlayCanvas(entries) {
   canvas.height = height;
   const ctx = canvas.getContext("2d");
 
-  const minTableWidthRatio = canvasConfig.table.widthRatio; // 최소 0.23
+  const minTableWidthRatio = canvasConfig.table.widthRatio; // 최소 0.20 (캔버스 너비의 20%)
   const tableHeightRatio = canvasConfig.table.heightRatio;
-  const col1Ratio = canvasConfig.table.col1Ratio; // 0.36 고정 (첫 번째 열)
+  const col1Ratio = 0.35; // 첫 번째 열: 35%
+  const col2Ratio = 0.65; // 두 번째 열: 65%
   const cellPaddingX = canvasConfig.table.cellPaddingX || 4;
 
   // 테이블 높이는 고정
@@ -24,36 +25,42 @@ function makeOverlayCanvas(entries) {
   const tableX = 0;
   const tableY = height - tableHeight;
 
-  // 글자 길이에 따라 테이블 너비 동적 계산 (두 번째 열만)
+  // 최소 테이블 너비
+  let minTableWidth = width * minTableWidthRatio; // 캔버스 너비의 20%
+
+  // 두 번째 열에 들어갈 글자 길이 계산
   ctx.font = canvasConfig.table.font;
-  let maxCol2Width = 0;
+  let maxCol2TextWidth = 0;
 
   for (const entry of entries) {
     const value = entry.value || "";
-    
-    // 값의 길이 측정
     const valueMetrics = ctx.measureText(value);
-    
-    // 여유분(패딩) 추가: 좌우 각 cellPaddingX
-    const valueWidth = valueMetrics.width + cellPaddingX * 2;
-    maxCol2Width = Math.max(maxCol2Width, valueWidth);
+    maxCol2TextWidth = Math.max(maxCol2TextWidth, valueMetrics.width);
   }
 
-  // 첫 번째 열: 고정 비율 (36%)
-  // 두 번째 열: 동적 (maxCol2Width에 맞춰)
-  const col1Width = width * col1Ratio;
-  const col2Width = maxCol2Width;
-  const tableWidth = col1Width + col2Width;
-  
-  // 최대값 제한 (캔버스 너비를 넘지 않도록, 여유분 약간 추가)
-  const finalTableWidth = Math.min(tableWidth, width * 0.95);
+  // 두 번째 열의 필요한 너비 계산 (패딩 포함)
+  const requiredCol2Width = maxCol2TextWidth + cellPaddingX * 2;
+
+  // 두 번째 열이 전체 테이블의 65%이므로, 필요한 테이블 너비 역산
+  // col2Width = tableWidth * 0.65 => tableWidth = col2Width / 0.65
+  const requiredTableWidth = requiredCol2Width / col2Ratio;
+
+  // 최소 너비보다 크면 늘림, 작으면 최소 너비 유지
+  let tableWidth = Math.max(minTableWidth, requiredTableWidth);
+
+  // 최대값 제한 (캔버스 너비를 넘지 않도록)
+  tableWidth = Math.min(tableWidth, width * 0.95);
+
+  // 실제 열 너비
+  const col1Width = tableWidth * col1Ratio;
+  const col2Width = tableWidth * col2Ratio;
 
   // 테이블 배경 및 테두리 그리기
   ctx.fillStyle = canvasConfig.table.backgroundColor;
-  ctx.fillRect(tableX, tableY, finalTableWidth, tableHeight);
+  ctx.fillRect(tableX, tableY, tableWidth, tableHeight);
   ctx.strokeStyle = canvasConfig.table.borderColor;
   ctx.lineWidth = canvasConfig.table.borderWidth;
-  ctx.strokeRect(tableX, tableY, finalTableWidth, tableHeight);
+  ctx.strokeRect(tableX, tableY, tableWidth, tableHeight);
 
   // 각 행(entry) 그리기
   const rowHeight = tableHeight / entries.length;
@@ -64,29 +71,27 @@ function makeOverlayCanvas(entries) {
   for (let i = 0; i < entries.length; i++) {
     const entry = entries[i];
     const rowY = tableY + i * rowHeight;
-    const finalCol1Width = finalTableWidth * (col1Width / tableWidth); // 비율 유지
-    const finalCol2Width = finalTableWidth * (col2Width / tableWidth); // 비율 유지
 
-    // 컬럼 1: 필드명 (왼쪽 정렬, 고정)
+    // 컬럼 1: 필드명 (왼쪽 정렬)
     ctx.textAlign = "left";
     ctx.fillText(entry.field || "", tableX + cellPaddingX, rowY + rowHeight / 2);
 
     // 컬럼 경계선
     ctx.strokeStyle = canvasConfig.table.borderColor;
     ctx.beginPath();
-    ctx.moveTo(tableX + finalCol1Width, rowY);
-    ctx.lineTo(tableX + finalCol1Width, rowY + rowHeight);
+    ctx.moveTo(tableX + col1Width, rowY);
+    ctx.lineTo(tableX + col1Width, rowY + rowHeight);
     ctx.stroke();
 
-    // 컬럼 2: 값 (왼쪽 정렬, 동적)
+    // 컬럼 2: 값 (왼쪽 정렬)
     ctx.textAlign = "left";
-    ctx.fillText(entry.value || "", tableX + finalCol1Width + cellPaddingX, rowY + rowHeight / 2);
+    ctx.fillText(entry.value || "", tableX + col1Width + cellPaddingX, rowY + rowHeight / 2);
 
     // 행 경계선
     if (i < entries.length - 1) {
       ctx.beginPath();
       ctx.moveTo(tableX, rowY + rowHeight);
-      ctx.lineTo(tableX + finalTableWidth, rowY + rowHeight);
+      ctx.lineTo(tableX + tableWidth, rowY + rowHeight);
       ctx.stroke();
     }
   }

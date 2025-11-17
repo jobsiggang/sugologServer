@@ -36,6 +36,10 @@ export async function POST(req) {
     const user = await User.findOne(query).populate('companyId');
 
     console.log('User found:', !!user, user?.username, user?.role);
+    if (user) {
+      console.log('User companyId:', user.companyId);
+      console.log('User companyId type:', typeof user.companyId);
+    }
 
     if (!user) {
       return NextResponse.json({
@@ -54,8 +58,12 @@ export async function POST(req) {
       }, { status: 401 });
     }
 
+    // companyId를 안전하게 추출
+    const userCompanyId = user.companyId?._id || user.companyId;
+    console.log('Extracted companyId for token:', userCompanyId);
+
     // JWT 토큰 생성
-    const token = generateToken(user._id, user.role, user.companyId?._id);
+    const token = generateToken(user._id, user.role, userCompanyId);
 
     // 응답 생성
     const response = NextResponse.json({
@@ -82,10 +90,12 @@ export async function POST(req) {
 
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('❌ Login error:', error);
+    console.error('Error stack:', error.stack);
     return NextResponse.json({ 
       success: false, 
-      message: "로그인 처리 중 오류가 발생했습니다." 
+      message: "로그인 처리 중 오류가 발생했습니다.",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }
 }

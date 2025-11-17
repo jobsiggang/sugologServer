@@ -376,15 +376,66 @@ function GoogleSettings({ user }) {
       </div>
 
       {/* 설정 가이드 */}
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <h3 className="text-sm font-bold text-blue-900 mb-2">📖 설정 가이드</h3>
-        <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
-          <li>Google Apps Script를 작성하고 배포합니다</li>
-          <li>배포 후 받은 웹앱 URL을 복사하여 위에 입력합니다</li>
-          <li>데이터를 저장할 Google Spreadsheet ID를 입력합니다</li>
-          <li>"설정 저장" 버튼을 눌러 저장합니다</li>
-          <li>"연결 테스트"로 정상 작동을 확인합니다</li>
-        </ol>
+      <div className="mt-6 space-y-4">
+        {/* Google Sheets 템플릿 */}
+        <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
+          <h3 className="text-sm font-bold text-purple-900 mb-2">📊 Google Sheets 템플릿</h3>
+          <p className="text-xs text-purple-800 mb-3">
+            아래 버튼을 클릭하여 Google Sheets 템플릿 사본을 만드세요. 이 시트는 업로드된 데이터를 자동으로 기록합니다.
+          </p>
+          <a
+            href={process.env.NEXT_PUBLIC_GOOGLE_SHEETS_TEMPLATE_URL || 'https://docs.google.com/spreadsheets/d/12pF-9Y8c_CYw2GxzkIVn7Yyyyx3mmMGdpdVuL4M8N3k/copy'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block w-full text-center bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 font-medium"
+          >
+            📄 Google Sheets 템플릿 사본 만들기
+          </a>
+          <p className="text-xs text-purple-600 mt-2">
+            💡 사본을 만든 후, URL에서 Spreadsheet ID를 복사하여 위 설정에 입력하세요
+          </p>
+        </div>
+
+        {/* 설정 가이드 */}
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 className="text-sm font-bold text-blue-900 mb-2">📖 설정 가이드</h3>
+          <ol className="text-xs text-blue-800 space-y-2 list-decimal list-inside">
+            <li>
+              <strong>Google Sheets 템플릿 사본 만들기</strong>
+              <p className="ml-5 text-blue-700">위 버튼을 클릭하여 사본을 생성합니다</p>
+            </li>
+            <li>
+              <strong>Spreadsheet ID 복사</strong>
+              <p className="ml-5 text-blue-700">
+                생성된 시트의 URL에서 ID 부분을 복사합니다<br />
+                예: https://docs.google.com/spreadsheets/d/<span className="bg-yellow-200 px-1 rounded">12pF-9Y8c...</span>/edit
+              </p>
+            </li>
+            <li>
+              <strong>Google Apps Script 작성</strong>
+              <p className="ml-5 text-blue-700">
+                docs/GOOGLE_APPS_SCRIPT_V2.js 파일의 코드를 복사하여<br />
+                시트 메뉴의 확장 프로그램 &gt; Apps Script에 붙여넣기
+              </p>
+            </li>
+            <li>
+              <strong>Apps Script 배포</strong>
+              <p className="ml-5 text-blue-700">
+                배포 &gt; 새 배포 &gt; 웹 앱<br />
+                실행 사용자: 나<br />
+                액세스 권한: <span className="bg-yellow-200 px-1 rounded font-bold">모든 사용자 (익명 포함)</span> ⚠️
+              </p>
+            </li>
+            <li>
+              <strong>웹앱 URL 복사</strong>
+              <p className="ml-5 text-blue-700">배포 완료 후 받은 웹앱 URL을 위 설정에 입력</p>
+            </li>
+            <li>
+              <strong>설정 저장 및 테스트</strong>
+              <p className="ml-5 text-blue-700">"설정 저장" 후 "연결 테스트"로 확인</p>
+            </li>
+          </ol>
+        </div>
       </div>
     </div>
   );

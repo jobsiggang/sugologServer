@@ -13,6 +13,18 @@ export default function CompanyDashboard() {
     checkAuth();
   }, []);
 
+  // 메뉴 열림/닫힘 시 body 스크롤 제어
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [menuOpen]);
+
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -99,14 +111,14 @@ export default function CompanyDashboard() {
             className="fixed inset-0 bg-black bg-opacity-50 z-40"
             onClick={() => setMenuOpen(false)}
           />
-          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 transform transition-transform">
+          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 overflow-y-auto">
             <div className="p-6 border-b">
               <h1 className="text-xl font-bold text-gray-800">업체 관리</h1>
               <p className="text-sm text-gray-600 mt-1">{user.name}님</p>
               <p className="text-xs text-gray-500">{user.companyName}</p>
             </div>
 
-            <nav className="p-4 space-y-2">
+            <nav className="p-4 space-y-2 pb-24">
               {menuItems.map(item => (
                 <button
                   key={item.id}
@@ -122,7 +134,7 @@ export default function CompanyDashboard() {
               ))}
             </nav>
 
-            <div className="absolute bottom-0 w-64 p-4 border-t bg-white">
+            <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
               <button
                 onClick={handleLogout}
                 className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"

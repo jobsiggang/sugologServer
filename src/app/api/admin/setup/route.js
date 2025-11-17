@@ -35,7 +35,10 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    const { username, password, name } = await request.json();
+    const body = await request.json();
+    const { username, password, name } = body;
+
+    console.log('Setup request body:', { username, name, passwordLength: password?.length });
 
     if (!username || !password || !name) {
       return NextResponse.json({ 
@@ -57,7 +60,9 @@ export async function POST(request) {
       role: 'supervisor'
     });
 
+    console.log('Creating supervisor:', { username, name, role: 'supervisor' });
     await supervisor.save();
+    console.log('Supervisor created successfully');
 
     return NextResponse.json({
       success: true,
@@ -65,8 +70,10 @@ export async function POST(request) {
     }, { status: 201 });
   } catch (error) {
     console.error('Create supervisor error:', error);
+    console.error('Error details:', error.message, error.stack);
     return NextResponse.json({ 
-      error: '슈퍼바이저 등록 중 오류가 발생했습니다.' 
+      error: '슈퍼바이저 등록 중 오류가 발생했습니다.',
+      details: error.message
     }, { status: 500 });
   }
 }

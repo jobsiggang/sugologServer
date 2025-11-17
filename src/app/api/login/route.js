@@ -5,7 +5,7 @@ import { generateToken } from "@/lib/auth";
 
 export async function POST(req) {
   try {
-    const { username, password } = await req.json();
+    const { username, password, companyId } = await req.json();
 
     if (!username || !password) {
       return NextResponse.json({
@@ -17,14 +17,27 @@ export async function POST(req) {
     // MongoDB 연결
     await connectDB();
 
-    // 사용자 찾기
-    const user = await User.findOne({ username, isActive: true }).populate('companyId');
+    // 사용자 찾기 (슈퍼바이저가 아니면 회사 ID도 체크)
+    let query = { username, isActive: true };
+    if (companyId) {
+      query.companyId = companyId;
+    }
+
+    const user = await User.findOne(query).populate('companyId');
 
     if (!user) {
       return NextResponse.json({
         success: false,
         message: "아이디 또는 비밀번호가 올바르지 않습니다.",
       }, { status: 401 });
+    }
+
+    // 슈퍼바이저가 아닌데 회사를 선택하지 않은 경우
+    if (user.role !== 'supervisor' && !companyId) {
+      return NextResponse.json({
+        success: false,
+        message: "회사를 선택해주세요.",
+      }, { status: 400 });
     }
 
     // 비밀번호 확인

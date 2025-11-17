@@ -5,34 +5,71 @@ import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
+  const [companies, setCompanies] = useState([]);
+  const [selectedCompany, setSelectedCompany] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [showSetupLink, setShowSetupLink] = useState(false);
+  const [isSupervisor, setIsSupervisor] = useState(false);
 
   useEffect(() => {
     checkSupervisor();
+    fetchCompanies();
   }, []);
+
+  const fetchCompanies = async () => {
+    try {
+      const response = await fetch('/api/companies/list');
+      const data = await response.json();
+      if (data.success) {
+        setCompanies(data.companies);
+      }
+    } catch (error) {
+      console.error('Companies fetch error:', error);
+    }
+  };
 
   const checkSupervisor = async () => {
     try {
       const response = await fetch('/api/admin/setup');
+      
+      if (!response.ok) {
+        console.error('Setup API error:', response.status, response.statusText);
+        return;
+      }
+      
       const data = await response.json();
-      if (data.needsSetup) {
+      console.log('Setup check response:', data);
+      
+      if (data.needsSetup === true) {
+        console.log('Showing setup link');
         setShowSetupLink(true);
       }
     } catch (error) {
       console.error('Supervisor check error:', error);
+      // 에러가 발생해도 설정 링크를 보여줌 (안전장치)
+      setShowSetupLink(true);
     }
   };
 
   const handleLogin = async () => {
     setError("");
 
+    // 슈퍼바이저가 아닌 경우 회사 선택 필수
+    if (!isSupervisor && !selectedCompany) {
+      setError("회사를 선택해주세요.");
+      return;
+    }
+
     const res = await fetch("/api/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ 
+        username, 
+        password,
+        companyId: isSupervisor ? null : selectedCompany
+      }),
     });
 
     const data = await res.json();
@@ -45,8 +82,10 @@ export default function LoginPage() {
       localStorage.setItem("userRole", data.role);
       
       // 역할에 따라 리다이렉트
-      if (data.role === 'supervisor' || data.role === 'company_admin') {
+      if (data.role === 'supervisor') {
         router.push("/admin");
+      } else if (data.role === 'company_admin') {
+        router.push("/company/dashboard");
       } else {
         router.push("/upload");
       }
@@ -103,6 +142,47 @@ export default function LoginPage() {
           <br />
           사진 업로드페이지로 이동하세요.
         </p>
+
+        {/* 슈퍼바이저 체크박스 */}
+        <div style={{ width: "100%", marginBottom: "12px", display: "flex", alignItems: "center", gap: "8px" }}>
+          <input
+            type="checkbox"
+            id="isSupervisor"
+            checked={isSupervisor}
+            onChange={(e) => setIsSupervisor(e.target.checked)}
+            style={{ width: "18px", height: "18px", cursor: "pointer" }}
+          />
+          <label htmlFor="isSupervisor" style={{ fontSize: "14px", color: "#555", cursor: "pointer" }}>
+            슈퍼바이저 로그인
+          </label>
+        </div>
+
+        {/* 회사 선택 (슈퍼바이저가 아닐 때만) */}
+        {!isSupervisor && (
+          <select
+            value={selectedCompany}
+            onChange={(e) => setSelectedCompany(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "10px 14px",
+              borderRadius: "10px",
+              border: "1px solid #ddd",
+              fontSize: "15px",
+              marginBottom: "12px",
+              outline: "none",
+              color: "#000",
+              fontWeight: "bold",
+              backgroundColor: "#fff"
+            }}
+          >
+            <option value="">회사를 선택하세요</option>
+            {companies.map((company) => (
+              <option key={company._id} value={company._id}>
+                {company.name}
+              </option>
+            ))}
+          </select>
+        )}
 
         <input
           type="text"

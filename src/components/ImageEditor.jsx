@@ -233,9 +233,20 @@ export default function ImageEditor({ author }) {
 
   // 🚀 업로드 — 합성(처리)과 업로드를 분리하여 각각 진행률을 업데이트
   const handleUpload = async () => {
-    if (!allRequiredFilled()) return;
-    if (!images.length) return toast.error("❌ 이미지를 선택하세요.");
+    console.log('🚀 handleUpload 시작');
+    console.log('entries:', entries);
+    console.log('images:', images);
+    
+    if (!allRequiredFilled()) {
+      console.log('❌ 필수 항목 누락');
+      return;
+    }
+    if (!images.length) {
+      console.log('❌ 이미지 없음');
+      return toast.error("❌ 이미지를 선택하세요.");
+    }
 
+    console.log('✅ 업로드 시작 - 초기화');
     // 초기화
     setUploading(true);
     setProcessingProgress(0);
@@ -266,28 +277,39 @@ export default function ImageEditor({ author }) {
     };
 
     try {
+      console.log('📦 합성 단계 시작');
       // 1) 합성(처리) 단계 — 순차 처리하여 명확한 진행률 제공
       const processed = [];
       for (let i = 0; i < images.length; i++) {
+        console.log(`합성 중 ${i+1}/${images.length}`);
         const { file, rotation } = images[i];
         processed[i] = await processImage(file, rotation);
         setProcessingProgress(Math.round(((i + 1) / images.length) * 100));
       }
 
+      console.log('✅ 합성 완료, 업로드 시작');
+      console.log('uploadPhoto 함수 존재:', typeof uploadPhoto);
+      console.log('uploadPhotosBatch 함수 존재:', typeof uploadPhotosBatch);
+      
       // 2) 업로드 단계 — 각 파일 업로드 완료 시점에 진행률 갱신
       const uploadedUrls = [];
       
       if (typeof uploadPhoto === "function") {
+        console.log('개별 업로드 방식 사용');
         for (let i = 0; i < processed.length; i++) {
+          console.log(`업로드 중 ${i+1}/${processed.length}`);
           const item = processed[i];
           const res = await uploadPhoto(item.base64, item.filename, item.entryData);
+          console.log('업로드 응답:', res);
           if (!res || !res.success) throw new Error(res?.error || "업로드 실패");
           if (res.url) uploadedUrls.push(res.url);
           setUploadingProgress(Math.round(((i + 1) / processed.length) * 100));
         }
       } else if (typeof uploadPhotosBatch === "function") {
+        console.log('배치 업로드 방식 사용');
         // 배치 업로드만 지원하는 경우: 호출 전 업로드Progress 0, 호출 후 100
         const res = await uploadPhotosBatch(processed);
+        console.log('배치 업로드 응답:', res);
         if (!res || !res.success) throw new Error(res?.error || "배치 업로드 실패");
         if (res.urls) uploadedUrls.push(...res.urls);
         setUploadingProgress(100);
@@ -297,6 +319,7 @@ export default function ImageEditor({ author }) {
 
       // 3) MongoDB에 업로드 정보 저장
       try {
+        console.log('💾 DB 저장 시작');
         const token = localStorage.getItem('token');
         const uploadRecord = {
           formName: selectedForm,
@@ -304,6 +327,8 @@ export default function ImageEditor({ author }) {
           data: entryData,
           imageUrls: uploadedUrls
         };
+
+        console.log('저장할 데이터:', uploadRecord);
 
         const saveResponse = await fetch('/api/uploads', {
           method: 'POST',
@@ -315,8 +340,11 @@ export default function ImageEditor({ author }) {
         });
 
         const saveData = await saveResponse.json();
+        console.log('DB 저장 응답:', saveData);
         if (!saveData.success) {
           console.error('DB 저장 실패:', saveData.error);
+        } else {
+          console.log('✅ DB 저장 완료');
         }
       } catch (dbErr) {
         console.error('DB 저장 중 오류:', dbErr);
@@ -324,6 +352,7 @@ export default function ImageEditor({ author }) {
       }
 
       // 완료 처리
+      console.log('✅ 모든 작업 완료');
       setProcessingProgress(100);
       setUploadingProgress(100);
       await new Promise((r) => setTimeout(r, 300));
@@ -334,7 +363,7 @@ export default function ImageEditor({ author }) {
       setImages([]);
       toast.success("✅ 모든 이미지 업로드 완료!");
     } catch (err) {
-      console.error(err);
+      console.error('❌ 업로드 실패:', err);
       toast.error(`❌ 업로드 실패: ${err?.message || err}`);
       setUploading(false);
       setProcessingProgress(0);

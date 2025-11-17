@@ -171,12 +171,14 @@ function GoogleSettings({ user }) {
       });
 
       const data = await response.json();
-      if (data.success && data.settings) {
-        setSettings(data.settings);
+      console.log('Google 설정 조회 응답:', data);
+      
+      if (data.success && data.googleSettings) {
+        setSettings(data.googleSettings);
         setFormData({
-          webAppUrl: data.settings.webAppUrl || '',
-          spreadsheetId: data.settings.spreadsheetId || '',
-          driveFolderId: data.settings.driveFolderId || ''
+          webAppUrl: data.googleSettings.webAppUrl || '',
+          spreadsheetId: data.googleSettings.spreadsheetId || '',
+          driveFolderId: data.googleSettings.driveFolderId || ''
         });
       }
     } catch (error) {
@@ -188,6 +190,8 @@ function GoogleSettings({ user }) {
 
   const handleUpdate = async (e) => {
     e.preventDefault();
+    console.log('Google 설정 저장 시도:', formData);
+    
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${user.companyId}/google-settings`, {
@@ -200,6 +204,8 @@ function GoogleSettings({ user }) {
       });
 
       const data = await response.json();
+      console.log('Google 설정 저장 응답:', data);
+      
       if (data.success) {
         alert('Google 설정이 저장되었습니다.');
         fetchSettings();
@@ -207,6 +213,7 @@ function GoogleSettings({ user }) {
         alert(data.error || '저장 실패');
       }
     } catch (error) {
+      console.error('저장 중 오류:', error);
       alert('오류가 발생했습니다.');
     }
   };

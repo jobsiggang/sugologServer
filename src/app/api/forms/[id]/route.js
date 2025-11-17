@@ -119,9 +119,15 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    // Soft delete
-    form.isActive = false;
-    await form.save();
+    // 비활성화된 양식만 삭제 가능
+    if (form.isActive) {
+      return NextResponse.json({ 
+        error: '활성화된 양식은 삭제할 수 없습니다. 먼저 비활성화하세요.' 
+      }, { status: 400 });
+    }
+
+    // Hard delete - DB에서 완전히 삭제
+    await Form.findByIdAndDelete(params.id);
 
     return NextResponse.json({
       success: true,

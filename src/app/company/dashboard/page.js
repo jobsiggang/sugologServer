@@ -500,7 +500,8 @@ function EmployeeManagement({ user }) {
       username: '',
       password: '',
       name: '',
-      role: 'employee'
+      role: 'employee',
+      isActive: true
     };
     setEmployees([newEmployee, ...employees]);
     setEditingId('new');
@@ -556,8 +557,14 @@ function EmployeeManagement({ user }) {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
+  const handleDelete = async (id, employee) => {
+    // 활성화된 직원은 삭제 불가
+    if (employee.isActive) {
+      alert('활성화된 직원은 삭제할 수 없습니다. 먼저 비활성화해주세요.');
+      return;
+    }
+
+    if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
 
     try {
       const token = localStorage.getItem('token');
@@ -572,9 +579,37 @@ function EmployeeManagement({ user }) {
       if (data.success) {
         fetchEmployees();
         setExpandedId(null);
+      } else {
+        alert(data.error || '삭제 실패');
       }
     } catch (error) {
       alert('삭제 실패');
+    }
+  };
+
+  const handleToggleActive = async (id, currentStatus) => {
+    const action = currentStatus ? '비활성화' : '활성화';
+    if (!confirm(`정말 ${action}하시겠습니까?`)) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/employees/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ isActive: !currentStatus })
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchEmployees();
+      } else {
+        alert(data.error || `${action} 실패`);
+      }
+    } catch (error) {
+      alert(`${action} 실패`);
     }
   };
 
@@ -621,6 +656,11 @@ function EmployeeManagement({ user }) {
                 <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
                 <span className="text-sm font-medium truncate">{emp.name}</span>
                 <span className="text-sm text-gray-600 truncate">({emp.username})</span>
+                {!emp.isActive && (
+                  <span className="px-2 py-0.5 text-xs bg-gray-200 text-gray-600 rounded">
+                    비활성
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
                 <span className={`w-2 h-2 rounded-full ${
@@ -687,16 +727,24 @@ function EmployeeManagement({ user }) {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-600">이름:</span>
+                        <span className="text-gray-600">성명:</span>
                         <span className="ml-2 font-medium">{emp.name}</span>
                       </div>
                       <div>
-                        <span className="text-gray-600">사용자명:</span>
+                        <span className="text-gray-600">아이디:</span>
                         <span className="ml-2">{emp.username}</span>
                       </div>
                       <div>
                         <span className="text-gray-600">역할:</span>
                         <span className="ml-2">{emp.role === 'employee' ? '직원' : '관리자'}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">상태:</span>
+                        <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                          emp.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {emp.isActive ? '활성' : '비활성'}
+                        </span>
                       </div>
                     </div>
 
@@ -709,8 +757,24 @@ function EmployeeManagement({ user }) {
                         ✏️ 수정
                       </button>
                       <button
-                        onClick={() => handleDelete(emp._id)}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        onClick={() => handleToggleActive(emp._id, emp.isActive)}
+                        className={`flex-1 px-4 py-2 text-white text-sm rounded ${
+                          emp.isActive 
+                            ? 'bg-yellow-600 hover:bg-yellow-700' 
+                            : 'bg-green-600 hover:bg-green-700'
+                        }`}
+                      >
+                        {emp.isActive ? '⏸️ 비활성화' : '▶️ 활성화'}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(emp._id, emp)}
+                        disabled={emp.isActive}
+                        className={`flex-1 px-4 py-2 text-white text-sm rounded ${
+                          emp.isActive
+                            ? 'bg-gray-300 cursor-not-allowed'
+                            : 'bg-red-600 hover:bg-red-700'
+                        }`}
+                        title={emp.isActive ? '비활성화 후 삭제 가능' : '완전 삭제'}
                       >
                         🗑️ 삭제
                       </button>

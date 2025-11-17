@@ -121,9 +121,8 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    // Soft delete
-    employee.isActive = false;
-    await employee.save();
+    // Hard delete - DB에서 완전히 삭제
+    await User.findByIdAndDelete(params.id);
 
     return NextResponse.json({
       success: true,

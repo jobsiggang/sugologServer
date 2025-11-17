@@ -7,23 +7,10 @@ export default function CompanyDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('employees');
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
   }, []);
-
-  // 메뉴 열림/닫힘 시 body 스크롤 제어
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [menuOpen]);
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
@@ -48,11 +35,6 @@ export default function CompanyDashboard() {
     router.push('/login');
   };
 
-  const handleMenuClick = (tab) => {
-    setActiveTab(tab);
-    setMenuOpen(false);
-  };
-
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -61,32 +43,14 @@ export default function CompanyDashboard() {
     );
   }
 
-  const menuItems = [
-    { id: 'employees', icon: '👥', label: '직원 관리' },
-    { id: 'sites', icon: '🏗️', label: '현장 관리' },
-    { id: 'forms', icon: '📋', label: '입력양식 관리' },
-    { id: 'keys', icon: '🔑', label: '유사키 관리' },
-    { id: 'google', icon: '📱', label: 'Google 설정' }
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 상단 헤더 */}
       <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 hover:bg-gray-100 rounded-lg"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            </button>
-            <div>
-              <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
-              <p className="text-xs text-gray-500">{user.name} 관리자</p>
-            </div>
+        <div className="flex items-center justify-between px-4 py-3 border-b">
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
+            <p className="text-xs text-gray-500">{user.name} 관리자</p>
           </div>
           <button
             onClick={handleLogout}
@@ -96,55 +60,60 @@ export default function CompanyDashboard() {
           </button>
         </div>
 
-        {/* 현재 탭 표시 */}
-        <div className="px-4 py-2 bg-blue-50 border-t border-blue-100">
-          <p className="text-sm font-medium text-blue-800">
-            {menuItems.find(item => item.id === activeTab)?.icon} {menuItems.find(item => item.id === activeTab)?.label}
-          </p>
+        {/* 가로 탭 메뉴 */}
+        <div className="flex overflow-x-auto bg-white">
+          <button
+            onClick={() => setActiveTab('employees')}
+            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'employees'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            👥 직원 관리
+          </button>
+          <button
+            onClick={() => setActiveTab('sites')}
+            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'sites'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🏗️ 현장 관리
+          </button>
+          <button
+            onClick={() => setActiveTab('forms')}
+            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'forms'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            📋 입력양식 관리
+          </button>
+          <button
+            onClick={() => setActiveTab('keys')}
+            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'keys'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            🔑 유사키 관리
+          </button>
+          <button
+            onClick={() => setActiveTab('google')}
+            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              activeTab === 'google'
+                ? 'border-blue-600 text-blue-600'
+                : 'border-transparent text-gray-600 hover:text-gray-800'
+            }`}
+          >
+            📱 Google 설정
+          </button>
         </div>
       </header>
-
-      {/* 햄버거 메뉴 (오버레이) */}
-      {menuOpen && (
-        <>
-          <div 
-            className="fixed inset-0 bg-black bg-opacity-50 z-40"
-            onClick={() => setMenuOpen(false)}
-          />
-          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 overflow-y-auto">
-            <div className="p-6 border-b">
-              <h1 className="text-xl font-bold text-gray-800">업체 관리</h1>
-              <p className="text-sm text-gray-600 mt-1">{user.name}님</p>
-              <p className="text-xs text-gray-500">{user.companyName}</p>
-            </div>
-
-            <nav className="p-4 space-y-2 pb-24">
-              {menuItems.map(item => (
-                <button
-                  key={item.id}
-                  onClick={() => handleMenuClick(item.id)}
-                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-                    activeTab === item.id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-gray-700 hover:bg-gray-100'
-                  }`}
-                >
-                  {item.icon} {item.label}
-                </button>
-              ))}
-            </nav>
-
-            <div className="absolute bottom-0 left-0 right-0 p-4 border-t bg-white">
-              <button
-                onClick={handleLogout}
-                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-              >
-                로그아웃
-              </button>
-            </div>
-          </aside>
-        </>
-      )}
 
       {/* 메인 컨텐츠 영역 */}
       <main className="p-4">
@@ -1187,14 +1156,14 @@ function FormManagement({ user }) {
   };
 
   const handleFieldsChange = (value) => {
-    // 쉼표로 구분된 문자열을 배열로 변환
-    const fieldsArray = value.split(',').map(f => f.trim()).filter(f => f);
+    // 세미콜론으로 구분된 문자열을 배열로 변환
+    const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
     setEditData({ ...editData, fields: fieldsArray });
   };
 
   const handleFieldOptionChange = (fieldName, value) => {
-    // 쉼표로 구분된 문자열을 배열로 변환
-    const optionsArray = value.split(',').map(o => o.trim()).filter(o => o);
+    // 세미콜론으로 구분된 문자열을 배열로 변환
+    const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
     setEditData({
       ...editData,
       fieldOptions: {
@@ -1239,7 +1208,7 @@ function FormManagement({ user }) {
                 <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
                 <span className="text-sm font-medium truncate">{form.formName}</span>
                 <span className="text-xs text-gray-500">
-                  [{Array.isArray(form.fields) ? form.fields.join(', ') : ''}]
+                  [{Array.isArray(form.fields) ? form.fields.join('; ') : ''}]
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -1264,13 +1233,13 @@ function FormManagement({ user }) {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">항목명 (쉼표로 구분)</label>
+                      <label className="block text-xs text-gray-600 mb-1">항목명 (세미콜론으로 구분)</label>
                       <input
                         type="text"
-                        value={Array.isArray(editData.fields) ? editData.fields.join(', ') : ''}
+                        value={Array.isArray(editData.fields) ? editData.fields.join('; ') : ''}
                         onChange={(e) => handleFieldsChange(e.target.value)}
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="예: 현장명, 일자, 공종코드, 물량, 공사단계"
+                        placeholder="예: 현장명; 일자; 공종코드; 물량; 공사단계"
                       />
                     </div>
 
@@ -1284,21 +1253,21 @@ function FormManagement({ user }) {
                           {editData.fields.map((field, idx) => (
                             <div key={idx}>
                               <label className="block text-xs text-gray-600 mb-1">
-                                {field} (쉼표로 구분)
+                                {field} (세미콜론으로 구분)
                               </label>
                               <input
                                 type="text"
                                 value={
                                   editData.fieldOptions && editData.fieldOptions[field]
-                                    ? editData.fieldOptions[field].join(', ')
+                                    ? editData.fieldOptions[field].join('; ')
                                     : ''
                                 }
                                 onChange={(e) => handleFieldOptionChange(field, e.target.value)}
                                 className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 placeholder={
-                                  field === '현장명' ? '예: 양주신도시, 옥정더퍼스트, 옥정메트로포레' :
-                                  field === '공종코드' ? '예: 1, 2, 3, 4, 5' :
-                                  field === '공사단계' ? '예: 전, 중, 후' :
+                                  field === '현장명' ? '예: 양주신도시; 옥정더퍼스트; 옥정메트로포레' :
+                                  field === '공종코드' ? '예: 1; 2; 3; 4; 5' :
+                                  field === '공사단계' ? '예: 전; 중; 후' :
                                   '옵션을 입력하세요 (선택사항)'
                                 }
                               />
@@ -1344,7 +1313,7 @@ function FormManagement({ user }) {
                       <div>
                         <span className="text-gray-600 font-semibold">항목명:</span>
                         <span className="ml-2 text-blue-600">
-                          [{Array.isArray(form.fields) ? form.fields.join(', ') : ''}]
+                          [{Array.isArray(form.fields) ? form.fields.join('; ') : ''}]
                         </span>
                       </div>
                       
@@ -1357,7 +1326,7 @@ function FormManagement({ user }) {
                               <div key={fieldName} className="text-xs">
                                 <span className="font-medium text-gray-700">{fieldName}:</span>
                                 <span className="ml-2 text-green-600">
-                                  [{Array.isArray(options) ? options.join(', ') : ''}]
+                                  [{Array.isArray(options) ? options.join('; ') : ''}]
                                 </span>
                               </div>
                             ))}
@@ -1454,7 +1423,7 @@ function KeyMappingManagement({ user }) {
     setEditingId(mapping._id);
     setEditData({ 
       ...mapping,
-      similarKeys: Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys
+      similarKeys: Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join('; ') : mapping.similarKeys
     });
   };
 
@@ -1477,7 +1446,7 @@ function KeyMappingManagement({ user }) {
       const dataToSend = {
         ...editData,
         similarKeys: typeof editData.similarKeys === 'string' 
-          ? editData.similarKeys.split(',').map(s => s.trim()).filter(s => s)
+          ? editData.similarKeys.split(';').map(s => s.trim()).filter(s => s)
           : editData.similarKeys
       };
 
@@ -1597,13 +1566,13 @@ function KeyMappingManagement({ user }) {
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">유사키 (쉼표로 구분)</label>
+                      <label className="block text-xs text-gray-600 mb-1">유사키 (세미콜론으로 구분)</label>
                       <input
                         type="text"
                         value={editData.similarKeys || ''}
                         onChange={(e) => handleCellChange('similarKeys', e.target.value)}
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="유사키1, 유사키2, 유사키3"
+                        placeholder="유사키1; 유사키2; 유사키3"
                       />
                     </div>
                     <div>
@@ -1645,7 +1614,7 @@ function KeyMappingManagement({ user }) {
                       <div className="col-span-2">
                         <span className="text-gray-600">유사키:</span>
                         <span className="ml-2 text-blue-600">
-                          {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys}
+                          {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join('; ') : mapping.similarKeys}
                         </span>
                       </div>
                       <div className="col-span-2">

@@ -1,0 +1,1091 @@
+0 verbose cli C:\Program Files\nodejs\node.exe C:\Users\jjcha\AppData\Roaming\npm\node_modules\npm\bin\npm-cli.js
+1 info using npm@10.7.0
+2 info using node@v22.15.0
+3 silly config:load:file:C:\Users\jjcha\AppData\Roaming\npm\node_modules\npm\npmrc
+4 silly config:load:file:D:\fairproject\fair_app\.npmrc
+5 silly config:load:file:C:\Users\jjcha\.npmrc
+6 silly config:load:file:C:\Users\jjcha\AppData\Roaming\npm\etc\npmrc
+7 verbose title npm install mongodb mongoose bcryptjs jsonwebtoken
+8 verbose argv "install" "mongodb" "mongoose" "bcryptjs" "jsonwebtoken"
+9 verbose logfile logs-max:10 dir:D:\fairproject\fair_app\.npm-cache\_logs\2025-11-17T00_12_12_591Z-
+10 verbose logfile D:\fairproject\fair_app\.npm-cache\_logs\2025-11-17T00_12_12_591Z-debug-0.log
+11 silly logfile start cleaning logs, removing 1 files
+12 silly logfile done cleaning log files
+13 silly idealTree buildDeps
+14 silly fetch manifest mongodb@*
+15 http fetch GET 200 https://registry.npmjs.org/npm 688ms
+16 http fetch GET 200 https://registry.npmjs.org/mongodb 345ms (cache miss)
+17 silly fetch manifest @aws-sdk/credential-providers@^3.806.0
+18 http fetch GET 200 https://registry.npmjs.org/@aws-sdk%2fcredential-providers 118ms (cache miss)
+19 silly fetch manifest @mongodb-js/zstd@^7.0.0
+20 http fetch GET 200 https://registry.npmjs.org/@mongodb-js%2fzstd 296ms (cache miss)
+21 silly fetch manifest gcp-metadata@^7.0.1
+22 http fetch GET 200 https://registry.npmjs.org/gcp-metadata 70ms (cache miss)
+23 silly fetch manifest kerberos@^7.0.0
+24 http fetch GET 200 https://registry.npmjs.org/kerberos 64ms (cache miss)
+25 silly fetch manifest mongodb-client-encryption@>=7.0.0 <7.1.0
+26 http fetch GET 200 https://registry.npmjs.org/mongodb-client-encryption 74ms (cache miss)
+27 silly fetch manifest snappy@^7.3.2
+28 http fetch GET 200 https://registry.npmjs.org/snappy 86ms (cache miss)
+29 silly fetch manifest socks@^2.8.6
+30 http fetch GET 200 https://registry.npmjs.org/socks 57ms (cache miss)
+31 silly fetch manifest mongoose@*
+32 http fetch GET 200 https://registry.npmjs.org/mongoose 124ms (cache miss)
+33 silly fetch manifest bcryptjs@*
+34 http fetch GET 200 https://registry.npmjs.org/bcryptjs 41ms (cache miss)
+35 silly fetch manifest jsonwebtoken@*
+36 http fetch GET 200 https://registry.npmjs.org/jsonwebtoken 74ms (cache miss)
+37 silly placeDep ROOT bcryptjs@3.0.3 OK for: fair_app@0.1.0 want: *
+38 silly placeDep ROOT jsonwebtoken@9.0.2 OK for: fair_app@0.1.0 want: *
+39 silly placeDep ROOT mongodb@7.0.0 OK for: fair_app@0.1.0 want: *
+40 silly placeDep ROOT mongoose@8.19.4 OK for: fair_app@0.1.0 want: *
+41 silly fetch manifest jws@^3.2.2
+42 silly fetch manifest lodash.once@^4.0.0
+43 silly fetch manifest lodash.includes@^4.3.0
+44 silly fetch manifest lodash.isnumber@^3.0.3
+45 silly fetch manifest lodash.isstring@^4.0.1
+46 silly fetch manifest lodash.isboolean@^3.0.3
+47 silly fetch manifest lodash.isinteger@^4.0.4
+48 silly fetch manifest lodash.isplainobject@^4.0.6
+49 silly fetch manifest bson@^7.0.0
+50 silly fetch manifest @mongodb-js/saslprep@^1.3.0
+51 silly fetch manifest mongodb-connection-string-url@^7.0.0
+52 silly fetch manifest bson@^6.10.4
+53 silly fetch manifest kareem@2.6.3
+54 silly fetch manifest mongodb@~6.20.0
+55 silly fetch manifest mpath@0.9.0
+56 silly fetch manifest mquery@5.0.0
+57 silly fetch manifest sift@17.1.3
+58 http fetch GET 200 https://registry.npmjs.org/lodash.includes 77ms (cache miss)
+59 http fetch GET 200 https://registry.npmjs.org/jws 113ms (cache miss)
+60 http fetch GET 200 https://registry.npmjs.org/lodash.isstring 134ms (cache miss)
+61 http fetch GET 200 https://registry.npmjs.org/lodash.once 137ms (cache miss)
+62 http fetch GET 200 https://registry.npmjs.org/lodash.isplainobject 137ms (cache miss)
+63 http fetch GET 200 https://registry.npmjs.org/mpath 158ms (cache miss)
+64 http fetch GET 200 https://registry.npmjs.org/lodash.isinteger 165ms (cache miss)
+65 http fetch GET 200 https://registry.npmjs.org/mongodb-connection-string-url 170ms (cache miss)
+66 http fetch GET 200 https://registry.npmjs.org/lodash.isboolean 178ms (cache miss)
+67 http fetch GET 200 https://registry.npmjs.org/kareem 174ms (cache miss)
+68 http fetch GET 200 https://registry.npmjs.org/sift 177ms (cache miss)
+69 http fetch GET 200 https://registry.npmjs.org/lodash.isnumber 200ms (cache miss)
+70 http fetch GET 200 https://registry.npmjs.org/bson 199ms (cache miss)
+71 http fetch GET 200 https://registry.npmjs.org/bson 211ms (cache miss)
+72 http fetch GET 200 https://registry.npmjs.org/mquery 241ms (cache miss)
+73 http fetch GET 200 https://registry.npmjs.org/@mongodb-js%2fsaslprep 526ms (cache miss)
+74 silly placeDep ROOT jws@3.2.2 OK for: jsonwebtoken@9.0.2 want: ^3.2.2
+75 silly placeDep ROOT lodash.includes@4.3.0 OK for: jsonwebtoken@9.0.2 want: ^4.3.0
+76 silly placeDep ROOT lodash.isboolean@3.0.3 OK for: jsonwebtoken@9.0.2 want: ^3.0.3
+77 silly placeDep ROOT lodash.isinteger@4.0.4 OK for: jsonwebtoken@9.0.2 want: ^4.0.4
+78 silly placeDep ROOT lodash.isnumber@3.0.3 OK for: jsonwebtoken@9.0.2 want: ^3.0.3
+79 silly placeDep ROOT lodash.isplainobject@4.0.6 OK for: jsonwebtoken@9.0.2 want: ^4.0.6
+80 silly placeDep ROOT lodash.isstring@4.0.1 OK for: jsonwebtoken@9.0.2 want: ^4.0.1
+81 silly placeDep ROOT lodash.once@4.1.1 OK for: jsonwebtoken@9.0.2 want: ^4.0.0
+82 silly fetch manifest jwa@^1.4.1
+83 http fetch GET 200 https://registry.npmjs.org/jwa 55ms (cache miss)
+84 silly placeDep ROOT jwa@1.4.2 OK for: jws@3.2.2 want: ^1.4.1
+85 silly fetch manifest ecdsa-sig-formatter@1.0.11
+86 silly fetch manifest buffer-equal-constant-time@^1.0.1
+87 http fetch GET 200 https://registry.npmjs.org/ecdsa-sig-formatter 54ms (cache miss)
+88 http fetch GET 200 https://registry.npmjs.org/buffer-equal-constant-time 60ms (cache miss)
+89 silly placeDep ROOT buffer-equal-constant-time@1.0.1 OK for: jwa@1.4.2 want: ^1.0.1
+90 silly placeDep ROOT ecdsa-sig-formatter@1.0.11 OK for: jwa@1.4.2 want: 1.0.11
+91 silly placeDep ROOT @mongodb-js/saslprep@1.3.2 OK for: mongodb@7.0.0 want: ^1.3.0
+92 silly placeDep ROOT bson@7.0.0 OK for: mongodb@7.0.0 want: ^7.0.0
+93 silly placeDep ROOT mongodb-connection-string-url@7.0.0 OK for: mongodb@7.0.0 want: ^7.0.0
+94 silly fetch manifest sparse-bitfield@^3.0.3
+95 silly fetch manifest @types/whatwg-url@^13.0.0
+96 silly fetch manifest whatwg-url@^14.1.0
+97 http fetch GET 200 https://registry.npmjs.org/sparse-bitfield 49ms (cache miss)
+98 http fetch GET 200 https://registry.npmjs.org/whatwg-url 58ms (cache revalidated)
+99 http fetch GET 200 https://registry.npmjs.org/@types%2fwhatwg-url 67ms (cache miss)
+100 silly placeDep ROOT sparse-bitfield@3.0.3 OK for: @mongodb-js/saslprep@1.3.2 want: ^3.0.3
+101 silly fetch manifest memory-pager@^1.0.2
+102 http fetch GET 200 https://registry.npmjs.org/memory-pager 56ms (cache miss)
+103 silly placeDep ROOT @types/whatwg-url@13.0.0 OK for: mongodb-connection-string-url@7.0.0 want: ^13.0.0
+104 silly placeDep node_modules/mongodb-connection-string-url whatwg-url@14.2.0 OK for: mongodb-connection-string-url@7.0.0 want: ^14.1.0
+105 silly fetch manifest @types/webidl-conversions@*
+106 silly fetch manifest tr46@^5.1.0
+107 silly fetch manifest webidl-conversions@^7.0.0
+108 http fetch GET 200 https://registry.npmjs.org/webidl-conversions 57ms (cache revalidated)
+109 http fetch GET 200 https://registry.npmjs.org/@types%2fwebidl-conversions 62ms (cache miss)
+110 http fetch GET 200 https://registry.npmjs.org/tr46 64ms (cache revalidated)
+111 silly placeDep ROOT @types/webidl-conversions@7.0.3 OK for: @types/whatwg-url@13.0.0 want: *
+112 silly fetch manifest @aws-sdk/credential-providers@^3.188.0
+113 silly fetch manifest @mongodb-js/zstd@^1.1.0 || ^2.0.0
+114 silly fetch manifest gcp-metadata@^5.2.0
+115 silly fetch manifest kerberos@^2.0.1
+116 silly fetch manifest mongodb-client-encryption@>=6.0.0 <7
+117 silly fetch manifest socks@^2.7.1
+118 silly placeDep node_modules/mongoose bson@6.10.4 OK for: mongoose@8.19.4 want: ^6.10.4
+119 silly placeDep ROOT kareem@2.6.3 OK for: mongoose@8.19.4 want: 2.6.3
+120 silly placeDep node_modules/mongoose mongodb@6.20.0 OK for: mongoose@8.19.4 want: ~6.20.0
+121 silly placeDep ROOT mpath@0.9.0 OK for: mongoose@8.19.4 want: 0.9.0
+122 silly placeDep ROOT mquery@5.0.0 OK for: mongoose@8.19.4 want: 5.0.0
+123 silly placeDep ROOT sift@17.1.3 OK for: mongoose@8.19.4 want: 17.1.3
+124 silly fetch manifest mongodb-connection-string-url@^3.0.2
+125 silly placeDep ROOT memory-pager@1.5.0 OK for: sparse-bitfield@3.0.3 want: ^1.0.2
+126 silly placeDep node_modules/mongodb-connection-string-url tr46@5.1.1 OK for: whatwg-url@14.2.0 want: ^5.1.0
+127 silly placeDep node_modules/mongodb-connection-string-url webidl-conversions@7.0.0 OK for: whatwg-url@14.2.0 want: ^7.0.0
+128 silly placeDep node_modules/mongoose mongodb-connection-string-url@3.0.2 OK for: mongodb@6.20.0 want: ^3.0.2
+129 silly fetch manifest whatwg-url@^14.1.0 || ^13.0.0
+130 silly fetch manifest @types/whatwg-url@^11.0.2
+131 silly placeDep node_modules/mongoose @types/whatwg-url@11.0.5 OK for: mongodb-connection-string-url@3.0.2 want: ^11.0.2
+132 silly placeDep node_modules/mongoose whatwg-url@14.2.0 OK for: mongodb-connection-string-url@3.0.2 want: ^14.1.0 || ^13.0.0
+133 silly placeDep node_modules/mongoose tr46@5.1.1 OK for: whatwg-url@14.2.0 want: ^5.1.0
+134 silly placeDep node_modules/mongoose webidl-conversions@7.0.0 OK for: whatwg-url@14.2.0 want: ^7.0.0
+135 silly reify moves {}
+136 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-wasm32-wasi
+137 silly reify mark deleted [
+137 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-wasm32-wasi'
+137 silly reify ]
+138 silly audit bulk request {
+138 silly audit   '@alloc/quick-lru': [ '5.2.0' ],
+138 silly audit   '@babel/code-frame': [ '7.27.1' ],
+138 silly audit   '@babel/compat-data': [ '7.28.4' ],
+138 silly audit   '@babel/core': [ '7.28.4' ],
+138 silly audit   semver: [ '6.3.1', '7.7.3' ],
+138 silly audit   '@babel/generator': [ '7.28.3' ],
+138 silly audit   '@babel/helper-annotate-as-pure': [ '7.27.3' ],
+138 silly audit   '@babel/helper-compilation-targets': [ '7.27.2' ],
+138 silly audit   '@babel/helper-create-class-features-plugin': [ '7.28.3' ],
+138 silly audit   '@babel/helper-create-regexp-features-plugin': [ '7.27.1' ],
+138 silly audit   '@babel/helper-define-polyfill-provider': [ '0.6.5' ],
+138 silly audit   '@babel/helper-globals': [ '7.28.0' ],
+138 silly audit   '@babel/helper-member-expression-to-functions': [ '7.27.1' ],
+138 silly audit   '@babel/helper-module-imports': [ '7.27.1' ],
+138 silly audit   '@babel/helper-module-transforms': [ '7.28.3' ],
+138 silly audit   '@babel/helper-optimise-call-expression': [ '7.27.1' ],
+138 silly audit   '@babel/helper-plugin-utils': [ '7.27.1' ],
+138 silly audit   '@babel/helper-remap-async-to-generator': [ '7.27.1' ],
+138 silly audit   '@babel/helper-replace-supers': [ '7.27.1' ],
+138 silly audit   '@babel/helper-skip-transparent-expression-wrappers': [ '7.27.1' ],
+138 silly audit   '@babel/helper-string-parser': [ '7.27.1' ],
+138 silly audit   '@babel/helper-validator-identifier': [ '7.27.1' ],
+138 silly audit   '@babel/helper-validator-option': [ '7.27.1' ],
+138 silly audit   '@babel/helper-wrap-function': [ '7.28.3' ],
+138 silly audit   '@babel/helpers': [ '7.28.4' ],
+138 silly audit   '@babel/parser': [ '7.28.4' ],
+138 silly audit   '@babel/plugin-bugfix-firefox-class-in-computed-class-key': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-bugfix-safari-class-field-initializer-scope': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-bugfix-safari-id-destructuring-collision-in-function-expression': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-bugfix-v8-spread-parameters-in-optional-chaining': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-bugfix-v8-static-class-fields-redefine-readonly': [ '7.28.3' ],
+138 silly audit   '@babel/plugin-proposal-private-property-in-object': [ '7.21.0-placeholder-for-preset-env.2' ],
+138 silly audit   '@babel/plugin-syntax-import-assertions': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-syntax-import-attributes': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-syntax-unicode-sets-regex': [ '7.18.6' ],
+138 silly audit   '@babel/plugin-transform-arrow-functions': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-async-generator-functions': [ '7.28.0' ],
+138 silly audit   '@babel/plugin-transform-async-to-generator': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-block-scoped-functions': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-block-scoping': [ '7.28.4' ],
+138 silly audit   '@babel/plugin-transform-class-properties': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-class-static-block': [ '7.28.3' ],
+138 silly audit   '@babel/plugin-transform-classes': [ '7.28.4' ],
+138 silly audit   '@babel/plugin-transform-computed-properties': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-destructuring': [ '7.28.0' ],
+138 silly audit   '@babel/plugin-transform-dotall-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-duplicate-keys': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-duplicate-named-capturing-groups-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-dynamic-import': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-explicit-resource-management': [ '7.28.0' ],
+138 silly audit   '@babel/plugin-transform-exponentiation-operator': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-export-namespace-from': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-for-of': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-function-name': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-json-strings': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-literals': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-logical-assignment-operators': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-member-expression-literals': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-modules-amd': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-modules-commonjs': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-modules-systemjs': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-modules-umd': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-named-capturing-groups-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-new-target': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-nullish-coalescing-operator': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-numeric-separator': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-object-rest-spread': [ '7.28.4' ],
+138 silly audit   '@babel/plugin-transform-object-super': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-optional-catch-binding': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-optional-chaining': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-parameters': [ '7.27.7' ],
+138 silly audit   '@babel/plugin-transform-private-methods': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-private-property-in-object': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-property-literals': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-regenerator': [ '7.28.4' ],
+138 silly audit   '@babel/plugin-transform-regexp-modifiers': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-reserved-words': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-shorthand-properties': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-spread': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-sticky-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-template-literals': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-typeof-symbol': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-unicode-escapes': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-unicode-property-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-unicode-regex': [ '7.27.1' ],
+138 silly audit   '@babel/plugin-transform-unicode-sets-regex': [ '7.27.1' ],
+138 silly audit   '@babel/preset-env': [ '7.28.3' ],
+138 silly audit   '@babel/preset-modules': [ '0.1.6-no-external-plugins' ],
+138 silly audit   '@babel/runtime': [ '7.28.4' ],
+138 silly audit   '@babel/template': [ '7.27.2' ],
+138 silly audit   '@babel/traverse': [ '7.28.4' ],
+138 silly audit   '@babel/types': [ '7.28.4' ],
+138 silly audit   '@capacitor/camera': [ '7.0.2' ],
+138 silly audit   '@capacitor/cli': [ '7.4.3' ],
+138 silly audit   chownr: [ '2.0.0', '3.0.0' ],
+138 silly audit   commander: [ '12.1.0', '2.20.3' ],
+138 silly audit   'fs-extra': [ '11.3.2', '9.1.0' ],
+138 silly audit   glob: [ '11.0.3', '7.2.3' ],
+138 silly audit   minizlib: [ '2.1.2', '3.1.0' ],
+138 silly audit   minipass: [ '3.3.6', '5.0.0', '7.1.2' ],
+138 silly audit   rimraf: [ '6.0.1', '2.7.1' ],
+138 silly audit   tar: [ '6.2.1', '7.5.1' ],
+138 silly audit   yallist: [ '4.0.0', '3.1.1', '5.0.0' ],
+138 silly audit   '@capacitor/core': [ '7.4.3' ],
+138 silly audit   '@capacitor/filesystem': [ '7.1.4' ],
+138 silly audit   '@capacitor/synapse': [ '1.0.4' ],
+138 silly audit   '@emnapi/runtime': [ '1.5.0' ],
+138 silly audit   '@img/colour': [ '1.0.0' ],
+138 silly audit   '@img/sharp-darwin-arm64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-darwin-x64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-libvips-darwin-arm64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-darwin-x64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linux-arm': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linux-arm64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linux-ppc64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linux-s390x': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linux-x64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linuxmusl-arm64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-libvips-linuxmusl-x64': [ '1.2.3' ],
+138 silly audit   '@img/sharp-linux-arm': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linux-arm64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linux-ppc64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linux-s390x': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linux-x64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linuxmusl-arm64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-linuxmusl-x64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-wasm32': [ '0.34.4' ],
+138 silly audit   '@img/sharp-win32-arm64': [ '0.34.4' ],
+138 silly audit   '@img/sharp-win32-ia32': [ '0.34.4' ],
+138 silly audit   '@img/sharp-win32-x64': [ '0.34.4' ],
+138 silly audit   '@ionic/cli-framework-output': [ '2.2.8' ],
+138 silly audit   '@ionic/utils-array': [ '2.1.6' ],
+138 silly audit   '@ionic/utils-fs': [ '3.1.7' ],
+138 silly audit   '@ionic/utils-object': [ '2.1.6' ],
+138 silly audit   '@ionic/utils-process': [ '2.1.12' ],
+138 silly audit   '@ionic/utils-stream': [ '3.1.7' ],
+138 silly audit   '@ionic/utils-subprocess': [ '3.0.1' ],
+138 silly audit   '@ionic/utils-terminal': [ '2.3.5' ],
+138 silly audit   '@isaacs/balanced-match': [ '4.0.1' ],
+138 silly audit   '@isaacs/brace-expansion': [ '5.0.0' ],
+138 silly audit   '@isaacs/cliui': [ '8.0.2' ],
+138 silly audit   'ansi-regex': [ '6.2.2', '5.0.1' ],
+138 silly audit   'ansi-styles': [ '6.2.3', '4.3.0' ],
+138 silly audit   'emoji-regex': [ '9.2.2', '8.0.0' ],
+138 silly audit   'string-width': [ '5.1.2', '4.2.3' ],
+138 silly audit   'strip-ansi': [ '7.1.2', '6.0.1' ],
+138 silly audit   'wrap-ansi': [ '8.1.0', '7.0.0' ],
+138 silly audit   '@isaacs/fs-minipass': [ '4.0.1' ],
+138 silly audit   '@jridgewell/gen-mapping': [ '0.3.13' ],
+138 silly audit   '@jridgewell/remapping': [ '2.3.5' ],
+138 silly audit   '@jridgewell/resolve-uri': [ '3.1.2' ],
+138 silly audit   '@jridgewell/source-map': [ '0.3.11' ],
+138 silly audit   '@jridgewell/sourcemap-codec': [ '1.5.5' ],
+138 silly audit   '@jridgewell/trace-mapping': [ '0.3.31' ],
+138 silly audit   '@next/env': [ '15.5.4' ],
+138 silly audit   '@next/swc-darwin-arm64': [ '15.5.4' ],
+138 silly audit   '@next/swc-darwin-x64': [ '15.5.4' ],
+138 silly audit   '@next/swc-linux-arm64-gnu': [ '15.5.4' ],
+138 silly audit   '@next/swc-linux-arm64-musl': [ '15.5.4' ],
+138 silly audit   '@next/swc-linux-x64-gnu': [ '15.5.4' ],
+138 silly audit   '@next/swc-linux-x64-musl': [ '15.5.4' ],
+138 silly audit   '@next/swc-win32-arm64-msvc': [ '15.5.4' ],
+138 silly audit   '@next/swc-win32-x64-msvc': [ '15.5.4' ],
+138 silly audit   '@nodelib/fs.scandir': [ '2.1.5' ],
+138 silly audit   '@nodelib/fs.stat': [ '2.0.5' ],
+138 silly audit   '@nodelib/fs.walk': [ '1.2.8' ],
+138 silly audit   '@rollup/plugin-babel': [ '5.3.1' ],
+138 silly audit   '@rollup/plugin-node-resolve': [ '11.2.1' ],
+138 silly audit   '@rollup/plugin-replace': [ '2.4.2' ],
+138 silly audit   'magic-string': [ '0.25.9', '0.30.19' ],
+138 silly audit   '@rollup/pluginutils': [ '3.1.0' ],
+138 silly audit   '@types/estree': [ '0.0.39', '1.0.8' ],
+138 silly audit   '@surma/rollup-plugin-off-main-thread': [ '2.2.3' ],
+138 silly audit   '@swc/helpers': [ '0.5.15' ],
+138 silly audit   '@tailwindcss/node': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-android-arm64': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-darwin-arm64': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-darwin-x64': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-freebsd-x64': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-linux-arm-gnueabihf': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-linux-arm64-gnu': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-linux-arm64-musl': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-linux-x64-gnu': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-linux-x64-musl': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-win32-arm64-msvc': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/oxide-win32-x64-msvc': [ '4.1.14' ],
+138 silly audit   '@tailwindcss/postcss': [ '4.1.14' ],
+138 silly audit   '@types/eslint': [ '9.6.1' ],
+138 silly audit   '@types/eslint-scope': [ '3.7.7' ],
+138 silly audit   '@types/fs-extra': [ '8.1.5' ],
+138 silly audit   '@types/glob': [ '7.2.0' ],
+138 silly audit   '@types/json-schema': [ '7.0.15' ],
+138 silly audit   '@types/minimatch': [ '6.0.0' ],
+138 silly audit   '@types/node': [ '20.19.19' ],
+138 silly audit   '@types/react': [ '19.2.2' ],
+138 silly audit   '@types/react-dom': [ '19.2.1' ],
+138 silly audit   '@types/resolve': [ '1.17.1' ],
+138 silly audit   '@types/slice-ansi': [ '4.0.0' ],
+138 silly audit   '@types/trusted-types': [ '2.0.7' ],
+138 silly audit   '@webassemblyjs/ast': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/floating-point-hex-parser': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/helper-api-error': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/helper-buffer': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/helper-numbers': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/helper-wasm-bytecode': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/helper-wasm-section': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/ieee754': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/leb128': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/utf8': [ '1.13.2' ],
+138 silly audit   '@webassemblyjs/wasm-edit': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/wasm-gen': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/wasm-opt': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/wasm-parser': [ '1.14.1' ],
+138 silly audit   '@webassemblyjs/wast-printer': [ '1.14.1' ],
+138 silly audit   '@xmldom/xmldom': [ '0.8.11' ],
+138 silly audit   '@xtuc/ieee754': [ '1.2.0' ],
+138 silly audit   '@xtuc/long': [ '4.2.2' ],
+138 silly audit   acorn: [ '8.15.0' ],
+138 silly audit   'acorn-import-phases': [ '1.0.4' ],
+138 silly audit   ajv: [ '6.12.6', '8.17.1' ],
+138 silly audit   'ajv-formats': [ '2.1.1' ],
+138 silly audit   'json-schema-traverse': [ '1.0.0', '0.4.1' ],
+138 silly audit   'ajv-keywords': [ '3.5.2', '5.1.0' ],
+138 silly audit   'array-buffer-byte-length': [ '1.0.2' ],
+138 silly audit   'array-union': [ '2.1.0', '1.0.2' ],
+138 silly audit   'array-uniq': [ '1.0.3' ],
+138 silly audit   'arraybuffer.prototype.slice': [ '1.0.4' ],
+138 silly audit   'astral-regex': [ '2.0.0' ],
+138 silly audit   async: [ '3.2.6' ],
+138 silly audit   'async-function': [ '1.0.0' ],
+138 silly audit   'at-least-node': [ '1.0.0' ],
+138 silly audit   'available-typed-arrays': [ '1.0.7' ],
+138 silly audit   'babel-loader': [ '8.4.1' ],
+138 silly audit   'babel-plugin-polyfill-corejs2': [ '0.4.14' ],
+138 silly audit   'babel-plugin-polyfill-corejs3': [ '0.13.0' ],
+138 silly audit   'babel-plugin-polyfill-regenerator': [ '0.6.5' ],
+138 silly audit   'balanced-match': [ '1.0.2' ],
+138 silly audit   'base64-js': [ '1.5.1' ],
+138 silly audit   'baseline-browser-mapping': [ '2.8.16' ],
+138 silly audit   'big-integer': [ '1.6.52' ],
+138 silly audit   'big.js': [ '5.2.2' ],
+138 silly audit   'bplist-parser': [ '0.3.2' ],
+138 silly audit   'brace-expansion': [ '2.0.2', '1.1.12' ],
+138 silly audit   braces: [ '3.0.3' ],
+138 silly audit   browserslist: [ '4.26.3' ],
+138 silly audit   'buffer-crc32': [ '0.2.13' ],
+138 silly audit   'buffer-from': [ '1.1.2' ],
+138 silly audit   'builtin-modules': [ '3.3.0' ],
+138 silly audit   'call-bind': [ '1.0.8' ],
+138 silly audit   'call-bind-apply-helpers': [ '1.0.2' ],
+138 silly audit   'call-bound': [ '1.0.4' ],
+138 silly audit   'caniuse-lite': [ '1.0.30001749' ],
+138 silly audit   'chrome-trace-event': [ '1.0.4' ],
+138 silly audit   'clean-webpack-plugin': [ '4.0.0' ],
+138 silly audit   'client-only': [ '0.0.1' ],
+138 silly audit   'color-convert': [ '2.0.1' ],
+138 silly audit   'color-name': [ '1.1.4' ],
+138 silly audit   'common-tags': [ '1.8.2' ],
+138 silly audit   commondir: [ '1.0.1' ],
+138 silly audit   'concat-map': [ '0.0.1' ],
+138 silly audit   'convert-source-map': [ '2.0.0' ],
+138 silly audit   'core-js-compat': [ '3.46.0' ],
+138 silly audit   'cross-spawn': [ '7.0.6' ],
+138 silly audit   'crypto-random-string': [ '2.0.0' ],
+138 silly audit   csstype: [ '3.1.3' ],
+138 silly audit   'data-view-buffer': [ '1.0.2' ],
+138 silly audit   'data-view-byte-length': [ '1.0.2' ],
+138 silly audit   'data-view-byte-offset': [ '1.0.1' ],
+138 silly audit   debug: [ '4.4.3' ],
+138 silly audit   deepmerge: [ '4.3.1' ],
+138 silly audit   'define-data-property': [ '1.1.4' ],
+138 silly audit   'define-lazy-prop': [ '2.0.0' ],
+138 silly audit   'define-properties': [ '1.2.1' ],
+138 silly audit   del: [ '4.1.1' ],
+138 silly audit   globby: [ '6.1.0', '11.1.0' ],
+138 silly audit   pify: [ '2.3.0', '4.0.1' ],
+138 silly audit   'detect-libc': [ '2.1.2' ],
+138 silly audit   'dir-glob': [ '3.0.1' ],
+138 silly audit   'dunder-proto': [ '1.0.1' ],
+138 silly audit   eastasianwidth: [ '0.2.0' ],
+138 silly audit   ejs: [ '3.1.10' ],
+138 silly audit   'electron-to-chromium': [ '1.5.234' ],
+138 silly audit   elementtree: [ '0.1.7' ],
+138 silly audit   'emojis-list': [ '3.0.0' ],
+138 silly audit   'enhanced-resolve': [ '5.18.3' ],
+138 silly audit   'env-paths': [ '2.2.1' ],
+138 silly audit   'es-abstract': [ '1.24.0' ],
+138 silly audit   'es-define-property': [ '1.0.1' ],
+138 silly audit   'es-errors': [ '1.3.0' ],
+138 silly audit   'es-module-lexer': [ '1.7.0' ],
+138 silly audit   'es-object-atoms': [ '1.1.1' ],
+138 silly audit   'es-set-tostringtag': [ '2.1.0' ],
+138 silly audit   'es-to-primitive': [ '1.3.0' ],
+138 silly audit   escalade: [ '3.2.0' ],
+138 silly audit   'eslint-scope': [ '5.1.1' ],
+138 silly audit   esrecurse: [ '4.3.0' ],
+138 silly audit   estraverse: [ '5.3.0', '4.3.0' ],
+138 silly audit   'estree-walker': [ '1.0.1' ],
+138 silly audit   esutils: [ '2.0.3' ],
+138 silly audit   events: [ '3.3.0' ],
+138 silly audit   'fast-deep-equal': [ '3.1.3' ],
+138 silly audit   'fast-glob': [ '3.3.3' ],
+138 silly audit   'fast-json-stable-stringify': [ '2.1.0' ],
+138 silly audit   'fast-uri': [ '3.1.0' ],
+138 silly audit   fastq: [ '1.19.1' ],
+138 silly audit   'fd-slicer': [ '1.1.0' ],
+138 silly audit   filelist: [ '1.0.4' ],
+138 silly audit   minimatch: [ '5.1.6', '3.1.2', '10.0.3' ],
+138 silly audit   'fill-range': [ '7.1.1' ],
+138 silly audit   'find-cache-dir': [ '3.3.2' ],
+138 silly audit   'find-up': [ '4.1.0' ],
+138 silly audit   'for-each': [ '0.3.5' ],
+138 silly audit   'foreground-child': [ '3.3.1' ],
+138 silly audit   'signal-exit': [ '4.1.0', '3.0.7' ],
+138 silly audit   'framer-motion': [ '12.23.24' ],
+138 silly audit   'fs-minipass': [ '2.1.0' ],
+138 silly audit   'fs.realpath': [ '1.0.0' ],
+138 silly audit   fsevents: [ '2.3.3' ],
+138 silly audit   'function-bind': [ '1.1.2' ],
+138 silly audit   'function.prototype.name': [ '1.1.8' ],
+138 silly audit   'functions-have-names': [ '1.2.3' ],
+138 silly audit   'generator-function': [ '2.0.1' ],
+138 silly audit   gensync: [ '1.0.0-beta.2' ],
+138 silly audit   'get-intrinsic': [ '1.3.0' ],
+138 silly audit   'get-own-enumerable-property-symbols': [ '3.0.2' ],
+138 silly audit   'get-proto': [ '1.0.1' ],
+138 silly audit   'get-symbol-description': [ '1.1.0' ],
+138 silly audit   'glob-parent': [ '5.1.2' ],
+138 silly audit   'glob-to-regexp': [ '0.4.1' ],
+138 silly audit   globalthis: [ '1.0.4' ],
+138 silly audit   goober: [ '2.1.18' ],
+138 silly audit   gopd: [ '1.2.0' ],
+138 silly audit   'graceful-fs': [ '4.2.11' ],
+138 silly audit   'has-bigints': [ '1.1.0' ],
+138 silly audit   'has-flag': [ '4.0.0' ],
+138 silly audit   'has-property-descriptors': [ '1.0.2' ],
+138 silly audit   'has-proto': [ '1.2.0' ],
+138 silly audit   'has-symbols': [ '1.1.0' ],
+138 silly audit   'has-tostringtag': [ '1.0.2' ],
+138 silly audit   hasown: [ '2.0.2' ],
+138 silly audit   idb: [ '7.1.1' ],
+138 silly audit   ignore: [ '5.3.2' ],
+138 silly audit   inflight: [ '1.0.6' ],
+138 silly audit   inherits: [ '2.0.4' ],
+138 silly audit   ini: [ '4.1.3' ],
+138 silly audit   'internal-slot': [ '1.1.0' ],
+138 silly audit   'is-array-buffer': [ '3.0.5' ],
+138 silly audit   'is-async-function': [ '2.1.1' ],
+138 silly audit   'is-bigint': [ '1.1.0' ],
+138 silly audit   'is-boolean-object': [ '1.2.2' ],
+138 silly audit   'is-callable': [ '1.2.7' ],
+138 silly audit   'is-core-module': [ '2.16.1' ],
+138 silly audit   'is-data-view': [ '1.0.2' ],
+138 silly audit   'is-date-object': [ '1.1.0' ],
+138 silly audit   'is-docker': [ '2.2.1' ],
+138 silly audit   'is-extglob': [ '2.1.1' ],
+138 silly audit   'is-finalizationregistry': [ '1.1.1' ],
+138 silly audit   'is-fullwidth-code-point': [ '3.0.0' ],
+138 silly audit   'is-generator-function': [ '1.1.2' ],
+138 silly audit   'is-glob': [ '4.0.3' ],
+138 silly audit   'is-map': [ '2.0.3' ],
+138 silly audit   'is-module': [ '1.0.0' ],
+138 silly audit   'is-negative-zero': [ '2.0.3' ],
+138 silly audit   'is-number': [ '7.0.0' ],
+138 silly audit   'is-number-object': [ '1.1.1' ],
+138 silly audit   'is-obj': [ '1.0.1' ],
+138 silly audit   'is-path-cwd': [ '2.2.0' ],
+138 silly audit   'is-path-in-cwd': [ '2.1.0' ],
+138 silly audit   'is-path-inside': [ '2.1.0' ],
+138 silly audit   'is-regex': [ '1.2.1' ],
+138 silly audit   'is-regexp': [ '1.0.0' ],
+138 silly audit   'is-set': [ '2.0.3' ],
+138 silly audit   'is-shared-array-buffer': [ '1.0.4' ],
+138 silly audit   'is-stream': [ '2.0.1' ],
+138 silly audit   'is-string': [ '1.1.1' ],
+138 silly audit   'is-symbol': [ '1.1.1' ],
+138 silly audit   'is-typed-array': [ '1.1.15' ],
+138 silly audit   'is-weakmap': [ '2.0.2' ],
+138 silly audit   'is-weakref': [ '1.1.1' ],
+138 silly audit   'is-weakset': [ '2.0.4' ],
+138 silly audit   'is-wsl': [ '2.2.0' ],
+138 silly audit   isarray: [ '2.0.5' ],
+138 silly audit   isexe: [ '2.0.0' ],
+138 silly audit   jackspeak: [ '4.1.1' ],
+138 silly audit   jake: [ '10.9.4' ],
+138 silly audit   'jest-worker': [ '27.5.1', '26.6.2' ],
+138 silly audit   jiti: [ '2.6.1' ],
+138 silly audit   'js-tokens': [ '4.0.0' ],
+138 silly audit   jsesc: [ '3.1.0' ],
+138 silly audit   'json-parse-even-better-errors': [ '2.3.1' ],
+138 silly audit   'json-schema': [ '0.4.0' ],
+138 silly audit   json5: [ '2.2.3' ],
+138 silly audit   jsonfile: [ '6.2.0' ],
+138 silly audit   jsonpointer: [ '5.0.1' ],
+138 silly audit   kleur: [ '4.1.5', '3.0.3' ],
+138 silly audit   leven: [ '3.1.0' ],
+138 silly audit   lightningcss: [ '1.30.1' ],
+138 silly audit   'lightningcss-darwin-arm64': [ '1.30.1' ],
+138 silly audit   'lightningcss-darwin-x64': [ '1.30.1' ],
+138 silly audit   'lightningcss-freebsd-x64': [ '1.30.1' ],
+138 silly audit   'lightningcss-linux-arm-gnueabihf': [ '1.30.1' ],
+138 silly audit   'lightningcss-linux-arm64-gnu': [ '1.30.1' ],
+138 silly audit   'lightningcss-linux-arm64-musl': [ '1.30.1' ],
+138 silly audit   'lightningcss-linux-x64-gnu': [ '1.30.1' ],
+138 silly audit   'lightningcss-linux-x64-musl': [ '1.30.1' ],
+138 silly audit   'lightningcss-win32-arm64-msvc': [ '1.30.1' ],
+138 silly audit   'lightningcss-win32-x64-msvc': [ '1.30.1' ],
+138 silly audit   'loader-runner': [ '4.3.1' ],
+138 silly audit   'loader-utils': [ '2.0.4' ],
+138 silly audit   'locate-path': [ '5.0.0' ],
+138 silly audit   lodash: [ '4.17.21' ],
+138 silly audit   'lodash.debounce': [ '4.0.8' ],
+138 silly audit   'lodash.sortby': [ '4.7.0' ],
+138 silly audit   'lru-cache': [ '5.1.1', '11.2.2' ],
+138 silly audit   'make-dir': [ '3.1.0' ],
+138 silly audit   'math-intrinsics': [ '1.1.0' ],
+138 silly audit   'merge-stream': [ '2.0.0' ],
+138 silly audit   merge2: [ '1.4.1' ],
+138 silly audit   micromatch: [ '4.0.8' ],
+138 silly audit   'mime-db': [ '1.52.0' ],
+138 silly audit   'mime-types': [ '2.1.35' ],
+138 silly audit   mkdirp: [ '1.0.4' ],
+138 silly audit   'motion-dom': [ '12.23.23' ],
+138 silly audit   'motion-utils': [ '12.23.6' ],
+138 silly audit   ms: [ '2.1.3' ],
+138 silly audit   nanoid: [ '3.3.11' ],
+138 silly audit   'native-run': [ '2.0.1' ],
+138 silly audit   'neo-async': [ '2.6.2' ],
+138 silly audit   next: [ '15.5.4' ],
+138 silly audit   'next-pwa': [ '5.6.0' ],
+138 silly audit   postcss: [ '8.4.31', '8.5.6' ],
+138 silly audit   'node-releases': [ '2.0.23' ],
+138 silly audit   'object-assign': [ '4.1.1' ],
+138 silly audit   'object-inspect': [ '1.13.4' ],
+138 silly audit   'object-keys': [ '1.1.1' ],
+138 silly audit   'object.assign': [ '4.1.7' ],
+138 silly audit   once: [ '1.4.0' ],
+138 silly audit   open: [ '8.4.2' ],
+138 silly audit   'own-keys': [ '1.0.1' ],
+138 silly audit   'p-limit': [ '2.3.0' ],
+138 silly audit   'p-locate': [ '4.1.0' ],
+138 silly audit   'p-map': [ '2.1.0' ],
+138 silly audit   'p-try': [ '2.2.0' ],
+138 silly audit   'package-json-from-dist': [ '1.0.1' ],
+138 silly audit   'path-exists': [ '4.0.0' ],
+138 silly audit   'path-is-absolute': [ '1.0.1' ],
+138 silly audit   'path-is-inside': [ '1.0.2' ],
+138 silly audit   'path-key': [ '3.1.1' ],
+138 silly audit   'path-parse': [ '1.0.7' ],
+138 silly audit   'path-scurry': [ '2.0.0' ],
+138 silly audit   'path-type': [ '4.0.0' ],
+138 silly audit   pend: [ '1.2.0' ],
+138 silly audit   picocolors: [ '1.1.1' ],
+138 silly audit   picomatch: [ '2.3.1' ],
+138 silly audit   pinkie: [ '2.0.4' ],
+138 silly audit   'pinkie-promise': [ '2.0.1' ],
+138 silly audit   'pkg-dir': [ '4.2.0' ],
+138 silly audit   plist: [ '3.1.0' ],
+138 silly audit   'possible-typed-array-names': [ '1.1.0' ],
+138 silly audit   'pretty-bytes': [ '5.6.0' ],
+138 silly audit   prompts: [ '2.4.2' ],
+138 silly audit   punycode: [ '2.3.1' ],
+138 silly audit   'queue-microtask': [ '1.2.3' ],
+138 silly audit   randombytes: [ '2.1.0' ],
+138 silly audit   react: [ '19.1.0' ],
+138 silly audit   'react-dom': [ '19.1.0' ],
+138 silly audit   'react-hot-toast': [ '2.6.0' ],
+138 silly audit   'readable-stream': [ '3.6.2' ],
+138 silly audit   'reflect.getprototypeof': [ '1.0.10' ],
+138 silly audit   regenerate: [ '1.4.2' ],
+138 silly audit   'regenerate-unicode-properties': [ '10.2.2' ],
+138 silly audit   'regexp.prototype.flags': [ '1.5.4' ],
+138 silly audit   'regexpu-core': [ '6.4.0' ],
+138 silly audit   regjsgen: [ '0.8.0' ],
+138 silly audit   regjsparser: [ '0.13.0' ],
+138 silly audit   'require-from-string': [ '2.0.2' ],
+138 silly audit   resolve: [ '1.22.10' ],
+138 silly audit   reusify: [ '1.1.0' ],
+138 silly audit   rollup: [ '2.79.2' ],
+138 silly audit   'rollup-plugin-terser': [ '7.0.2' ],
+138 silly audit   'serialize-javascript': [ '4.0.0', '6.0.2' ],
+138 silly audit   'supports-color': [ '7.2.0', '8.1.1' ],
+138 silly audit   'run-parallel': [ '1.2.0' ],
+138 silly audit   'safe-array-concat': [ '1.1.3' ],
+138 silly audit   'safe-buffer': [ '5.2.1' ],
+138 silly audit   'safe-push-apply': [ '1.0.0' ],
+138 silly audit   'safe-regex-test': [ '1.1.0' ],
+138 silly audit   sax: [ '1.1.4' ],
+138 silly audit   scheduler: [ '0.26.0' ],
+138 silly audit   'schema-utils': [ '2.7.1', '4.3.3' ],
+138 silly audit   'set-function-length': [ '1.2.2' ],
+138 silly audit   'set-function-name': [ '2.0.2' ],
+138 silly audit   'set-proto': [ '1.0.0' ],
+138 silly audit   sharp: [ '0.34.4' ],
+138 silly audit   'shebang-command': [ '2.0.0' ],
+138 silly audit   'shebang-regex': [ '3.0.0' ],
+138 silly audit   'side-channel': [ '1.1.0' ],
+138 silly audit   'side-channel-list': [ '1.0.0' ],
+138 silly audit   'side-channel-map': [ '1.0.1' ],
+138 silly audit   'side-channel-weakmap': [ '1.0.2' ],
+138 silly audit   sisteransi: [ '1.0.5' ],
+138 silly audit   slash: [ '3.0.0' ],
+138 silly audit   'slice-ansi': [ '4.0.0' ],
+138 silly audit   'source-list-map': [ '2.0.1' ],
+138 silly audit   'source-map': [ '0.6.1', '0.8.0-beta.0' ],
+138 silly audit   'source-map-js': [ '1.2.1' ],
+138 silly audit   'source-map-support': [ '0.5.21' ],
+138 silly audit   'sourcemap-codec': [ '1.4.8' ],
+138 silly audit   split2: [ '4.2.0' ],
+138 silly audit   'stop-iteration-iterator': [ '1.1.0' ],
+138 silly audit   string_decoder: [ '1.3.0' ],
+138 silly audit   'string.prototype.matchall': [ '4.0.12' ],
+138 silly audit   'string.prototype.trim': [ '1.2.10' ],
+138 silly audit   'string.prototype.trimend': [ '1.0.9' ],
+138 silly audit   'string.prototype.trimstart': [ '1.0.8' ],
+138 silly audit   'stringify-object': [ '3.3.0' ],
+138 silly audit   'strip-comments': [ '2.0.1' ],
+138 silly audit   'styled-jsx': [ '5.1.6' ],
+138 silly audit   'supports-preserve-symlinks-flag': [ '1.0.0' ],
+138 silly audit   tailwindcss: [ '4.1.14' ],
+138 silly audit   tapable: [ '2.3.0' ],
+138 silly audit   'temp-dir': [ '2.0.0' ],
+138 silly audit   tempy: [ '0.6.0' ],
+138 silly audit   terser: [ '5.44.0' ],
+138 silly audit   'terser-webpack-plugin': [ '5.3.14' ],
+138 silly audit   through2: [ '4.0.2' ],
+138 silly audit   'to-regex-range': [ '5.0.1' ],
+138 silly audit   tr46: [ '1.0.1', '5.1.1' ],
+138 silly audit   'tree-kill': [ '1.2.2' ],
+138 silly audit   tslib: [ '2.8.1' ],
+138 silly audit   'type-fest': [ '0.16.0' ],
+138 silly audit   'typed-array-buffer': [ '1.0.3' ],
+138 silly audit   'typed-array-byte-length': [ '1.0.3' ],
+138 silly audit   'typed-array-byte-offset': [ '1.0.4' ],
+138 silly audit   'typed-array-length': [ '1.0.7' ],
+138 silly audit   typescript: [ '5.9.3' ],
+138 silly audit   'unbox-primitive': [ '1.1.0' ],
+138 silly audit   'undici-types': [ '6.21.0' ],
+138 silly audit   'unicode-canonical-property-names-ecmascript': [ '2.0.1' ],
+138 silly audit   'unicode-match-property-ecmascript': [ '2.0.0' ],
+138 silly audit   'unicode-match-property-value-ecmascript': [ '2.2.1' ],
+138 silly audit   'unicode-property-aliases-ecmascript': [ '2.2.0' ],
+138 silly audit   'unique-string': [ '2.0.0' ],
+138 silly audit   universalify: [ '2.0.1' ],
+138 silly audit   untildify: [ '4.0.0' ],
+138 silly audit   upath: [ '1.2.0' ],
+138 silly audit   'update-browserslist-db': [ '1.1.3' ],
+138 silly audit   'uri-js': [ '4.4.1' ],
+138 silly audit   'util-deprecate': [ '1.0.2' ],
+138 silly audit   watchpack: [ '2.4.4' ],
+138 silly audit   'webidl-conversions': [ '4.0.2', '7.0.0' ],
+138 silly audit   webpack: [ '5.102.1' ],
+138 silly audit   'webpack-sources': [ '3.3.3', '1.4.3' ],
+138 silly audit   'whatwg-url': [ '7.1.0', '14.2.0' ],
+138 silly audit   which: [ '2.0.2' ],
+138 silly audit   'which-boxed-primitive': [ '1.1.1' ],
+138 silly audit   'which-builtin-type': [ '1.2.1' ],
+138 silly audit   'which-collection': [ '1.0.2' ],
+138 silly audit   'which-typed-array': [ '1.1.19' ],
+138 silly audit   'workbox-background-sync': [ '6.6.0' ],
+138 silly audit   'workbox-broadcast-update': [ '6.6.0' ],
+138 silly audit   'workbox-build': [ '6.6.0' ],
+138 silly audit   '@apideck/better-ajv-errors': [ '0.3.6' ],
+138 silly audit   'workbox-cacheable-response': [ '6.6.0' ],
+138 silly audit   'workbox-core': [ '6.6.0' ],
+138 silly audit   'workbox-expiration': [ '6.6.0' ],
+138 silly audit   'workbox-google-analytics': [ '6.6.0' ],
+138 silly audit   'workbox-navigation-preload': [ '6.6.0' ],
+138 silly audit   'workbox-precaching': [ '6.6.0' ],
+138 silly audit   'workbox-range-requests': [ '6.6.0' ],
+138 silly audit   'workbox-recipes': [ '6.6.0' ],
+138 silly audit   'workbox-routing': [ '6.6.0' ],
+138 silly audit   'workbox-strategies': [ '6.6.0' ],
+138 silly audit   'workbox-streams': [ '6.6.0' ],
+138 silly audit   'workbox-sw': [ '6.6.0' ],
+138 silly audit   'workbox-webpack-plugin': [ '6.6.0' ],
+138 silly audit   'workbox-window': [ '6.6.0' ],
+138 silly audit   wrappy: [ '1.0.2' ],
+138 silly audit   xml2js: [ '0.6.2' ],
+138 silly audit   xmlbuilder: [ '11.0.1', '15.1.1' ],
+138 silly audit   yauzl: [ '2.10.0' ],
+138 silly audit   bcryptjs: [ '3.0.3' ],
+138 silly audit   jsonwebtoken: [ '9.0.2' ],
+138 silly audit   mongodb: [ '7.0.0', '6.20.0' ],
+138 silly audit   mongoose: [ '8.19.4' ],
+138 silly audit   jws: [ '3.2.2' ],
+138 silly audit   'lodash.includes': [ '4.3.0' ],
+138 silly audit   'lodash.isboolean': [ '3.0.3' ],
+138 silly audit   'lodash.isinteger': [ '4.0.4' ],
+138 silly audit   'lodash.isnumber': [ '3.0.3' ],
+138 silly audit   'lodash.isplainobject': [ '4.0.6' ],
+138 silly audit   'lodash.isstring': [ '4.0.1' ],
+138 silly audit   'lodash.once': [ '4.1.1' ],
+138 silly audit   jwa: [ '1.4.2' ],
+138 silly audit   'buffer-equal-constant-time': [ '1.0.1' ],
+138 silly audit   'ecdsa-sig-formatter': [ '1.0.11' ],
+138 silly audit   '@mongodb-js/saslprep': [ '1.3.2' ],
+138 silly audit   bson: [ '7.0.0', '6.10.4' ],
+138 silly audit   'mongodb-connection-string-url': [ '7.0.0', '3.0.2' ],
+138 silly audit   'sparse-bitfield': [ '3.0.3' ],
+138 silly audit   '@types/whatwg-url': [ '13.0.0', '11.0.5' ],
+138 silly audit   '@types/webidl-conversions': [ '7.0.3' ],
+138 silly audit   kareem: [ '2.6.3' ],
+138 silly audit   mpath: [ '0.9.0' ],
+138 silly audit   mquery: [ '5.0.0' ],
+138 silly audit   sift: [ '17.1.3' ],
+138 silly audit   'memory-pager': [ '1.5.0' ],
+138 silly audit   '@tailwindcss/oxide-wasm32-wasi': [ '4.1.14' ]
+138 silly audit }
+139 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-win32-arm64-msvc
+140 silly reify mark deleted [
+140 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-win32-arm64-msvc'
+140 silly reify ]
+141 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-linux-x64-musl
+142 silly reify mark deleted [
+142 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-linux-x64-musl'
+142 silly reify ]
+143 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-linux-x64-gnu
+144 silly reify mark deleted [
+144 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-linux-x64-gnu'
+144 silly reify ]
+145 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-linux-arm64-musl
+146 silly reify mark deleted [
+146 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-linux-arm64-musl'
+146 silly reify ]
+147 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-linux-arm64-gnu
+148 silly reify mark deleted [
+148 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-linux-arm64-gnu'
+148 silly reify ]
+149 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-linux-arm-gnueabihf
+150 silly reify mark deleted [
+150 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-linux-arm-gnueabihf'
+150 silly reify ]
+151 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-freebsd-x64
+152 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\lightningcss-freebsd-x64' ]
+153 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-darwin-x64
+154 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\lightningcss-darwin-x64' ]
+155 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\lightningcss-darwin-arm64
+156 silly reify mark deleted [
+156 silly reify   'D:\\fairproject\\fair_app\\node_modules\\lightningcss-darwin-arm64'
+156 silly reify ]
+157 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\fsevents
+158 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\fsevents' ]
+159 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-win32-arm64-msvc
+160 silly reify mark deleted [
+160 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-win32-arm64-msvc'
+160 silly reify ]
+161 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-linux-x64-musl
+162 silly reify mark deleted [
+162 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-linux-x64-musl'
+162 silly reify ]
+163 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-linux-x64-gnu
+164 silly reify mark deleted [
+164 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-linux-x64-gnu'
+164 silly reify ]
+165 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-linux-arm64-musl
+166 silly reify mark deleted [
+166 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-linux-arm64-musl'
+166 silly reify ]
+167 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-linux-arm64-gnu
+168 silly reify mark deleted [
+168 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-linux-arm64-gnu'
+168 silly reify ]
+169 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-linux-arm-gnueabihf
+170 silly reify mark deleted [
+170 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-linux-arm-gnueabihf'
+170 silly reify ]
+171 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-freebsd-x64
+172 silly reify mark deleted [
+172 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-freebsd-x64'
+172 silly reify ]
+173 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-darwin-x64
+174 silly reify mark deleted [
+174 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-darwin-x64'
+174 silly reify ]
+175 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-darwin-arm64
+176 silly reify mark deleted [
+176 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-darwin-arm64'
+176 silly reify ]
+177 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@tailwindcss\oxide-android-arm64
+178 silly reify mark deleted [
+178 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@tailwindcss\\oxide-android-arm64'
+178 silly reify ]
+179 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-win32-arm64-msvc
+180 silly reify mark deleted [
+180 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-win32-arm64-msvc'
+180 silly reify ]
+181 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-linux-x64-musl
+182 silly reify mark deleted [
+182 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-linux-x64-musl'
+182 silly reify ]
+183 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-linux-x64-gnu
+184 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-linux-x64-gnu' ]
+185 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-linux-arm64-musl
+186 silly reify mark deleted [
+186 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-linux-arm64-musl'
+186 silly reify ]
+187 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-linux-arm64-gnu
+188 silly reify mark deleted [
+188 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-linux-arm64-gnu'
+188 silly reify ]
+189 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-darwin-x64
+190 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-darwin-x64' ]
+191 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@next\swc-darwin-arm64
+192 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@next\\swc-darwin-arm64' ]
+193 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-win32-ia32
+194 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-win32-ia32' ]
+195 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-win32-arm64
+196 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-win32-arm64' ]
+197 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-wasm32
+198 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-wasm32' ]
+199 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linuxmusl-x64
+200 silly reify mark deleted [
+200 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linuxmusl-x64'
+200 silly reify ]
+201 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linuxmusl-arm64
+202 silly reify mark deleted [
+202 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linuxmusl-arm64'
+202 silly reify ]
+203 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linux-x64
+204 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linux-x64' ]
+205 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linux-s390x
+206 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linux-s390x' ]
+207 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linux-ppc64
+208 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linux-ppc64' ]
+209 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linux-arm64
+210 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linux-arm64' ]
+211 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-linux-arm
+212 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-linux-arm' ]
+213 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linuxmusl-x64
+214 silly reify mark deleted [
+214 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linuxmusl-x64'
+214 silly reify ]
+215 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linuxmusl-arm64
+216 silly reify mark deleted [
+216 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linuxmusl-arm64'
+216 silly reify ]
+217 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linux-x64
+218 silly reify mark deleted [
+218 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linux-x64'
+218 silly reify ]
+219 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linux-s390x
+220 silly reify mark deleted [
+220 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linux-s390x'
+220 silly reify ]
+221 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linux-ppc64
+222 silly reify mark deleted [
+222 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linux-ppc64'
+222 silly reify ]
+223 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linux-arm64
+224 silly reify mark deleted [
+224 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linux-arm64'
+224 silly reify ]
+225 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-linux-arm
+226 silly reify mark deleted [
+226 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-linux-arm'
+226 silly reify ]
+227 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-darwin-x64
+228 silly reify mark deleted [
+228 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-darwin-x64'
+228 silly reify ]
+229 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-libvips-darwin-arm64
+230 silly reify mark deleted [
+230 silly reify   'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-libvips-darwin-arm64'
+230 silly reify ]
+231 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-darwin-x64
+232 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-darwin-x64' ]
+233 verbose reify failed optional dependency D:\fairproject\fair_app\node_modules\@img\sharp-darwin-arm64
+234 silly reify mark deleted [ 'D:\\fairproject\\fair_app\\node_modules\\@img\\sharp-darwin-arm64' ]
+235 silly tarball no local data for memory-pager@https://registry.npmjs.org/memory-pager/-/memory-pager-1.5.0.tgz. Extracting by manifest.
+236 silly tarball no local data for sift@https://registry.npmjs.org/sift/-/sift-17.1.3.tgz. Extracting by manifest.
+237 silly tarball no local data for mquery@https://registry.npmjs.org/mquery/-/mquery-5.0.0.tgz. Extracting by manifest.
+238 silly tarball no local data for mpath@https://registry.npmjs.org/mpath/-/mpath-0.9.0.tgz. Extracting by manifest.
+239 silly tarball no local data for kareem@https://registry.npmjs.org/kareem/-/kareem-2.6.3.tgz. Extracting by manifest.
+240 silly tarball no local data for sparse-bitfield@https://registry.npmjs.org/sparse-bitfield/-/sparse-bitfield-3.0.3.tgz. Extracting by manifest.
+241 silly tarball no local data for bson@https://registry.npmjs.org/bson/-/bson-7.0.0.tgz. Extracting by manifest.
+242 silly tarball no local data for mongodb-connection-string-url@https://registry.npmjs.org/mongodb-connection-string-url/-/mongodb-connection-string-url-7.0.0.tgz. Extracting by manifest.
+243 silly tarball no local data for @types/whatwg-url@https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-13.0.0.tgz. Extracting by manifest.
+244 silly tarball no local data for ecdsa-sig-formatter@https://registry.npmjs.org/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz. Extracting by manifest.
+245 silly tarball no local data for lodash.isstring@https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz. Extracting by manifest.
+246 silly tarball no local data for @types/webidl-conversions@https://registry.npmjs.org/@types/webidl-conversions/-/webidl-conversions-7.0.3.tgz. Extracting by manifest.
+247 silly tarball no local data for @mongodb-js/saslprep@https://registry.npmjs.org/@mongodb-js/saslprep/-/saslprep-1.3.2.tgz. Extracting by manifest.
+248 silly tarball no local data for buffer-equal-constant-time@https://registry.npmjs.org/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz. Extracting by manifest.
+249 silly tarball no local data for jwa@https://registry.npmjs.org/jwa/-/jwa-1.4.2.tgz. Extracting by manifest.
+250 silly tarball no local data for lodash.once@https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz. Extracting by manifest.
+251 silly tarball no local data for lodash.isplainobject@https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz. Extracting by manifest.
+252 silly tarball no local data for lodash.isnumber@https://registry.npmjs.org/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz. Extracting by manifest.
+253 silly tarball no local data for lodash.isboolean@https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz. Extracting by manifest.
+254 silly tarball no local data for lodash.includes@https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz. Extracting by manifest.
+255 silly tarball no local data for lodash.isinteger@https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz. Extracting by manifest.
+256 silly tarball no local data for mongoose@https://registry.npmjs.org/mongoose/-/mongoose-8.19.4.tgz. Extracting by manifest.
+257 silly tarball no local data for jsonwebtoken@https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.2.tgz. Extracting by manifest.
+258 silly tarball no local data for mongodb@https://registry.npmjs.org/mongodb/-/mongodb-7.0.0.tgz. Extracting by manifest.
+259 silly tarball no local data for webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-7.0.0.tgz. Extracting by manifest.
+260 silly tarball no local data for webidl-conversions@https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-7.0.0.tgz. Extracting by manifest.
+261 silly tarball no local data for whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-14.2.0.tgz. Extracting by manifest.
+262 silly tarball no local data for tr46@https://registry.npmjs.org/tr46/-/tr46-5.1.1.tgz. Extracting by manifest.
+263 silly tarball no local data for tr46@https://registry.npmjs.org/tr46/-/tr46-5.1.1.tgz. Extracting by manifest.
+264 silly tarball no local data for whatwg-url@https://registry.npmjs.org/whatwg-url/-/whatwg-url-14.2.0.tgz. Extracting by manifest.
+265 silly tarball no local data for @types/whatwg-url@https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-11.0.5.tgz. Extracting by manifest.
+266 silly tarball no local data for mongodb-connection-string-url@https://registry.npmjs.org/mongodb-connection-string-url/-/mongodb-connection-string-url-3.0.2.tgz. Extracting by manifest.
+267 silly tarball no local data for bson@https://registry.npmjs.org/bson/-/bson-6.10.4.tgz. Extracting by manifest.
+268 silly tarball no local data for mongodb@https://registry.npmjs.org/mongodb/-/mongodb-6.20.0.tgz. Extracting by manifest.
+269 silly tarball no local data for jws@https://registry.npmjs.org/jws/-/jws-3.2.2.tgz. Extracting by manifest.
+270 silly tarball no local data for bcryptjs@https://registry.npmjs.org/bcryptjs/-/bcryptjs-3.0.3.tgz. Extracting by manifest.
+271 http fetch GET 200 https://registry.npmjs.org/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz 120ms (cache miss)
+272 http fetch GET 200 https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz 142ms (cache miss)
+273 http fetch GET 200 https://registry.npmjs.org/@types/webidl-conversions/-/webidl-conversions-7.0.3.tgz 173ms (cache miss)
+274 http fetch GET 200 https://registry.npmjs.org/sparse-bitfield/-/sparse-bitfield-3.0.3.tgz 208ms (cache miss)
+275 http fetch GET 200 https://registry.npmjs.org/lodash.isnumber/-/lodash.isnumber-3.0.3.tgz 211ms (cache miss)
+276 http fetch GET 200 https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz 225ms (cache miss)
+277 http fetch GET 200 https://registry.npmjs.org/ecdsa-sig-formatter/-/ecdsa-sig-formatter-1.0.11.tgz 227ms (cache miss)
+278 http fetch GET 200 https://registry.npmjs.org/lodash.isinteger/-/lodash.isinteger-4.0.4.tgz 224ms (cache miss)
+279 http fetch GET 200 https://registry.npmjs.org/jwa/-/jwa-1.4.2.tgz 232ms (cache miss)
+280 http fetch GET 200 https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz 237ms (cache miss)
+281 http fetch GET 200 https://registry.npmjs.org/lodash.isplainobject/-/lodash.isplainobject-4.0.6.tgz 239ms (cache miss)
+282 http fetch GET 200 https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-7.0.0.tgz 245ms (cache miss)
+283 http fetch GET 200 https://registry.npmjs.org/kareem/-/kareem-2.6.3.tgz 264ms (cache miss)
+284 http fetch GET 200 https://registry.npmjs.org/memory-pager/-/memory-pager-1.5.0.tgz 267ms (cache miss)
+285 http fetch GET 200 https://registry.npmjs.org/webidl-conversions/-/webidl-conversions-7.0.0.tgz 259ms (cache miss)
+286 http fetch GET 200 https://registry.npmjs.org/lodash.includes/-/lodash.includes-4.3.0.tgz 273ms (cache miss)
+287 http fetch GET 200 https://registry.npmjs.org/mongodb-connection-string-url/-/mongodb-connection-string-url-7.0.0.tgz 291ms (cache miss)
+288 http fetch GET 200 https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-11.0.5.tgz 302ms (cache miss)
+289 http fetch GET 200 https://registry.npmjs.org/jws/-/jws-3.2.2.tgz 289ms (cache miss)
+290 http fetch GET 200 https://registry.npmjs.org/tr46/-/tr46-5.1.1.tgz 308ms (cache miss)
+291 http fetch GET 200 https://registry.npmjs.org/mongodb-connection-string-url/-/mongodb-connection-string-url-3.0.2.tgz 313ms (cache miss)
+292 http fetch GET 200 https://registry.npmjs.org/mpath/-/mpath-0.9.0.tgz 331ms (cache miss)
+293 http fetch GET 200 https://registry.npmjs.org/bcryptjs/-/bcryptjs-3.0.3.tgz 316ms (cache miss)
+294 http fetch GET 200 https://registry.npmjs.org/jsonwebtoken/-/jsonwebtoken-9.0.2.tgz 337ms (cache miss)
+295 http fetch GET 200 https://registry.npmjs.org/mquery/-/mquery-5.0.0.tgz 345ms (cache miss)
+296 http fetch GET 200 https://registry.npmjs.org/tr46/-/tr46-5.1.1.tgz 345ms (cache miss)
+297 http fetch GET 200 https://registry.npmjs.org/whatwg-url/-/whatwg-url-14.2.0.tgz 358ms (cache miss)
+298 http fetch GET 200 https://registry.npmjs.org/whatwg-url/-/whatwg-url-14.2.0.tgz 362ms (cache miss)
+299 http fetch GET 200 https://registry.npmjs.org/sift/-/sift-17.1.3.tgz 393ms (cache miss)
+300 http fetch GET 200 https://registry.npmjs.org/@mongodb-js/saslprep/-/saslprep-1.3.2.tgz 429ms (cache miss)
+301 http fetch GET 200 https://registry.npmjs.org/bson/-/bson-7.0.0.tgz 543ms (cache miss)
+302 http fetch GET 200 https://registry.npmjs.org/@types/whatwg-url/-/whatwg-url-13.0.0.tgz 557ms (cache miss)
+303 http fetch GET 200 https://registry.npmjs.org/bson/-/bson-6.10.4.tgz 583ms (cache miss)
+304 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 723ms
+305 silly audit report {
+305 silly audit report   tar: [
+305 silly audit report     {
+305 silly audit report       id: 1109463,
+305 silly audit report       url: 'https://github.com/advisories/GHSA-29xp-372q-xqph',
+305 silly audit report       title: 'node-tar has a race condition leading to uninitialized memory exposure',
+305 silly audit report       severity: 'moderate',
+305 silly audit report       vulnerable_versions: '=7.5.1',
+305 silly audit report       cwe: [Array],
+305 silly audit report       cvss: [Object]
+305 silly audit report     }
+305 silly audit report   ]
+305 silly audit report }
+306 http fetch GET 200 https://registry.npmjs.org/tar 69ms (cache miss)
+307 http fetch GET 200 https://registry.npmjs.org/mongoose/-/mongoose-8.19.4.tgz 1050ms (cache miss)
+308 http fetch GET 200 https://registry.npmjs.org/mongodb/-/mongodb-7.0.0.tgz 1226ms (cache miss)
+309 http fetch GET 200 https://registry.npmjs.org/mongodb/-/mongodb-6.20.0.tgz 1260ms (cache miss)
+310 http fetch GET 200 https://registry.npmjs.org/@tailwindcss%2foxide 897ms (cache miss)
+311 silly ADD node_modules/memory-pager
+312 silly ADD node_modules/sift
+313 silly ADD node_modules/mquery
+314 silly ADD node_modules/mpath
+315 silly ADD node_modules/kareem
+316 silly ADD node_modules/@types/webidl-conversions
+317 silly ADD node_modules/@types/whatwg-url
+318 silly ADD node_modules/sparse-bitfield
+319 silly ADD node_modules/mongodb-connection-string-url
+320 silly ADD node_modules/mongodb-connection-string-url/node_modules/webidl-conversions
+321 silly ADD node_modules/mongodb-connection-string-url/node_modules/tr46
+322 silly ADD node_modules/mongodb-connection-string-url/node_modules/whatwg-url
+323 silly ADD node_modules/bson
+324 silly ADD node_modules/@mongodb-js/saslprep
+325 silly ADD node_modules/ecdsa-sig-formatter
+326 silly ADD node_modules/buffer-equal-constant-time
+327 silly ADD node_modules/jwa
+328 silly ADD node_modules/lodash.once
+329 silly ADD node_modules/lodash.isstring
+330 silly ADD node_modules/lodash.isplainobject
+331 silly ADD node_modules/lodash.isnumber
+332 silly ADD node_modules/lodash.isinteger
+333 silly ADD node_modules/lodash.isboolean
+334 silly ADD node_modules/lodash.includes
+335 silly ADD node_modules/jws
+336 silly ADD node_modules/mongoose
+337 silly ADD node_modules/mongoose/node_modules/webidl-conversions
+338 silly ADD node_modules/mongoose/node_modules/tr46
+339 silly ADD node_modules/mongoose/node_modules/whatwg-url
+340 silly ADD node_modules/mongoose/node_modules/@types/whatwg-url
+341 silly ADD node_modules/mongoose/node_modules/mongodb-connection-string-url
+342 silly ADD node_modules/mongoose/node_modules/mongodb
+343 silly ADD node_modules/mongoose/node_modules/bson
+344 silly ADD node_modules/mongodb
+345 silly ADD node_modules/jsonwebtoken
+346 silly ADD node_modules/bcryptjs
+347 silly ADD
+348 silly ADD
+349 silly ADD
+350 silly ADD
+351 silly ADD
+352 silly ADD
+353 silly ADD
+354 silly ADD
+355 silly ADD
+356 silly ADD
+357 silly ADD
+358 silly ADD
+359 silly ADD
+360 silly ADD
+361 silly ADD
+362 silly ADD
+363 silly ADD
+364 silly ADD
+365 silly ADD
+366 silly ADD
+367 silly ADD
+368 silly ADD
+369 silly ADD
+370 silly ADD
+371 silly ADD
+372 silly ADD
+373 silly ADD
+374 silly ADD
+375 silly ADD
+376 silly ADD
+377 silly ADD
+378 silly ADD
+379 silly ADD
+380 silly ADD
+381 silly ADD
+382 silly ADD
+383 silly ADD
+384 silly ADD
+385 silly ADD
+386 silly ADD
+387 silly ADD
+388 silly ADD
+389 silly ADD
+390 silly ADD
+391 silly ADD
+392 silly ADD
+393 silly ADD
+394 silly ADD
+395 silly ADD
+396 notice
+396 notice New [31mmajor[39m version of npm available! [31m10.7.0[39m -> [34m11.6.2[39m
+396 notice Changelog: [34mhttps://github.com/npm/cli/releases/tag/v11.6.2[39m
+396 notice To update run: [4mnpm install -g npm@11.6.2[24m
+396 notice  { force: true, [Symbol(proc-log.meta)]: true }
+397 verbose exit 0
+398 info ok

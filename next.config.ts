@@ -1,17 +1,10 @@
-import { NextConfig } from "next";
-import withPWA from "next-pwa";
+import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = withPWA({
+const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
-    unoptimized: true, // PWA에서 로컬 이미지 문제 방지
+    unoptimized: true,
   },
-  pwa: {
-    dest: "public",
-    register: true,
-    skipWaiting: true,
-    disable: process.env.NODE_ENV === "development", // 개발 중에는 PWA 비활성화
-  },
-});
+};
 
 export default nextConfig;

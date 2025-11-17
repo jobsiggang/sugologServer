@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
@@ -8,6 +8,23 @@ export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [showSetupLink, setShowSetupLink] = useState(false);
+
+  useEffect(() => {
+    checkSupervisor();
+  }, []);
+
+  const checkSupervisor = async () => {
+    try {
+      const response = await fetch('/api/admin/setup');
+      const data = await response.json();
+      if (data.needsSetup) {
+        setShowSetupLink(true);
+      }
+    } catch (error) {
+      console.error('Supervisor check error:', error);
+    }
+  };
 
   const handleLogin = async () => {
     setError("");
@@ -21,9 +38,18 @@ export default function LoginPage() {
     const data = await res.json();
 
     if (data.success) {
+      // 토큰과 사용자 정보 저장
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
       localStorage.setItem("authorName", username);
       localStorage.setItem("userRole", data.role);
-      router.push("/upload");
+      
+      // 역할에 따라 리다이렉트
+      if (data.role === 'supervisor' || data.role === 'company_admin') {
+        router.push("/admin");
+      } else {
+        router.push("/upload");
+      }
     } else {
       setError(data.message || "로그인 실패");
     }
@@ -144,6 +170,51 @@ export default function LoginPage() {
         >
           로그인
         </button>
+
+        {showSetupLink && (
+          <div style={{ 
+            marginTop: "20px", 
+            textAlign: "center",
+            padding: "15px",
+            background: "linear-gradient(135deg, #ff6b6b, #ff8787)",
+            borderRadius: "10px",
+            border: "2px solid #ff5252"
+          }}>
+            <p style={{ 
+              color: "#fff", 
+              fontSize: "14px", 
+              marginBottom: "10px",
+              fontWeight: 500
+            }}>
+              관리자가 설정되지 않았습니다.
+            </p>
+            <a
+              href="/admin/setup"
+              style={{
+                display: "inline-block",
+                background: "#fff",
+                color: "#ff5252",
+                padding: "8px 20px",
+                borderRadius: "8px",
+                textDecoration: "none",
+                fontSize: "14px",
+                fontWeight: 600,
+                transition: "all 0.2s",
+                boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.background = "#fff9f9";
+                e.currentTarget.style.boxShadow = "0 3px 8px rgba(0,0,0,0.15)";
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.background = "#fff";
+                e.currentTarget.style.boxShadow = "0 2px 4px rgba(0,0,0,0.1)";
+              }}
+            >
+              🔧 관리자 초기 설정하기
+            </a>
+          </div>
+        )}
       </div>
     </div>
   );

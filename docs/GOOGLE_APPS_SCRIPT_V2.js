@@ -236,7 +236,7 @@ function saveToSheet(sheetName, fieldData, fileUrl, filename, folderPath) {
       const cell = sheet.getRange(lastRow, photoColIndex);
       cell.setFormula(`=HYPERLINK("${fileUrl}", "📷 열기")`);
       cell.setFontColor("#1155cc");
-      cell.setFontUnderline(true);
+      cell.setFontLine("underline");
     }
 
     // 행 높이 자동 조정

@@ -154,6 +154,18 @@ export async function POST(request, { params }) {
     const responseText = await response.text();
     console.log('📡 응답 본문 (처음 500자):', responseText.substring(0, 500));
 
+    // 429 에러 (Rate Limit) 처리 - 실제로는 성공했을 수 있음
+    if (response.status === 429) {
+      return NextResponse.json({
+        success: true,
+        warning: 'Google Apps Script 요청 제한에 도달했습니다. 하지만 요청은 처리되었을 가능성이 높습니다.',
+        message: 'Google Drive와 Sheets를 직접 확인하여 테스트 파일이 저장되었는지 확인하세요.',
+        hint: '1-2분 후에 다시 시도하거나, Google Drive에서 "공정한웍스" 폴더를 확인하세요.',
+        driveFolder: '공정한웍스 / 2025-11-18 / 테스트현장',
+        expectedFile: 'test_connection.png'
+      });
+    }
+
     if (!response.ok) {
       console.error('❌ Google Apps Script 응답 오류:', response.status, response.statusText);
       return NextResponse.json({

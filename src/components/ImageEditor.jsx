@@ -50,13 +50,42 @@ export default function ImageEditor({ author }) {
     color: "#fff",
   };
 
-  // 📋 시트 데이터 로드
+  // 📋 MongoDB에서 현장과 입력양식 데이터 로드
   useEffect(() => {
     const fetchData = async () => {
-      const sites = await fetchSheetData("현장목록");
-      const forms = await fetchSheetData("입력양식");
-      setSiteData(sites);
-      setFormList(forms.map((f) => f["양식명"]));
+      try {
+        const token = localStorage.getItem('token');
+        
+        // 현장 목록 가져오기
+        const sitesResponse = await fetch('/api/sites', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const sitesData = await sitesResponse.json();
+        if (sitesData.success) {
+          setSiteData(sitesData.sites.map(s => ({
+            현장명: s.siteName,
+            프로젝트명: s.projectName,
+            공종코드: s.workTypeCode,
+            공종명: s.workTypeName
+          })));
+        }
+
+        // 입력양식 목록 가져오기
+        const formsResponse = await fetch('/api/forms', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const formsData = await formsResponse.json();
+        if (formsData.success) {
+          setFormList(formsData.forms.filter(f => f.isActive).map(f => f.formName));
+        }
+      } catch (error) {
+        console.error('데이터 로드 실패:', error);
+        toast.error('데이터를 불러오는데 실패했습니다.');
+      }
     };
     fetchData();
   }, []);
@@ -104,27 +133,44 @@ export default function ImageEditor({ author }) {
 
   const handleLoadForm = async () => {
     if (!selectedForm) return;
-    const allForms = await fetchSheetData("입력양식");
-    const form = allForms.find((f) => f["양식명"] === selectedForm);
-    if (!form) return;
-    const fields = form["항목명"].split(",");
+    
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/forms', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      
+      if (data.success) {
+        const form = data.forms.find((f) => f.formName === selectedForm);
+        if (!form) return;
+        
+        // fields 배열이 있으면 사용, 없으면 기본값
+        const fields = form.fields || [];
 
-    const now = new Date();
-    const kstOffset = 9 * 60;
-    const localOffset = now.getTimezoneOffset();
-    const kstTime = new Date(now.getTime() + (kstOffset + localOffset) * 60000);
-    const yyyy = kstTime.getFullYear();
-    const mm = String(kstTime.getMonth() + 1).padStart(2, "0");
-    const dd = String(kstTime.getDate()).padStart(2, "0");
-    const todayStr = `${yyyy}-${mm}-${dd}`;
+        const now = new Date();
+        const kstOffset = 9 * 60;
+        const localOffset = now.getTimezoneOffset();
+        const kstTime = new Date(now.getTime() + (kstOffset + localOffset) * 60000);
+        const yyyy = kstTime.getFullYear();
+        const mm = String(kstTime.getMonth() + 1).padStart(2, "0");
+        const dd = String(kstTime.getDate()).padStart(2, "0");
+        const todayStr = `${yyyy}-${mm}-${dd}`;
 
-    const newEntries = fields.map((f) => ({
-      key: Date.now() + Math.random(),
-      field: f,
-      value: f === "일자" ? todayStr : "",
-    }));
+        const newEntries = fields.map((f) => ({
+          key: Date.now() + Math.random(),
+          field: f,
+          value: f === "일자" ? todayStr : "",
+        }));
 
-    setEntries(newEntries);
+        setEntries(newEntries);
+      }
+    } catch (error) {
+      console.error('양식 로드 실패:', error);
+      toast.error('양식을 불러오는데 실패했습니다.');
+    }
   };
 
   // 📸 이미지 선택/촬영

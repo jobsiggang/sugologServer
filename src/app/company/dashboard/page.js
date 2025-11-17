@@ -604,9 +604,9 @@ function EmployeeManagement({ user }) {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
-  const [uploads, setUploads] = useState([]);
-  const [loadingUploads, setLoadingUploads] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [uploads, setUploads] = useState({});
+  const [loadingUploads, setLoadingUploads] = useState({});
 
   useEffect(() => {
     fetchEmployees();
@@ -632,7 +632,7 @@ function EmployeeManagement({ user }) {
   };
 
   const fetchUploads = async (employeeId) => {
-    setLoadingUploads(true);
+    setLoadingUploads(prev => ({ ...prev, [employeeId]: true }));
     try {
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/uploads?userId=${employeeId}`, {
@@ -642,12 +642,12 @@ function EmployeeManagement({ user }) {
       });
       const data = await response.json();
       if (data.success) {
-        setUploads(data.uploads);
+        setUploads(prev => ({ ...prev, [employeeId]: data.uploads }));
       }
     } catch (error) {
       console.error('업로드 데이터 조회 실패:', error);
     } finally {
-      setLoadingUploads(false);
+      setLoadingUploads(prev => ({ ...prev, [employeeId]: false }));
     }
   };
 
@@ -662,16 +662,18 @@ function EmployeeManagement({ user }) {
     setEmployees([newEmployee, ...employees]);
     setEditingId('new');
     setEditData(newEmployee);
+    setExpandedId('new');
   };
 
   const handleEdit = (emp) => {
     setEditingId(emp._id);
-    setEditData({ ...emp, password: '' }); // 비밀번호는 빈 값으로
+    setEditData({ ...emp, password: '' });
   };
 
   const handleCancel = () => {
     if (editingId === 'new') {
       setEmployees(employees.filter(e => e._id !== 'new'));
+      setExpandedId(null);
     }
     setEditingId(null);
     setEditData({});
@@ -684,7 +686,6 @@ function EmployeeManagement({ user }) {
       const url = isNew ? '/api/employees' : `/api/employees/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
-      // 비밀번호가 비어있으면 제외 (수정 시)
       const dataToSend = { ...editData };
       if (!isNew && !dataToSend.password) {
         delete dataToSend.password;
@@ -727,6 +728,7 @@ function EmployeeManagement({ user }) {
       const data = await response.json();
       if (data.success) {
         fetchEmployees();
+        setExpandedId(null);
       }
     } catch (error) {
       alert('삭제 실패');
@@ -737,9 +739,15 @@ function EmployeeManagement({ user }) {
     setEditData({ ...editData, [field]: value });
   };
 
-  const handleViewUploads = (emp) => {
-    setSelectedEmployee(emp);
-    fetchUploads(emp._id);
+  const toggleExpand = (empId) => {
+    if (expandedId === empId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(empId);
+      if (!uploads[empId] && empId !== 'new') {
+        fetchUploads(empId);
+      }
+    }
   };
 
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
@@ -756,196 +764,171 @@ function EmployeeManagement({ user }) {
         </button>
       </div>
 
-      {/* 직원 목록 테이블 */}
-      <div className="bg-white rounded-lg shadow overflow-x-auto mb-6">
-        <table className="w-full border-collapse min-w-[700px]">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">이름</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">사용자명</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">비밀번호</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-24">역할</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-64">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((emp, index) => (
-              <tr key={emp._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
-                
-                <td className="px-2 py-2 border-r">
-                  {editingId === emp._id ? (
-                    <input
-                      type="text"
-                      value={editData.name || ''}
-                      onChange={(e) => handleCellChange('name', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="이름"
-                    />
-                  ) : (
-                    <span className="text-sm">{emp.name}</span>
-                  )}
-                </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {employees.map((emp, index) => (
+          <div key={emp._id} className="border-b last:border-b-0">
+            {/* 직원 정보 행 - 클릭으로 펼치기/접기 */}
+            <div
+              onClick={() => editingId !== emp._id && toggleExpand(emp._id)}
+              className={`px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 ${
+                expandedId === emp._id ? 'bg-blue-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
+                <span className="text-sm font-medium truncate">{emp.name}</span>
+                <span className="text-sm text-gray-600 truncate">({emp.username})</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`w-2 h-2 rounded-full ${
+                  expandedId === emp._id ? 'bg-blue-600' : 'bg-gray-400'
+                }`}></span>
+              </div>
+            </div>
 
-                <td className="px-2 py-2 border-r">
-                  {editingId === emp._id ? (
-                    <input
-                      type="text"
-                      value={editData.username || ''}
-                      onChange={(e) => handleCellChange('username', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="사용자명"
-                    />
-                  ) : (
-                    <span className="text-sm">{emp.username}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  {editingId === emp._id ? (
-                    <input
-                      type="password"
-                      value={editData.password || ''}
-                      onChange={(e) => handleCellChange('password', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder={editingId === 'new' ? '비밀번호' : '변경시만 입력'}
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-400">••••••••</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  <span className="text-sm">
-                    {emp.role === 'employee' ? '직원' : '관리자'}
-                  </span>
-                </td>
-
-                <td className="px-2 py-2 text-center">
-                  {editingId === emp._id ? (
-                    <div className="flex gap-1 justify-center">
+            {/* 펼쳐진 상세 정보 */}
+            {expandedId === emp._id && (
+              <div className="px-4 py-4 bg-gray-50 border-t">
+                {editingId === emp._id ? (
+                  // 편집 모드
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">이름</label>
+                      <input
+                        type="text"
+                        value={editData.name || ''}
+                        onChange={(e) => handleCellChange('name', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="이름"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">사용자명</label>
+                      <input
+                        type="text"
+                        value={editData.username || ''}
+                        onChange={(e) => handleCellChange('username', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="사용자명"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">
+                        비밀번호 {editingId !== 'new' && '(변경시만 입력)'}
+                      </label>
+                      <input
+                        type="password"
+                        value={editData.password || ''}
+                        onChange={(e) => handleCellChange('password', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder={editingId === 'new' ? '비밀번호' : '변경시만 입력'}
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSave}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                       >
-                        저장
+                        💾 저장
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
                       >
-                        취소
+                        ✖️ 취소
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex gap-1 justify-center">
+                  </div>
+                ) : (
+                  // 일반 보기 모드
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">이름:</span>
+                        <span className="ml-2 font-medium">{emp.name}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">사용자명:</span>
+                        <span className="ml-2">{emp.username}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">역할:</span>
+                        <span className="ml-2">{emp.role === 'employee' ? '직원' : '관리자'}</span>
+                      </div>
+                    </div>
+
+                    {/* 액션 버튼 */}
+                    <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(emp)}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
-                        수정
-                      </button>
-                      <button
-                        onClick={() => handleViewUploads(emp)}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-                      >
-                        업로드
+                        ✏️ 수정
                       </button>
                       <button
                         onClick={() => handleDelete(emp._id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                       >
-                        삭제
+                        🗑️ 삭제
                       </button>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+                    {/* 전송기록 */}
+                    <div className="border-t pt-3">
+                      <h4 className="text-sm font-semibold mb-2">📋 전송기록</h4>
+                      {loadingUploads[emp._id] ? (
+                        <div className="text-center py-4 text-sm text-gray-500">로딩 중...</div>
+                      ) : !uploads[emp._id] || uploads[emp._id].length === 0 ? (
+                        <div className="text-center py-4 text-sm text-gray-500">
+                          업로드한 데이터가 없습니다.
+                        </div>
+                      ) : (
+                        <div className="space-y-2 max-h-60 overflow-y-auto">
+                          {uploads[emp._id].map((upload, idx) => (
+                            <div key={upload._id} className="p-3 bg-white rounded border text-xs">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <div className="font-medium">{upload.siteName} - {upload.formName}</div>
+                                  <div className="text-gray-500 mt-1">
+                                    {new Date(upload.createdAt).toLocaleString('ko-KR')}
+                                  </div>
+                                </div>
+                                <span className={`px-2 py-1 rounded text-xs ${
+                                  upload.status === 'uploaded' ? 'bg-green-100 text-green-800' :
+                                  upload.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                  'bg-red-100 text-red-800'
+                                }`}>
+                                  {upload.status === 'uploaded' ? '완료' :
+                                   upload.status === 'pending' ? '대기' : '실패'}
+                                </span>
+                              </div>
+                              <details className="cursor-pointer">
+                                <summary className="text-blue-600 hover:text-blue-800">
+                                  상세보기
+                                </summary>
+                                <div className="mt-2 p-2 bg-gray-50 rounded">
+                                  {Object.entries(upload.data || {}).map(([key, value]) => (
+                                    <div key={key} className="mb-1">
+                                      <span className="font-medium">{key}:</span> {value}
+                                    </div>
+                                  ))}
+                                </div>
+                              </details>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      {/* 업로드 데이터 조회 섹션 */}
-      {selectedEmployee && (
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold">
-              {selectedEmployee.name}님의 업로드 데이터
-            </h3>
-            <button
-              onClick={() => setSelectedEmployee(null)}
-              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              닫기
-            </button>
-          </div>
-
-          {loadingUploads ? (
-            <div className="text-center py-10 text-gray-500">로딩 중...</div>
-          ) : uploads.length === 0 ? (
-            <div className="text-center py-10 text-gray-500">
-              업로드한 데이터가 없습니다.
-            </div>
-          ) : (
-            <div className="overflow-auto max-h-96">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-100 border-b">
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">No</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">현장명</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">양식명</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">업로드 일시</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">상태</th>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">데이터</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {uploads.map((upload, index) => (
-                    <tr key={upload._id} className="border-b hover:bg-gray-50">
-                      <td className="px-4 py-2 text-sm border-r">{index + 1}</td>
-                      <td className="px-4 py-2 text-sm border-r">{upload.siteName}</td>
-                      <td className="px-4 py-2 text-sm border-r">{upload.formName}</td>
-                      <td className="px-4 py-2 text-sm border-r">
-                        {new Date(upload.createdAt).toLocaleString('ko-KR')}
-                      </td>
-                      <td className="px-4 py-2 text-sm border-r">
-                        <span className={`px-2 py-1 rounded text-xs ${
-                          upload.status === 'uploaded' ? 'bg-green-100 text-green-800' :
-                          upload.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {upload.status === 'uploaded' ? '완료' :
-                           upload.status === 'pending' ? '대기' : '실패'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-2 text-sm">
-                        <details className="cursor-pointer">
-                          <summary className="text-blue-600 hover:text-blue-800">
-                            상세보기
-                          </summary>
-                          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
-                            {Object.entries(upload.data || {}).map(([key, value]) => (
-                              <div key={key} className="mb-1">
-                                <span className="font-medium">{key}:</span> {value}
-                              </div>
-                            ))}
-                          </div>
-                        </details>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className="mt-4 text-sm text-gray-600">
-        <p>💡 팁: "업로드" 버튼을 눌러 각 직원의 업로드 데이터를 조회할 수 있습니다.</p>
-        <p>💡 엑셀처럼 셀을 직접 수정한 후 "저장" 버튼을 눌러주세요.</p>
+        <p>💡 직원 이름을 클릭하면 상세정보와 전송기록이 펼쳐집니다.</p>
       </div>
     </div>
   );

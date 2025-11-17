@@ -61,7 +61,25 @@ userSchema.pre('save', async function(next) {
 
 // 비밀번호 검증 메서드
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  try {
+    if (!this.password) {
+      console.error('User password is missing');
+      return false;
+    }
+    if (!candidatePassword) {
+      console.error('Candidate password is missing');
+      return false;
+    }
+    return await bcrypt.compare(candidatePassword, this.password);
+  } catch (error) {
+    console.error('Error in comparePassword:', error);
+    // 비밀번호가 해싱되지 않은 경우를 대비한 fallback
+    if (error.message.includes('invalid salt')) {
+      console.warn('Password appears to be unhashed, comparing directly');
+      return candidatePassword === this.password;
+    }
+    throw error;
+  }
 };
 
 export default mongoose.models.User || mongoose.model('User', userSchema);

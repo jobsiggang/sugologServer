@@ -19,8 +19,15 @@ if (!cached) {
 
 async function connectDB() {
   if (cached.conn) {
-    console.log('Using cached MongoDB connection');
-    return cached.conn;
+    // 연결 상태 확인
+    if (mongoose.connection.readyState === 1) {
+      console.log('Using cached MongoDB connection');
+      return cached.conn;
+    } else {
+      console.log('Cached connection is not ready, reconnecting...');
+      cached.conn = null;
+      cached.promise = null;
+    }
   }
 
   if (!cached.promise) {
@@ -28,6 +35,8 @@ async function connectDB() {
       bufferCommands: false,
       serverSelectionTimeoutMS: 10000, // 10초 타임아웃
       socketTimeoutMS: 45000, // 45초 소켓 타임아웃
+      maxPoolSize: 10, // 연결 풀 크기
+      minPoolSize: 2,
     };
 
     console.log('Creating new MongoDB connection...');
@@ -47,6 +56,7 @@ async function connectDB() {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    cached.conn = null;
     console.error('❌ MongoDB connection error in connectDB:', e);
     throw e;
   }

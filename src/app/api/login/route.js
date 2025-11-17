@@ -135,9 +135,20 @@ export async function POST(req) {
   } catch (error) {
     console.error('❌ Login error:', error);
     console.error('Error stack:', error.stack);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    
+    // MongoDB 연결 에러 처리
+    if (error.name === 'MongooseError' || error.name === 'MongoServerError') {
+      return NextResponse.json({ 
+        success: false, 
+        message: "데이터베이스 연결 오류입니다. 잠시 후 다시 시도해주세요.",
+      }, { status: 503 });
+    }
+    
     return NextResponse.json({ 
       success: false, 
-      message: "로그인 처리 중 오류가 발생했습니다.",
+      message: "로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }

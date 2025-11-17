@@ -330,6 +330,7 @@ function SiteManagement({ user }) {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     fetchSites();
@@ -366,6 +367,7 @@ function SiteManagement({ user }) {
     setSites([newSite, ...sites]);
     setEditingId('new');
     setEditData(newSite);
+    setExpandedId('new');
   };
 
   const handleEdit = (site) => {
@@ -376,6 +378,7 @@ function SiteManagement({ user }) {
   const handleCancel = () => {
     if (editingId === 'new') {
       setSites(sites.filter(s => s._id !== 'new'));
+      setExpandedId(null);
     }
     setEditingId(null);
     setEditData({});
@@ -425,6 +428,7 @@ function SiteManagement({ user }) {
       const data = await response.json();
       if (data.success) {
         fetchSites();
+        setExpandedId(null);
       }
     } catch (error) {
       alert('삭제 실패');
@@ -433,6 +437,14 @@ function SiteManagement({ user }) {
 
   const handleCellChange = (field, value) => {
     setEditData({ ...editData, [field]: value });
+  };
+
+  const toggleExpand = (siteId) => {
+    if (expandedId === siteId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(siteId);
+    }
   };
 
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
@@ -449,150 +461,151 @@ function SiteManagement({ user }) {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full border-collapse min-w-[800px]">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">현장명</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">프로젝트명</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공종코드</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공종명</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공사단계</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sites.map((site, index) => (
-              <tr key={site._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
-                
-                <td className="px-2 py-2 border-r">
-                  {editingId === site._id ? (
-                    <input
-                      type="text"
-                      value={editData.siteName || ''}
-                      onChange={(e) => handleCellChange('siteName', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="현장명"
-                    />
-                  ) : (
-                    <span className="text-sm">{site.siteName}</span>
-                  )}
-                </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {sites.map((site, index) => (
+          <div key={site._id} className="border-b last:border-b-0">
+            <div
+              onClick={() => editingId !== site._id && toggleExpand(site._id)}
+              className={`px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 ${
+                expandedId === site._id ? 'bg-blue-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
+                <span className="text-sm font-medium truncate">{site.siteName}</span>
+                <span className="text-sm text-gray-600 truncate">({site.projectName})</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`w-2 h-2 rounded-full ${
+                  expandedId === site._id ? 'bg-blue-600' : 'bg-gray-400'
+                }`}></span>
+              </div>
+            </div>
 
-                <td className="px-2 py-2 border-r">
-                  {editingId === site._id ? (
-                    <input
-                      type="text"
-                      value={editData.projectName || ''}
-                      onChange={(e) => handleCellChange('projectName', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="프로젝트명"
-                    />
-                  ) : (
-                    <span className="text-sm">{site.projectName}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  {editingId === site._id ? (
-                    <input
-                      type="text"
-                      value={editData.workTypeCode || ''}
-                      onChange={(e) => handleCellChange('workTypeCode', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="코드"
-                    />
-                  ) : (
-                    <span className="text-sm">{site.workTypeCode}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  {editingId === site._id ? (
-                    <input
-                      type="text"
-                      value={editData.workTypeName || ''}
-                      onChange={(e) => handleCellChange('workTypeName', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="공종명"
-                    />
-                  ) : (
-                    <span className="text-sm">{site.workTypeName}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  {editingId === site._id ? (
-                    <select
-                      value={editData.constructionStage || '시작전'}
-                      onChange={(e) => handleCellChange('constructionStage', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="시작전">시작전</option>
-                      <option value="진행중">진행중</option>
-                      <option value="완료">완료</option>
-                    </select>
-                  ) : (
-                    <span className={`text-sm px-2 py-1 rounded ${
-                      site.constructionStage === '완료' ? 'bg-green-100 text-green-800' :
-                      site.constructionStage === '진행중' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {site.constructionStage}
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 text-center">
-                  {editingId === site._id ? (
-                    <div className="flex gap-1 justify-center">
+            {expandedId === site._id && (
+              <div className="px-4 py-4 bg-gray-50 border-t">
+                {editingId === site._id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">현장명</label>
+                      <input
+                        type="text"
+                        value={editData.siteName || ''}
+                        onChange={(e) => handleCellChange('siteName', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="현장명"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">프로젝트명</label>
+                      <input
+                        type="text"
+                        value={editData.projectName || ''}
+                        onChange={(e) => handleCellChange('projectName', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="프로젝트명"
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">공종코드</label>
+                        <input
+                          type="text"
+                          value={editData.workTypeCode || ''}
+                          onChange={(e) => handleCellChange('workTypeCode', e.target.value)}
+                          className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="코드"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs text-gray-600 mb-1">공종명</label>
+                        <input
+                          type="text"
+                          value={editData.workTypeName || ''}
+                          onChange={(e) => handleCellChange('workTypeName', e.target.value)}
+                          className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="공종명"
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">공사단계</label>
+                      <select
+                        value={editData.constructionStage || '시작전'}
+                        onChange={(e) => handleCellChange('constructionStage', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="시작전">시작전</option>
+                        <option value="진행중">진행중</option>
+                        <option value="완료">완료</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSave}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                       >
-                        저장
+                        💾 저장
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
                       >
-                        취소
+                        ✖️ 취소
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex gap-1 justify-center">
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">현장명:</span>
+                        <span className="ml-2 font-medium">{site.siteName}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">프로젝트명:</span>
+                        <span className="ml-2">{site.projectName}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">공종:</span>
+                        <span className="ml-2">{site.workTypeCode} - {site.workTypeName}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">공사단계:</span>
+                        <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                          site.constructionStage === '완료' ? 'bg-green-100 text-green-800' :
+                          site.constructionStage === '진행중' ? 'bg-blue-100 text-blue-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {site.constructionStage}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(site)}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
-                        수정
+                        ✏️ 수정
                       </button>
                       <button
                         onClick={() => handleDelete(site._id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                       >
-                        삭제
+                        🗑️ 삭제
                       </button>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {sites.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
-            등록된 현장이 없습니다. "행 추가" 버튼을 눌러 현장을 추가하세요.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
 
       <div className="mt-4 text-sm text-gray-600">
-        <p>💡 팁: 각 행을 더블클릭하거나 "수정" 버튼을 눌러 편집할 수 있습니다.</p>
-        <p>💡 엑셀처럼 셀을 직접 수정한 후 "저장" 버튼을 눌러주세요.</p>
+        <p>💡 현장명을 클릭하면 상세정보가 펼쳐집니다.</p>
       </div>
     </div>
   );

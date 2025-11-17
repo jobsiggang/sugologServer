@@ -51,7 +51,26 @@ export default function UploadPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <ImageEditor author={user.name} />
+      {/* 상단 헤더 */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
+            <p className="text-xs text-gray-500">{user.name} ({user.username})</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+          >
+            로그아웃
+          </button>
+        </div>
+      </header>
+
+      {/* 메인 컨텐츠 */}
+      <main>
+        <ImageEditor author={user.name} />
+      </main>
     </div>
   );
 }

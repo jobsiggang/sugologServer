@@ -5,24 +5,64 @@ import { useState, useEffect } from "react";
 
 
 export default function UploadPage() {
-  const [author, setAuthor] = useState("");
+  const [user, setUser] = useState(null);
   const router = useRouter();
 
   useEffect(() => {
-    const saved = localStorage.getItem("authorName");
-    if (!saved) {
-      console.warn("⚠️ 로그인 정보 없음 → 로그인 페이지로 이동");
-      router.push("/login");
-    } else {
-      setAuthor(saved);
-    }
+    checkAuth();
   }, [router]);
 
-  if (!author) return <p>로그인 정보를 불러오는 중...</p>;
+  const checkAuth = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.warn("⚠️ 로그인 정보 없음 → 로그인 페이지로 이동");
+      router.push("/login");
+      return;
+    }
+
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (!userData) {
+      router.push("/login");
+      return;
+    }
+
+    setUser(userData);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    router.push('/login');
+  };
+
+  if (!user) return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <p className="text-gray-600">로그인 정보를 불러오는 중...</p>
+    </div>
+  );
 
   return (
-    <div>
-      <ImageEditor author={author} />
+    <div className="min-h-screen bg-gray-50">
+      {/* 상단 헤더 */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div>
+            <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
+            <p className="text-xs text-gray-500">{user.name} ({user.username})</p>
+          </div>
+          <button
+            onClick={handleLogout}
+            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+          >
+            로그아웃
+          </button>
+        </div>
+      </header>
+
+      {/* 메인 컨텐츠 */}
+      <main>
+        <ImageEditor author={user.name} />
+      </main>
     </div>
   );
 }

@@ -6,7 +6,8 @@ import { useRouter } from 'next/navigation';
 export default function CompanyDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState('google');
+  const [activeTab, setActiveTab] = useState('employees');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -35,6 +36,11 @@ export default function CompanyDashboard() {
     router.push('/login');
   };
 
+  const handleMenuClick = (tab) => {
+    setActiveTab(tab);
+    setMenuOpen(false);
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -43,85 +49,93 @@ export default function CompanyDashboard() {
     );
   }
 
+  const menuItems = [
+    { id: 'employees', icon: '👥', label: '직원 관리' },
+    { id: 'sites', icon: '🏗️', label: '현장 관리' },
+    { id: 'forms', icon: '📋', label: '입력양식 관리' },
+    { id: 'keys', icon: '🔑', label: '유사키 관리' },
+    { id: 'google', icon: '📱', label: 'Google 설정' }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      {/* 세로 사이드바 메뉴 */}
-      <aside className="w-64 bg-white shadow-lg">
-        <div className="p-6 border-b">
-          <h1 className="text-xl font-bold text-gray-800">업체 관리</h1>
-          <p className="text-sm text-gray-600 mt-1">{user.name}님</p>
-          <p className="text-xs text-gray-500">{user.companyId?.name || '업체명'}</p>
-        </div>
-
-        <nav className="p-4 space-y-2">
-          <button
-            onClick={() => setActiveTab('google')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-              activeTab === 'google'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            📱 Google 설정
-          </button>
-
-          <button
-            onClick={() => setActiveTab('sites')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-              activeTab === 'sites'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            🏗️ 현장 관리
-          </button>
-
-          <button
-            onClick={() => setActiveTab('employees')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-              activeTab === 'employees'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            👥 직원 관리
-          </button>
-
-          <button
-            onClick={() => setActiveTab('forms')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-              activeTab === 'forms'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            📋 입력양식 관리
-          </button>
-
-          <button
-            onClick={() => setActiveTab('keys')}
-            className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
-              activeTab === 'keys'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            🔑 유사키 관리
-          </button>
-        </nav>
-
-        <div className="absolute bottom-0 w-64 p-4 border-t bg-white">
+    <div className="min-h-screen bg-gray-50">
+      {/* 상단 헤더 */}
+      <header className="bg-white shadow-sm sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="p-2 hover:bg-gray-100 rounded-lg"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
+              <p className="text-xs text-gray-500">{user.name} 관리자</p>
+            </div>
+          </div>
           <button
             onClick={handleLogout}
-            className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
           >
             로그아웃
           </button>
         </div>
-      </aside>
+
+        {/* 현재 탭 표시 */}
+        <div className="px-4 py-2 bg-blue-50 border-t border-blue-100">
+          <p className="text-sm font-medium text-blue-800">
+            {menuItems.find(item => item.id === activeTab)?.icon} {menuItems.find(item => item.id === activeTab)?.label}
+          </p>
+        </div>
+      </header>
+
+      {/* 햄버거 메뉴 (오버레이) */}
+      {menuOpen && (
+        <>
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40"
+            onClick={() => setMenuOpen(false)}
+          />
+          <aside className="fixed left-0 top-0 bottom-0 w-64 bg-white shadow-lg z-50 transform transition-transform">
+            <div className="p-6 border-b">
+              <h1 className="text-xl font-bold text-gray-800">업체 관리</h1>
+              <p className="text-sm text-gray-600 mt-1">{user.name}님</p>
+              <p className="text-xs text-gray-500">{user.companyName}</p>
+            </div>
+
+            <nav className="p-4 space-y-2">
+              {menuItems.map(item => (
+                <button
+                  key={item.id}
+                  onClick={() => handleMenuClick(item.id)}
+                  className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === item.id
+                      ? 'bg-blue-600 text-white'
+                      : 'text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {item.icon} {item.label}
+                </button>
+              ))}
+            </nav>
+
+            <div className="absolute bottom-0 w-64 p-4 border-t bg-white">
+              <button
+                onClick={handleLogout}
+                className="w-full px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+              >
+                로그아웃
+              </button>
+            </div>
+          </aside>
+        </>
+      )}
 
       {/* 메인 컨텐츠 영역 */}
-      <main className="flex-1 p-8">
+      <main className="p-4">
         {activeTab === 'google' && <GoogleSettings user={user} />}
         {activeTab === 'sites' && <SiteManagement user={user} />}
         {activeTab === 'employees' && <EmployeeManagement user={user} />}
@@ -224,29 +238,29 @@ function GoogleSettings({ user }) {
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
-    <div className="max-w-4xl">
-      <h2 className="text-2xl font-bold mb-6">Google Apps Script 설정</h2>
+    <div className="w-full">
+      <h2 className="text-xl font-bold mb-4">Google Apps Script 설정</h2>
 
       {settings?.setupCompleted && (
-        <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-800 font-medium">✅ Google 설정이 완료되었습니다</p>
-          <p className="text-sm text-green-600 mt-1">
+        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+          <p className="text-sm text-green-800 font-medium">✅ Google 설정 완료</p>
+          <p className="text-xs text-green-600 mt-1">
             마지막 동기화: {settings.lastSync ? new Date(settings.lastSync).toLocaleString('ko-KR') : '없음'}
           </p>
         </div>
       )}
 
       {!settings?.setupCompleted && (
-        <div className="mb-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-yellow-800 font-medium">⚠️ Google 설정이 필요합니다</p>
-          <p className="text-sm text-yellow-600 mt-1">
-            아래 설정을 완료해야 직원들이 사진을 업로드할 수 있습니다.
+        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p className="text-sm text-yellow-800 font-medium">⚠️ Google 설정 필요</p>
+          <p className="text-xs text-yellow-600 mt-1">
+            설정을 완료해야 사진 업로드가 가능합니다.
           </p>
         </div>
       )}
 
-      <div className="bg-white p-6 rounded-lg shadow">
-        <form onSubmit={handleUpdate} className="space-y-6">
+      <div className="bg-white p-4 rounded-lg shadow">
+        <form onSubmit={handleUpdate} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Google Apps Script 웹앱 URL <span className="text-red-500">*</span>
@@ -424,19 +438,19 @@ function SiteManagement({ user }) {
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
-    <div className="max-w-full">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">현장 관리</h2>
+        <h2 className="text-xl font-bold">현장 관리</h2>
         <button
           onClick={handleAddRow}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          + 행 추가
+          + 추가
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-auto">
-        <table className="w-full border-collapse">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="w-full border-collapse min-w-[800px]">
           <thead>
             <tr className="bg-gray-100 border-b-2 border-gray-300">
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
@@ -584,17 +598,15 @@ function SiteManagement({ user }) {
   );
 }
 
-// 직원 관리 컴포넌트
+// 직원 관리 컴포넌트 (엑셀 스타일 + 업로드 데이터 조회)
 function EmployeeManagement({ user }) {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [formData, setFormData] = useState({
-    username: '',
-    password: '',
-    name: '',
-    role: 'employee'
-  });
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [selectedEmployee, setSelectedEmployee] = useState(null);
+  const [uploads, setUploads] = useState([]);
+  const [loadingUploads, setLoadingUploads] = useState(false);
 
   useEffect(() => {
     fetchEmployees();
@@ -619,27 +631,81 @@ function EmployeeManagement({ user }) {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const fetchUploads = async (employeeId) => {
+    setLoadingUploads(true);
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/employees', {
-        method: 'POST',
+      const response = await fetch(`/api/uploads?userId=${employeeId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setUploads(data.uploads);
+      }
+    } catch (error) {
+      console.error('업로드 데이터 조회 실패:', error);
+    } finally {
+      setLoadingUploads(false);
+    }
+  };
+
+  const handleAddRow = () => {
+    const newEmployee = {
+      _id: 'new',
+      username: '',
+      password: '',
+      name: '',
+      role: 'employee'
+    };
+    setEmployees([newEmployee, ...employees]);
+    setEditingId('new');
+    setEditData(newEmployee);
+  };
+
+  const handleEdit = (emp) => {
+    setEditingId(emp._id);
+    setEditData({ ...emp, password: '' }); // 비밀번호는 빈 값으로
+  };
+
+  const handleCancel = () => {
+    if (editingId === 'new') {
+      setEmployees(employees.filter(e => e._id !== 'new'));
+    }
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const isNew = editingId === 'new';
+      const url = isNew ? '/api/employees' : `/api/employees/${editingId}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      // 비밀번호가 비어있으면 제외 (수정 시)
+      const dataToSend = { ...editData };
+      if (!isNew && !dataToSend.password) {
+        delete dataToSend.password;
+      }
+
+      const response = await fetch(url, {
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(dataToSend)
       });
 
       const data = await response.json();
       if (data.success) {
-        alert('직원이 등록되었습니다.');
-        setShowAddForm(false);
-        setFormData({ username: '', password: '', name: '', role: 'employee' });
+        setEditingId(null);
+        setEditData({});
         fetchEmployees();
       } else {
-        alert(data.error || '등록 실패');
+        alert(data.error || '저장 실패');
       }
     } catch (error) {
       alert('오류가 발생했습니다.');
@@ -660,7 +726,6 @@ function EmployeeManagement({ user }) {
 
       const data = await response.json();
       if (data.success) {
-        alert('삭제되었습니다.');
         fetchEmployees();
       }
     } catch (error) {
@@ -668,94 +733,219 @@ function EmployeeManagement({ user }) {
     }
   };
 
+  const handleCellChange = (field, value) => {
+    setEditData({ ...editData, [field]: value });
+  };
+
+  const handleViewUploads = (emp) => {
+    setSelectedEmployee(emp);
+    fetchUploads(emp._id);
+  };
+
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
-    <div className="max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold">직원 관리</h2>
+    <div className="w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">직원 관리</h2>
         <button
-          onClick={() => setShowAddForm(!showAddForm)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          onClick={handleAddRow}
+          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          {showAddForm ? '취소' : '+ 직원 추가'}
+          + 추가
         </button>
       </div>
 
-      {showAddForm && (
-        <div className="bg-white p-6 rounded-lg shadow mb-6">
-          <h3 className="text-lg font-semibold mb-4">새 직원 등록</h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">사용자명</label>
-              <input
-                type="text"
-                value={formData.username}
-                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호</label>
-              <input
-                type="password"
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
-              <input
-                type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                required
-              />
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
-            >
-              등록
-            </button>
-          </form>
-        </div>
-      )}
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">이름</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">사용자명</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">역할</th>
-              <th className="px-6 py-3 text-left text-sm font-medium text-gray-700">작업</th>
+      {/* 직원 목록 테이블 */}
+      <div className="bg-white rounded-lg shadow overflow-x-auto mb-6">
+        <table className="w-full border-collapse min-w-[700px]">
+          <thead>
+            <tr className="bg-gray-100 border-b-2 border-gray-300">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">이름</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">사용자명</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[150px]">비밀번호</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-24">역할</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-64">작업</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
-            {employees.map((emp) => (
-              <tr key={emp._id}>
-                <td className="px-6 py-4 text-sm">{emp.name}</td>
-                <td className="px-6 py-4 text-sm">{emp.username}</td>
-                <td className="px-6 py-4 text-sm">
-                  {emp.role === 'employee' ? '직원' : '관리자'}
+          <tbody>
+            {employees.map((emp, index) => (
+              <tr key={emp._id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
+                
+                <td className="px-2 py-2 border-r">
+                  {editingId === emp._id ? (
+                    <input
+                      type="text"
+                      value={editData.name || ''}
+                      onChange={(e) => handleCellChange('name', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="이름"
+                    />
+                  ) : (
+                    <span className="text-sm">{emp.name}</span>
+                  )}
                 </td>
-                <td className="px-6 py-4 text-sm">
-                  <button
-                    onClick={() => handleDelete(emp._id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    삭제
-                  </button>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === emp._id ? (
+                    <input
+                      type="text"
+                      value={editData.username || ''}
+                      onChange={(e) => handleCellChange('username', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="사용자명"
+                    />
+                  ) : (
+                    <span className="text-sm">{emp.username}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === emp._id ? (
+                    <input
+                      type="password"
+                      value={editData.password || ''}
+                      onChange={(e) => handleCellChange('password', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={editingId === 'new' ? '비밀번호' : '변경시만 입력'}
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-400">••••••••</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  <span className="text-sm">
+                    {emp.role === 'employee' ? '직원' : '관리자'}
+                  </span>
+                </td>
+
+                <td className="px-2 py-2 text-center">
+                  {editingId === emp._id ? (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={handleSave}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={() => handleEdit(emp)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleViewUploads(emp)}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        업로드
+                      </button>
+                      <button
+                        onClick={() => handleDelete(emp._id)}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
+      </div>
+
+      {/* 업로드 데이터 조회 섹션 */}
+      {selectedEmployee && (
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold">
+              {selectedEmployee.name}님의 업로드 데이터
+            </h3>
+            <button
+              onClick={() => setSelectedEmployee(null)}
+              className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+            >
+              닫기
+            </button>
+          </div>
+
+          {loadingUploads ? (
+            <div className="text-center py-10 text-gray-500">로딩 중...</div>
+          ) : uploads.length === 0 ? (
+            <div className="text-center py-10 text-gray-500">
+              업로드한 데이터가 없습니다.
+            </div>
+          ) : (
+            <div className="overflow-auto max-h-96">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-100 border-b">
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">No</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">현장명</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">양식명</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">업로드 일시</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r">상태</th>
+                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700">데이터</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {uploads.map((upload, index) => (
+                    <tr key={upload._id} className="border-b hover:bg-gray-50">
+                      <td className="px-4 py-2 text-sm border-r">{index + 1}</td>
+                      <td className="px-4 py-2 text-sm border-r">{upload.siteName}</td>
+                      <td className="px-4 py-2 text-sm border-r">{upload.formName}</td>
+                      <td className="px-4 py-2 text-sm border-r">
+                        {new Date(upload.createdAt).toLocaleString('ko-KR')}
+                      </td>
+                      <td className="px-4 py-2 text-sm border-r">
+                        <span className={`px-2 py-1 rounded text-xs ${
+                          upload.status === 'uploaded' ? 'bg-green-100 text-green-800' :
+                          upload.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {upload.status === 'uploaded' ? '완료' :
+                           upload.status === 'pending' ? '대기' : '실패'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-2 text-sm">
+                        <details className="cursor-pointer">
+                          <summary className="text-blue-600 hover:text-blue-800">
+                            상세보기
+                          </summary>
+                          <div className="mt-2 p-2 bg-gray-50 rounded text-xs">
+                            {Object.entries(upload.data || {}).map(([key, value]) => (
+                              <div key={key} className="mb-1">
+                                <span className="font-medium">{key}:</span> {value}
+                              </div>
+                            ))}
+                          </div>
+                        </details>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>💡 팁: "업로드" 버튼을 눌러 각 직원의 업로드 데이터를 조회할 수 있습니다.</p>
+        <p>💡 엑셀처럼 셀을 직접 수정한 후 "저장" 버튼을 눌러주세요.</p>
       </div>
     </div>
   );
@@ -873,19 +1063,19 @@ function FormManagement({ user }) {
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
-    <div className="max-w-full">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">입력양식 관리</h2>
+        <h2 className="text-xl font-bold">입력양식 관리</h2>
         <button
           onClick={handleAddRow}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          + 행 추가
+          + 추가
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-auto">
-        <table className="w-full border-collapse">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="w-full border-collapse min-w-[600px]">
           <thead>
             <tr className="bg-gray-100 border-b-2 border-gray-300">
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
@@ -1112,19 +1302,19 @@ function KeyMappingManagement({ user }) {
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
-    <div className="max-w-full">
+    <div className="w-full">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-2xl font-bold">유사키 관리</h2>
+        <h2 className="text-xl font-bold">유사키 관리</h2>
         <button
           onClick={handleAddRow}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          + 행 추가
+          + 추가
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-auto">
-        <table className="w-full border-collapse">
+      <div className="bg-white rounded-lg shadow overflow-x-auto">
+        <table className="w-full border-collapse min-w-[700px]">
           <thead>
             <tr className="bg-gray-100 border-b-2 border-gray-300">
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>

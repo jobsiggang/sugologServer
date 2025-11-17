@@ -953,6 +953,7 @@ function FormManagement({ user }) {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     fetchForms();
@@ -987,6 +988,7 @@ function FormManagement({ user }) {
     setForms([newForm, ...forms]);
     setEditingId('new');
     setEditData(newForm);
+    setExpandedId('new');
   };
 
   const handleEdit = (form) => {
@@ -997,6 +999,7 @@ function FormManagement({ user }) {
   const handleCancel = () => {
     if (editingId === 'new') {
       setForms(forms.filter(f => f._id !== 'new'));
+      setExpandedId(null);
     }
     setEditingId(null);
     setEditData({});
@@ -1046,6 +1049,7 @@ function FormManagement({ user }) {
       const data = await response.json();
       if (data.success) {
         fetchForms();
+        setExpandedId(null);
       }
     } catch (error) {
       alert('삭제 실패');
@@ -1054,6 +1058,14 @@ function FormManagement({ user }) {
 
   const handleCellChange = (field, value) => {
     setEditData({ ...editData, [field]: value });
+  };
+
+  const toggleExpand = (formId) => {
+    if (expandedId === formId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(formId);
+    }
   };
 
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
@@ -1070,106 +1082,126 @@ function FormManagement({ user }) {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full border-collapse min-w-[600px]">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[250px]">양식명</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[300px]">설명</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r w-24">상태</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {forms.map((form, index) => (
-              <tr key={form._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
-                
-                <td className="px-2 py-2 border-r">
-                  {editingId === form._id ? (
-                    <input
-                      type="text"
-                      value={editData.formName || ''}
-                      onChange={(e) => handleCellChange('formName', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="양식명"
-                    />
-                  ) : (
-                    <span className="text-sm">{form.formName}</span>
-                  )}
-                </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {forms.map((form, index) => (
+          <div key={form._id} className="border-b last:border-b-0">
+            <div
+              onClick={() => editingId !== form._id && toggleExpand(form._id)}
+              className={`px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 ${
+                expandedId === form._id ? 'bg-blue-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
+                <span className="text-sm font-medium truncate">{form.formName}</span>
+                <span className={`px-2 py-1 rounded text-xs ${
+                  form.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                }`}>
+                  {form.isActive ? '활성' : '비활성'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`w-2 h-2 rounded-full ${
+                  expandedId === form._id ? 'bg-blue-600' : 'bg-gray-400'
+                }`}></span>
+              </div>
+            </div>
 
-                <td className="px-2 py-2 border-r">
-                  {editingId === form._id ? (
-                    <input
-                      type="text"
-                      value={editData.description || ''}
-                      onChange={(e) => handleCellChange('description', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="설명"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-600">{form.description}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r text-center">
-                  {editingId === form._id ? (
-                    <select
-                      value={editData.isActive ? 'active' : 'inactive'}
-                      onChange={(e) => handleCellChange('isActive', e.target.value === 'active')}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="active">활성</option>
-                      <option value="inactive">비활성</option>
-                    </select>
-                  ) : (
-                    <span className={`text-sm px-2 py-1 rounded ${
-                      form.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {form.isActive ? '활성' : '비활성'}
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 text-center">
-                  {editingId === form._id ? (
-                    <div className="flex gap-1 justify-center">
+            {expandedId === form._id && (
+              <div className="px-4 py-4 bg-gray-50 border-t">
+                {editingId === form._id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">양식명</label>
+                      <input
+                        type="text"
+                        value={editData.formName || ''}
+                        onChange={(e) => handleCellChange('formName', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="양식명"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">설명</label>
+                      <input
+                        type="text"
+                        value={editData.description || ''}
+                        onChange={(e) => handleCellChange('description', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="설명"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">상태</label>
+                      <select
+                        value={editData.isActive ? 'active' : 'inactive'}
+                        onChange={(e) => handleCellChange('isActive', e.target.value === 'active')}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="active">활성</option>
+                        <option value="inactive">비활성</option>
+                      </select>
+                    </div>
+                    <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSave}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                       >
-                        저장
+                        💾 저장
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
                       >
-                        취소
+                        ✖️ 취소
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex gap-1 justify-center">
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">양식명:</span>
+                        <span className="ml-2 font-medium">{form.formName}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">상태:</span>
+                        <span className={`ml-2 px-2 py-1 rounded text-xs ${
+                          form.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                        }`}>
+                          {form.isActive ? '활성' : '비활성'}
+                        </span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-600">설명:</span>
+                        <span className="ml-2">{form.description}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(form)}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
-                        수정
+                        ✏️ 수정
                       </button>
                       <button
                         onClick={() => handleDelete(form._id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                       >
-                        삭제
+                        🗑️ 삭제
                       </button>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>💡 양식명을 클릭하면 상세정보가 펼쳐집니다.</p>
       </div>
     </div>
   );
@@ -1181,6 +1213,7 @@ function KeyMappingManagement({ user }) {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
+  const [expandedId, setExpandedId] = useState(null);
 
   useEffect(() => {
     fetchKeyMappings();
@@ -1208,6 +1241,7 @@ function KeyMappingManagement({ user }) {
   const handleAddRow = () => {
     const newMapping = {
       _id: 'new',
+      masterKey: '',
       originalKey: '',
       similarKeys: '',
       description: ''
@@ -1215,6 +1249,7 @@ function KeyMappingManagement({ user }) {
     setKeyMappings([newMapping, ...keyMappings]);
     setEditingId('new');
     setEditData(newMapping);
+    setExpandedId('new');
   };
 
   const handleEdit = (mapping) => {
@@ -1228,6 +1263,7 @@ function KeyMappingManagement({ user }) {
   const handleCancel = () => {
     if (editingId === 'new') {
       setKeyMappings(keyMappings.filter(k => k._id !== 'new'));
+      setExpandedId(null);
     }
     setEditingId(null);
     setEditData({});
@@ -1240,7 +1276,6 @@ function KeyMappingManagement({ user }) {
       const url = isNew ? '/api/key-mappings' : `/api/key-mappings/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
-      // similarKeys를 배열로 변환
       const dataToSend = {
         ...editData,
         similarKeys: typeof editData.similarKeys === 'string' 
@@ -1285,6 +1320,7 @@ function KeyMappingManagement({ user }) {
       const data = await response.json();
       if (data.success) {
         fetchKeyMappings();
+        setExpandedId(null);
       }
     } catch (error) {
       alert('삭제 실패');
@@ -1293,6 +1329,14 @@ function KeyMappingManagement({ user }) {
 
   const handleCellChange = (field, value) => {
     setEditData({ ...editData, [field]: value });
+  };
+
+  const toggleExpand = (mappingId) => {
+    if (expandedId === mappingId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(mappingId);
+    }
   };
 
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
@@ -1309,103 +1353,133 @@ function KeyMappingManagement({ user }) {
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto">
-        <table className="w-full border-collapse min-w-[700px]">
-          <thead>
-            <tr className="bg-gray-100 border-b-2 border-gray-300">
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">기본키</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[300px]">유사키 (쉼표로 구분)</th>
-              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[250px]">설명</th>
-              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
-            </tr>
-          </thead>
-          <tbody>
-            {keyMappings.map((mapping, index) => (
-              <tr key={mapping._id} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
-                
-                <td className="px-2 py-2 border-r">
-                  {editingId === mapping._id ? (
-                    <input
-                      type="text"
-                      value={editData.originalKey || ''}
-                      onChange={(e) => handleCellChange('originalKey', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="기본키"
-                    />
-                  ) : (
-                    <span className="text-sm font-medium">{mapping.originalKey}</span>
-                  )}
-                </td>
+      <div className="bg-white rounded-lg shadow overflow-hidden">
+        {keyMappings.map((mapping, index) => (
+          <div key={mapping._id} className="border-b last:border-b-0">
+            <div
+              onClick={() => editingId !== mapping._id && toggleExpand(mapping._id)}
+              className={`px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 ${
+                expandedId === mapping._id ? 'bg-blue-50' : ''
+              }`}
+            >
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
+                <span className="text-sm font-medium truncate">{mapping.masterKey}</span>
+                <span className="text-sm text-gray-600 truncate">({mapping.originalKey || '기본키 없음'})</span>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <span className={`w-2 h-2 rounded-full ${
+                  expandedId === mapping._id ? 'bg-blue-600' : 'bg-gray-400'
+                }`}></span>
+              </div>
+            </div>
 
-                <td className="px-2 py-2 border-r">
-                  {editingId === mapping._id ? (
-                    <input
-                      type="text"
-                      value={editData.similarKeys || ''}
-                      onChange={(e) => handleCellChange('similarKeys', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="유사키1, 유사키2, 유사키3"
-                    />
-                  ) : (
-                    <span className="text-sm text-blue-600">
-                      {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys}
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 border-r">
-                  {editingId === mapping._id ? (
-                    <input
-                      type="text"
-                      value={editData.description || ''}
-                      onChange={(e) => handleCellChange('description', e.target.value)}
-                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="설명"
-                    />
-                  ) : (
-                    <span className="text-sm text-gray-600">{mapping.description}</span>
-                  )}
-                </td>
-
-                <td className="px-2 py-2 text-center">
-                  {editingId === mapping._id ? (
-                    <div className="flex gap-1 justify-center">
+            {expandedId === mapping._id && (
+              <div className="px-4 py-4 bg-gray-50 border-t">
+                {editingId === mapping._id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">마스터키</label>
+                      <input
+                        type="text"
+                        value={editData.masterKey || ''}
+                        onChange={(e) => handleCellChange('masterKey', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="마스터키"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">기본키</label>
+                      <input
+                        type="text"
+                        value={editData.originalKey || ''}
+                        onChange={(e) => handleCellChange('originalKey', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="기본키"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">유사키 (쉼표로 구분)</label>
+                      <input
+                        type="text"
+                        value={editData.similarKeys || ''}
+                        onChange={(e) => handleCellChange('similarKeys', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="유사키1, 유사키2, 유사키3"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs text-gray-600 mb-1">설명</label>
+                      <input
+                        type="text"
+                        value={editData.description || ''}
+                        onChange={(e) => handleCellChange('description', e.target.value)}
+                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        placeholder="설명"
+                      />
+                    </div>
+                    <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSave}
-                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
                       >
-                        저장
+                        💾 저장
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
                       >
-                        취소
+                        ✖️ 취소
                       </button>
                     </div>
-                  ) : (
-                    <div className="flex gap-1 justify-center">
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <span className="text-gray-600">마스터키:</span>
+                        <span className="ml-2 font-medium">{mapping.masterKey}</span>
+                      </div>
+                      <div>
+                        <span className="text-gray-600">기본키:</span>
+                        <span className="ml-2">{mapping.originalKey || '-'}</span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-600">유사키:</span>
+                        <span className="ml-2 text-blue-600">
+                          {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys}
+                        </span>
+                      </div>
+                      <div className="col-span-2">
+                        <span className="text-gray-600">설명:</span>
+                        <span className="ml-2">{mapping.description}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(mapping)}
-                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
-                        수정
+                        ✏️ 수정
                       </button>
                       <button
                         onClick={() => handleDelete(mapping._id)}
-                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                       >
-                        삭제
+                        🗑️ 삭제
                       </button>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>💡 마스터키를 클릭하면 상세정보가 펼쳐집니다.</p>
       </div>
     </div>
   );

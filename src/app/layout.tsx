@@ -10,22 +10,20 @@ export const metadata = {
   },
 };
 
-
 export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#f0f0f0",
 };
-
-export const themeColor = "#f0f0f0";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="ko">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content={themeColor} />
+        <meta name="theme-color" content="#f0f0f0" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
 

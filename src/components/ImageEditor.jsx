@@ -19,6 +19,7 @@ export default function ImageEditor({ author }) {
   const [entries, setEntries] = useState([]);
   const [formList, setFormList] = useState([]);
   const [selectedForm, setSelectedForm] = useState("");
+  const [fieldOptions, setFieldOptions] = useState({}); // 양식의 fieldOptions 저장
   const [images, setImages] = useState([]);
   const [previewIndex, setPreviewIndex] = useState(0);
   const [uploading, setUploading] = useState(false);
@@ -147,6 +148,24 @@ export default function ImageEditor({ author }) {
         const form = data.forms.find((f) => f.formName === selectedForm);
         if (!form) return;
         
+        // ✅ 양식 ID를 localStorage에 저장 (업로드 시 사용)
+        localStorage.setItem('selectedFormId', form._id);
+        console.log('✅ 양식 선택:', form.formName, 'ID:', form._id);
+        
+        // ✅ fieldOptions 저장 (Map 객체를 일반 객체로 변환)
+        const options = {};
+        if (form.fieldOptions) {
+          if (form.fieldOptions instanceof Map) {
+            form.fieldOptions.forEach((value, key) => {
+              options[key] = value;
+            });
+          } else if (typeof form.fieldOptions === 'object') {
+            Object.assign(options, form.fieldOptions);
+          }
+        }
+        setFieldOptions(options);
+        console.log('✅ fieldOptions 설정:', options);
+        
         // fields 배열이 있으면 사용, 없으면 기본값
         const fields = form.fields || [];
 
@@ -166,6 +185,7 @@ export default function ImageEditor({ author }) {
         }));
 
         setEntries(newEntries);
+        toast.success(`✅ "${selectedForm}" 양식을 불러왔습니다.`);
       }
     } catch (error) {
       console.error('양식 로드 실패:', error);
@@ -427,7 +447,12 @@ export default function ImageEditor({ author }) {
         </div>
 
         {/* 입력 폼 */}
-        <InputForm entries={entries} setEntries={setEntries} siteData={siteData} />
+        <InputForm 
+          entries={entries} 
+          setEntries={setEntries} 
+          siteData={siteData} 
+          fieldOptions={fieldOptions}
+        />
 
         {/* 진행률 바 */}
         {uploading && (

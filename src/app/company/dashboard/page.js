@@ -1211,16 +1211,23 @@ function FormManagement({ user }) {
                           {(editData.folderStructure || []).map((folderItem, idx) => (
                             <div key={idx} className="flex items-center gap-2">
                               <span className="text-xs text-gray-500 w-6">{idx + 1}.</span>
-                              <select
-                                value={folderItem}
-                                onChange={(e) => handleFolderItemChange(idx, e.target.value)}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
-                              >
-                                <option value="">항목 선택</option>
-                                {editData.fields.map((field) => (
-                                  <option key={field} value={field}>{field}</option>
-                                ))}
-                              </select>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between mb-1">
+                                  <span className="text-xs text-gray-400">{idx === 0 ? '상위' : idx === ((editData.folderStructure||[]).length - 1) ? '하위' : '중간'}</span>
+                                  <span className="text-xs text-gray-400">{idx + 1} 단계</span>
+                                </div>
+                                <select
+                                  value={folderItem}
+                                  onChange={(e) => handleFolderItemChange(idx, e.target.value)}
+                                  className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
+                                >
+                                  <option value="">항목 선택</option>
+                                  <option value="직원명">직원명</option>
+                                  {editData.fields.map((field) => (
+                                    <option key={field} value={field}>{field}</option>
+                                  ))}
+                                </select>
+                              </div>
                               <button
                                 type="button"
                                 onClick={() => handleRemoveFolderItem(idx)}
@@ -1330,12 +1337,22 @@ function FormManagement({ user }) {
                       >
                         ✏️ 수정
                       </button>
-                      <button
-                        onClick={() => handleDelete(form._id)}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-                      >
-                        🗑️ 삭제
-                      </button>
+                      { !form.isActive ? (
+                        <button
+                          onClick={() => handleDelete(form._id)}
+                          className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                        >
+                          🗑️ 삭제
+                        </button>
+                      ) : (
+                        <button
+                          disabled
+                          title="비활성화 상태에서만 삭제 가능"
+                          className="flex-1 px-4 py-2 bg-gray-300 text-white text-sm rounded opacity-60 cursor-not-allowed"
+                        >
+                          🗑️ 삭제
+                        </button>
+                      )}
                     </div>
                   </div>
                 )}

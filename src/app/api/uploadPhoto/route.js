@@ -58,10 +58,10 @@ export async function POST(req) {
       return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // fieldData에 작성자 정보 추가
+    // fieldData에 사용자 정보 추가: '사용자'는 성명, '사용자명'은 아이디
     const enrichedFieldData = {
       ...fieldData,
-      "작성자": user.name,
+      "사용자": user.name,
       "사용자명": user.username,
       "업체명": company.name
     };

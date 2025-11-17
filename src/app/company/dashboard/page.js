@@ -763,11 +763,227 @@ function EmployeeManagement({ user }) {
 
 // 입력양식 관리 컴포넌트
 function FormManagement({ user }) {
+  const [forms, setForms] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+
+  useEffect(() => {
+    fetchForms();
+  }, []);
+
+  const fetchForms = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/forms', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setForms(data.forms);
+      }
+    } catch (error) {
+      console.error('입력양식 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddRow = () => {
+    const newForm = {
+      _id: 'new',
+      formName: '',
+      description: '',
+      isActive: true
+    };
+    setForms([newForm, ...forms]);
+    setEditingId('new');
+    setEditData(newForm);
+  };
+
+  const handleEdit = (form) => {
+    setEditingId(form._id);
+    setEditData({ ...form });
+  };
+
+  const handleCancel = () => {
+    if (editingId === 'new') {
+      setForms(forms.filter(f => f._id !== 'new'));
+    }
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const isNew = editingId === 'new';
+      const url = isNew ? '/api/forms' : `/api/forms/${editingId}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editData)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setEditingId(null);
+        setEditData({});
+        fetchForms();
+      } else {
+        alert(data.error || '저장 실패');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/forms/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchForms();
+      }
+    } catch (error) {
+      alert('삭제 실패');
+    }
+  };
+
+  const handleCellChange = (field, value) => {
+    setEditData({ ...editData, [field]: value });
+  };
+
+  if (loading) return <div className="text-center py-10">로딩 중...</div>;
+
   return (
-    <div className="max-w-4xl">
-      <h2 className="text-2xl font-bold mb-6">입력양식 관리</h2>
-      <div className="bg-white p-8 rounded-lg shadow text-center">
-        <p className="text-gray-500">입력양식 관리 기능은 준비 중입니다.</p>
+    <div className="max-w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">입력양식 관리</h2>
+        <button
+          onClick={handleAddRow}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          + 행 추가
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100 border-b-2 border-gray-300">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[250px]">양식명</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[300px]">설명</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-r w-24">상태</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {forms.map((form, index) => (
+              <tr key={form._id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
+                
+                <td className="px-2 py-2 border-r">
+                  {editingId === form._id ? (
+                    <input
+                      type="text"
+                      value={editData.formName || ''}
+                      onChange={(e) => handleCellChange('formName', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="양식명"
+                    />
+                  ) : (
+                    <span className="text-sm">{form.formName}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === form._id ? (
+                    <input
+                      type="text"
+                      value={editData.description || ''}
+                      onChange={(e) => handleCellChange('description', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="설명"
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-600">{form.description}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r text-center">
+                  {editingId === form._id ? (
+                    <select
+                      value={editData.isActive ? 'active' : 'inactive'}
+                      onChange={(e) => handleCellChange('isActive', e.target.value === 'active')}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="active">활성</option>
+                      <option value="inactive">비활성</option>
+                    </select>
+                  ) : (
+                    <span className={`text-sm px-2 py-1 rounded ${
+                      form.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {form.isActive ? '활성' : '비활성'}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 text-center">
+                  {editingId === form._id ? (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={handleSave}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={() => handleEdit(form)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(form._id)}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -775,11 +991,235 @@ function FormManagement({ user }) {
 
 // 유사키 관리 컴포넌트
 function KeyMappingManagement({ user }) {
+  const [keyMappings, setKeyMappings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+
+  useEffect(() => {
+    fetchKeyMappings();
+  }, []);
+
+  const fetchKeyMappings = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/key-mappings', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setKeyMappings(data.keyMappings);
+      }
+    } catch (error) {
+      console.error('유사키 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddRow = () => {
+    const newMapping = {
+      _id: 'new',
+      originalKey: '',
+      similarKeys: '',
+      description: ''
+    };
+    setKeyMappings([newMapping, ...keyMappings]);
+    setEditingId('new');
+    setEditData(newMapping);
+  };
+
+  const handleEdit = (mapping) => {
+    setEditingId(mapping._id);
+    setEditData({ 
+      ...mapping,
+      similarKeys: Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys
+    });
+  };
+
+  const handleCancel = () => {
+    if (editingId === 'new') {
+      setKeyMappings(keyMappings.filter(k => k._id !== 'new'));
+    }
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const isNew = editingId === 'new';
+      const url = isNew ? '/api/key-mappings' : `/api/key-mappings/${editingId}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      // similarKeys를 배열로 변환
+      const dataToSend = {
+        ...editData,
+        similarKeys: typeof editData.similarKeys === 'string' 
+          ? editData.similarKeys.split(',').map(s => s.trim()).filter(s => s)
+          : editData.similarKeys
+      };
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(dataToSend)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setEditingId(null);
+        setEditData({});
+        fetchKeyMappings();
+      } else {
+        alert(data.error || '저장 실패');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/key-mappings/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchKeyMappings();
+      }
+    } catch (error) {
+      alert('삭제 실패');
+    }
+  };
+
+  const handleCellChange = (field, value) => {
+    setEditData({ ...editData, [field]: value });
+  };
+
+  if (loading) return <div className="text-center py-10">로딩 중...</div>;
+
   return (
-    <div className="max-w-4xl">
-      <h2 className="text-2xl font-bold mb-6">유사키 관리</h2>
-      <div className="bg-white p-8 rounded-lg shadow text-center">
-        <p className="text-gray-500">유사키 관리 기능은 준비 중입니다.</p>
+    <div className="max-w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">유사키 관리</h2>
+        <button
+          onClick={handleAddRow}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          + 행 추가
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100 border-b-2 border-gray-300">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">기본키</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[300px]">유사키 (쉼표로 구분)</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[250px]">설명</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {keyMappings.map((mapping, index) => (
+              <tr key={mapping._id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
+                
+                <td className="px-2 py-2 border-r">
+                  {editingId === mapping._id ? (
+                    <input
+                      type="text"
+                      value={editData.originalKey || ''}
+                      onChange={(e) => handleCellChange('originalKey', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="기본키"
+                    />
+                  ) : (
+                    <span className="text-sm font-medium">{mapping.originalKey}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === mapping._id ? (
+                    <input
+                      type="text"
+                      value={editData.similarKeys || ''}
+                      onChange={(e) => handleCellChange('similarKeys', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="유사키1, 유사키2, 유사키3"
+                    />
+                  ) : (
+                    <span className="text-sm text-blue-600">
+                      {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join(', ') : mapping.similarKeys}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === mapping._id ? (
+                    <input
+                      type="text"
+                      value={editData.description || ''}
+                      onChange={(e) => handleCellChange('description', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="설명"
+                    />
+                  ) : (
+                    <span className="text-sm text-gray-600">{mapping.description}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 text-center">
+                  {editingId === mapping._id ? (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={handleSave}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={() => handleEdit(mapping)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(mapping._id)}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

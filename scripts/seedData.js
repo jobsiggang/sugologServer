@@ -113,14 +113,14 @@ const seedData = async () => {
     console.log('✅ Google Apps Script 웹앱 URL 설정 완료');
     console.log('✅ Google Spreadsheet ID 설정 완료');
 
-    // 2. 슈퍼바이저 생성
-    const supervisor = await User.create({
-      username: 'super',
-      password: 'super123',
-      name: '최고관리자',
-      role: 'supervisor'
-    });
-    console.log('✅ 슈퍼바이저 생성 완료:', supervisor.username);
+    // // 2. 슈퍼바이저 생성
+    // const supervisor = await User.create({
+    //   username: 'super',
+    //   password: 'super123',
+    //   name: '최고관리자',
+    //   role: 'supervisor'
+    // });
+    // console.log('✅ 슈퍼바이저 생성 완료:', supervisor.username);
 
     // 3. 업체 관리자 생성
     const companyAdmin = await User.create({
@@ -132,8 +132,8 @@ const seedData = async () => {
     });
     console.log('✅ 업체관리자 생성 완료:', companyAdmin.username);
 
-    // 4. 직원 생성
-    const employees = await User.insertMany([
+    // 4. 직원 생성 (insertMany는 pre('save') 훅을 트리거하지 않으므로 create로 생성하여 비밀번호 해싱이 되도록 함)
+    const employeesData = [
       {
         username: 'worker1',
         password: 'worker123',
@@ -148,7 +148,13 @@ const seedData = async () => {
         role: 'employee',
         companyId: company._id
       }
-    ]);
+    ];
+
+    const employees = [];
+    for (const u of employeesData) {
+      const created = await User.create(u);
+      employees.push(created);
+    }
     console.log('✅ 직원 생성 완료:', employees.length + '명');
 
     // 5. 샘플 현장 데이터 생성

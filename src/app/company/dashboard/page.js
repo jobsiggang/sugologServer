@@ -310,13 +310,275 @@ function GoogleSettings({ user }) {
   );
 }
 
-// 현장 관리 컴포넌트
+// 현장 관리 컴포넌트 (엑셀 스타일)
 function SiteManagement({ user }) {
+  const [sites, setSites] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+
+  useEffect(() => {
+    fetchSites();
+  }, []);
+
+  const fetchSites = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/sites', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      const data = await response.json();
+      if (data.success) {
+        setSites(data.sites);
+      }
+    } catch (error) {
+      console.error('현장 목록 조회 실패:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddRow = () => {
+    const newSite = {
+      _id: 'new',
+      siteName: '',
+      projectName: '',
+      workTypeCode: '',
+      workTypeName: '',
+      constructionStage: '시작전'
+    };
+    setSites([newSite, ...sites]);
+    setEditingId('new');
+    setEditData(newSite);
+  };
+
+  const handleEdit = (site) => {
+    setEditingId(site._id);
+    setEditData({ ...site });
+  };
+
+  const handleCancel = () => {
+    if (editingId === 'new') {
+      setSites(sites.filter(s => s._id !== 'new'));
+    }
+    setEditingId(null);
+    setEditData({});
+  };
+
+  const handleSave = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const isNew = editingId === 'new';
+      const url = isNew ? '/api/sites' : `/api/sites/${editingId}`;
+      const method = isNew ? 'POST' : 'PUT';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(editData)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setEditingId(null);
+        setEditData({});
+        fetchSites();
+      } else {
+        alert(data.error || '저장 실패');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('정말 삭제하시겠습니까?')) return;
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/sites/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        fetchSites();
+      }
+    } catch (error) {
+      alert('삭제 실패');
+    }
+  };
+
+  const handleCellChange = (field, value) => {
+    setEditData({ ...editData, [field]: value });
+  };
+
+  if (loading) return <div className="text-center py-10">로딩 중...</div>;
+
   return (
-    <div className="max-w-4xl">
-      <h2 className="text-2xl font-bold mb-6">현장 관리</h2>
-      <div className="bg-white p-8 rounded-lg shadow text-center">
-        <p className="text-gray-500">현장 관리 기능은 준비 중입니다.</p>
+    <div className="max-w-full">
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-2xl font-bold">현장 관리</h2>
+        <button
+          onClick={handleAddRow}
+          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          + 행 추가
+        </button>
+      </div>
+
+      <div className="bg-white rounded-lg shadow overflow-auto">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100 border-b-2 border-gray-300">
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-12">No</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">현장명</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r min-w-[200px]">프로젝트명</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공종코드</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공종명</th>
+              <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-r w-32">공사단계</th>
+              <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 w-40">작업</th>
+            </tr>
+          </thead>
+          <tbody>
+            {sites.map((site, index) => (
+              <tr key={site._id} className="border-b hover:bg-gray-50">
+                <td className="px-4 py-2 text-sm border-r text-gray-600">{index + 1}</td>
+                
+                <td className="px-2 py-2 border-r">
+                  {editingId === site._id ? (
+                    <input
+                      type="text"
+                      value={editData.siteName || ''}
+                      onChange={(e) => handleCellChange('siteName', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="현장명"
+                    />
+                  ) : (
+                    <span className="text-sm">{site.siteName}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === site._id ? (
+                    <input
+                      type="text"
+                      value={editData.projectName || ''}
+                      onChange={(e) => handleCellChange('projectName', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="프로젝트명"
+                    />
+                  ) : (
+                    <span className="text-sm">{site.projectName}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === site._id ? (
+                    <input
+                      type="text"
+                      value={editData.workTypeCode || ''}
+                      onChange={(e) => handleCellChange('workTypeCode', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="코드"
+                    />
+                  ) : (
+                    <span className="text-sm">{site.workTypeCode}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === site._id ? (
+                    <input
+                      type="text"
+                      value={editData.workTypeName || ''}
+                      onChange={(e) => handleCellChange('workTypeName', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="공종명"
+                    />
+                  ) : (
+                    <span className="text-sm">{site.workTypeName}</span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 border-r">
+                  {editingId === site._id ? (
+                    <select
+                      value={editData.constructionStage || '시작전'}
+                      onChange={(e) => handleCellChange('constructionStage', e.target.value)}
+                      className="w-full px-2 py-1 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="시작전">시작전</option>
+                      <option value="진행중">진행중</option>
+                      <option value="완료">완료</option>
+                    </select>
+                  ) : (
+                    <span className={`text-sm px-2 py-1 rounded ${
+                      site.constructionStage === '완료' ? 'bg-green-100 text-green-800' :
+                      site.constructionStage === '진행중' ? 'bg-blue-100 text-blue-800' :
+                      'bg-gray-100 text-gray-800'
+                    }`}>
+                      {site.constructionStage}
+                    </span>
+                  )}
+                </td>
+
+                <td className="px-2 py-2 text-center">
+                  {editingId === site._id ? (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={handleSave}
+                        className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                      >
+                        저장
+                      </button>
+                      <button
+                        onClick={handleCancel}
+                        className="px-3 py-1 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                      >
+                        취소
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex gap-1 justify-center">
+                      <button
+                        onClick={() => handleEdit(site)}
+                        className="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                      >
+                        수정
+                      </button>
+                      <button
+                        onClick={() => handleDelete(site._id)}
+                        className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                      >
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {sites.length === 0 && (
+          <div className="text-center py-12 text-gray-500">
+            등록된 현장이 없습니다. "행 추가" 버튼을 눌러 현장을 추가하세요.
+          </div>
+        )}
+      </div>
+
+      <div className="mt-4 text-sm text-gray-600">
+        <p>💡 팁: 각 행을 더블클릭하거나 "수정" 버튼을 눌러 편집할 수 있습니다.</p>
+        <p>💡 엑셀처럼 셀을 직접 수정한 후 "저장" 버튼을 눌러주세요.</p>
       </div>
     </div>
   );

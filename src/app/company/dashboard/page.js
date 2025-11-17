@@ -733,6 +733,8 @@ function FormManagement({ user }) {
   const [editingId, setEditingId] = useState(null);
   const [editData, setEditData] = useState({});
   const [expandedId, setExpandedId] = useState(null);
+  const [fieldInput, setFieldInput] = useState('');
+  const [optionInputs, setOptionInputs] = useState({});
 
   useEffect(() => {
     fetchForms();
@@ -780,6 +782,8 @@ function FormManagement({ user }) {
       fields: Array.isArray(form.fields) ? form.fields : [],
       fieldOptions: fieldOptions
     });
+    setFieldInput('');
+    setOptionInputs({});
   };
 
   const handleCancel = () => {
@@ -789,6 +793,8 @@ function FormManagement({ user }) {
     }
     setEditingId(null);
     setEditData({});
+    setFieldInput('');
+    setOptionInputs({});
   };
 
   const handleSave = async () => {
@@ -846,14 +852,79 @@ function FormManagement({ user }) {
     setEditData({ ...editData, [field]: value });
   };
 
+  const handleAddField = () => {
+    if (!fieldInput.trim()) return;
+    
+    // 콤마로 구분된 항목들을 배열로 변환
+    const newFields = fieldInput.split(',').map(f => f.trim()).filter(f => f);
+    const currentFields = editData.fields || [];
+    
+    setEditData({ 
+      ...editData, 
+      fields: [...currentFields, ...newFields]
+    });
+    setFieldInput('');
+  };
+
+  const handleRemoveField = (index) => {
+    const newFields = [...editData.fields];
+    const removedField = newFields[index];
+    newFields.splice(index, 1);
+    
+    // 해당 필드의 옵션도 제거
+    const newFieldOptions = { ...editData.fieldOptions };
+    delete newFieldOptions[removedField];
+    
+    setEditData({
+      ...editData,
+      fields: newFields,
+      fieldOptions: newFieldOptions
+    });
+  };
+
+  const handleAddFieldOption = (fieldName) => {
+    const optionValue = optionInputs[fieldName] || '';
+    if (!optionValue.trim()) return;
+
+    // 콤마로 구분된 옵션들을 배열로 변환
+    const newOptions = optionValue.split(',').map(o => o.trim()).filter(o => o);
+    const currentOptions = (editData.fieldOptions && editData.fieldOptions[fieldName]) || [];
+
+    setEditData({
+      ...editData,
+      fieldOptions: {
+        ...editData.fieldOptions,
+        [fieldName]: [...currentOptions, ...newOptions]
+      }
+    });
+    
+    setOptionInputs({
+      ...optionInputs,
+      [fieldName]: ''
+    });
+  };
+
+  const handleRemoveFieldOption = (fieldName, optionIndex) => {
+    const options = [...(editData.fieldOptions[fieldName] || [])];
+    options.splice(optionIndex, 1);
+    
+    setEditData({
+      ...editData,
+      fieldOptions: {
+        ...editData.fieldOptions,
+        [fieldName]: options
+      }
+    });
+  };
+
   const handleFieldsChange = (value) => {
-    // 세미콜론으로 구분된 문자열을 배열로 변환
+    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
     const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
     setEditData({ ...editData, fields: fieldsArray });
   };
 
   const handleFieldOptionChange = (fieldName, value) => {
-    // 세미콜론으로 구분된 문자열을 배열로 변환
+    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
     const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
     setEditData({
       ...editData,
@@ -938,9 +1009,12 @@ function FormManagement({ user }) {
             {expandedId === form._id && (
               <div className="px-4 py-4 bg-gray-50 border-t">
                 {editingId === form._id ? (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
+                    {/* 1. 양식명 */}
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">양식명</label>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        1. 입력양식명
+                      </label>
                       <input
                         type="text"
                         value={editData.formName || ''}
@@ -949,68 +1023,138 @@ function FormManagement({ user }) {
                         placeholder="예: DL연간단가"
                       />
                     </div>
+
+                    {/* 2. 항목명 추가 */}
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">항목명 (세미콜론으로 구분)</label>
-                      <input
-                        type="text"
-                        value={Array.isArray(editData.fields) ? editData.fields.join('; ') : ''}
-                        onChange={(e) => handleFieldsChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="예: 현장명; 일자; 공종코드; 물량; 공사단계"
-                      />
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        2. 항목명 추가 (콤마로 구분하여 입력)
+                      </label>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          value={fieldInput}
+                          onChange={(e) => setFieldInput(e.target.value)}
+                          onKeyPress={(e) => {
+                            if (e.key === 'Enter') {
+                              e.preventDefault();
+                              handleAddField();
+                            }
+                          }}
+                          className="flex-1 px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="예: 현장명, 일자, 위치, 공종"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddField}
+                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 whitespace-nowrap"
+                        >
+                          완료
+                        </button>
+                      </div>
+                      {Array.isArray(editData.fields) && editData.fields.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-2">
+                          {editData.fields.map((field, idx) => (
+                            <span
+                              key={idx}
+                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
+                            >
+                              {field}
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveField(idx)}
+                                className="text-blue-600 hover:text-blue-900 font-bold"
+                              >
+                                ×
+                              </button>
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    {/* 각 항목별 옵션 리스트 입력 */}
+                    {/* 3. 항목별 자동 목록 추가 */}
                     {Array.isArray(editData.fields) && editData.fields.length > 0 && (
-                      <div className="border-t pt-3 mt-3">
-                        <label className="block text-sm font-semibold text-gray-700 mb-2">
-                          항목별 선택 옵션 설정
+                      <div className="border-t pt-4">
+                        <label className="block text-sm font-semibold text-gray-700 mb-3">
+                          3. 항목별 자동 목록 추가 (선택사항)
                         </label>
-                        <div className="space-y-2">
+                        <div className="space-y-3">
                           {editData.fields.map((field, idx) => (
-                            <div key={idx}>
-                              <label className="block text-xs text-gray-600 mb-1">
-                                {field} (세미콜론으로 구분)
+                            <div key={idx} className="bg-gray-50 p-3 rounded">
+                              <label className="block text-xs font-medium text-gray-700 mb-2">
+                                {field}
                               </label>
-                              <input
-                                type="text"
-                                value={
-                                  editData.fieldOptions && editData.fieldOptions[field]
-                                    ? editData.fieldOptions[field].join('; ')
-                                    : ''
-                                }
-                                onChange={(e) => handleFieldOptionChange(field, e.target.value)}
-                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                placeholder={
-                                  field === '현장명' ? '예: 양주신도시; 옥정더퍼스트; 옥정메트로포레' :
-                                  field === '공종코드' ? '예: 1; 2; 3; 4; 5' :
-                                  field === '공사단계' ? '예: 전; 중; 후' :
-                                  '옵션을 입력하세요 (선택사항)'
-                                }
-                              />
+                              <div className="flex gap-2 mb-2">
+                                <input
+                                  type="text"
+                                  value={optionInputs[field] || ''}
+                                  onChange={(e) => setOptionInputs({
+                                    ...optionInputs,
+                                    [field]: e.target.value
+                                  })}
+                                  onKeyPress={(e) => {
+                                    if (e.key === 'Enter') {
+                                      e.preventDefault();
+                                      handleAddFieldOption(field);
+                                    }
+                                  }}
+                                  className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                  placeholder={
+                                    field === '현장명' ? '예: 양주신도시, 옥정더퍼스트' :
+                                    field === '공종' ? '예: 타일, 목공, 철근' :
+                                    '옵션을 콤마로 구분하여 입력'
+                                  }
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => handleAddFieldOption(field)}
+                                  className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 whitespace-nowrap"
+                                >
+                                  + 추가
+                                </button>
+                              </div>
+                              {editData.fieldOptions && editData.fieldOptions[field] && editData.fieldOptions[field].length > 0 && (
+                                <div className="flex flex-wrap gap-1">
+                                  {editData.fieldOptions[field].map((option, optIdx) => (
+                                    <span
+                                      key={optIdx}
+                                      className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
+                                    >
+                                      {option}
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveFieldOption(field, optIdx)}
+                                        className="text-green-600 hover:text-green-900 font-bold"
+                                      >
+                                        ×
+                                      </button>
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
                             </div>
                           ))}
                         </div>
                       </div>
                     )}
 
-                    {/* 파일 저장 폴더 구조 설정 */}
+                    {/* 4. 파일 저장 폴더 구조 */}
                     {Array.isArray(editData.fields) && editData.fields.length > 0 && (
-                      <div className="border-t pt-3 mt-3">
+                      <div className="border-t pt-4">
                         <div className="flex justify-between items-center mb-2">
                           <label className="block text-sm font-semibold text-gray-700">
-                            📁 파일저장 폴더 구조 설정
+                            4. 📁 파일저장 폴더 구조 설정
                           </label>
                           <button
                             type="button"
                             onClick={handleAddFolderItem}
-                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                            className="px-3 py-1 text-xs bg-purple-600 text-white rounded hover:bg-purple-700"
                           >
                             + 추가
                           </button>
                         </div>
                         <p className="text-xs text-gray-500 mb-2">
-                          💡 Google Drive에 저장될 폴더 구조 순서를 설정하세요 (예: 일자 &gt; 현장명 &gt; 위치 &gt; 공종)
+                          💡 Google Drive 폴더 구조 순서 (예: 일자 &gt; 현장명 &gt; 위치)
                         </p>
                         <div className="space-y-2">
                           {(editData.folderStructure || []).map((folderItem, idx) => (
@@ -1019,7 +1163,7 @@ function FormManagement({ user }) {
                               <select
                                 value={folderItem}
                                 onChange={(e) => handleFolderItemChange(idx, e.target.value)}
-                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                               >
                                 <option value="">항목 선택</option>
                                 {editData.fields.map((field) => (
@@ -1044,27 +1188,32 @@ function FormManagement({ user }) {
                       </div>
                     )}
 
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">상태</label>
+                    {/* 5. 활성화 선택 */}
+                    <div className="border-t pt-4">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">
+                        5. 활성화 선택
+                      </label>
                       <select
                         value={editData.isActive ? 'active' : 'inactive'}
                         onChange={(e) => handleCellChange('isActive', e.target.value === 'active')}
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                       >
-                        <option value="active">활성</option>
-                        <option value="inactive">비활성</option>
+                        <option value="active">✅ 활성</option>
+                        <option value="inactive">❌ 비활성</option>
                       </select>
                     </div>
-                    <div className="flex gap-2 pt-2">
+
+                    {/* 저장/취소 버튼 */}
+                    <div className="flex gap-2 pt-3 border-t">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        className="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
                       >
                         💾 저장
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
+                        className="flex-1 px-4 py-3 bg-gray-400 text-white font-semibold rounded hover:bg-gray-500"
                       >
                         ✖️ 취소
                       </button>

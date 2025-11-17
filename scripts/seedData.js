@@ -60,6 +60,11 @@ const formSchema = new mongoose.Schema({
   companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company' },
   formName: String,
   fields: [String],
+  fieldOptions: {
+    type: Map,
+    of: [String],
+    default: new Map()
+  },
   isActive: { type: Boolean, default: true },
   createdAt: { type: Date, default: Date.now }
 });
@@ -198,18 +203,33 @@ const seedData = async () => {
     const forms = await Form.insertMany([
       {
         companyId: company._id,
+        formName: 'DL연간단가',
+        fields: ['현장명', '일자', '공종코드', '물량', '공사단계'],
+        fieldOptions: new Map([
+          ['현장명', ['양주신도시', '옥정더퍼스트', '옥정메트로포레', '옥정리더스가든']],
+          ['공종코드', ['1', '2', '3', '4', '5']],
+          ['공사단계', ['전', '중', '후']]
+        ])
+      },
+      {
+        companyId: company._id,
+        formName: '품의건',
+        fields: ['공사현장', '일자', '위치', '공종명', '물량', '공사단계'],
+        fieldOptions: new Map([
+          ['공사현장', ['양주신도시', '옥정더퍼스트', '옥정메트로포레']],
+          ['공종명', ['도배', '타일', '석고보드', '인테리어']],
+          ['공사단계', ['전', '중', '후']]
+        ])
+      },
+      {
+        companyId: company._id,
         formName: '일일작업보고서',
-        fields: ['현장명', '일자', '작업위치', '공종', '작업내용', '작업자', '작업시간', '진행상황']
-      },
-      {
-        companyId: company._id,
-        formName: '자재발주서',
-        fields: ['현장명', '일자', '자재명', '수량', '단위', '단가', '공급업체', '비고']
-      },
-      {
-        companyId: company._id,
-        formName: '하자보수내역',
-        fields: ['현장명', '일자', '하자위치', '하자내용', '보수방법', '담당자', '완료여부']
+        fields: ['현장명', '일자', '작업위치', '공종', '작업내용', '작업자', '작업시간', '진행상황'],
+        fieldOptions: new Map([
+          ['현장명', ['힐스테이트 광교', '자이 용인', '롯데캐슬 판교', '센트럴 파크 수원']],
+          ['공종', ['도배', '타일', '석고보드']],
+          ['진행상황', ['시작', '진행중', '완료']]
+        ])
       }
     ]);
     console.log('✅ 입력양식 생성 완료:', forms.length + '개');

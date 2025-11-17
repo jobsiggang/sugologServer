@@ -398,21 +398,7 @@ export default function ImageEditor({ author }) {
 
   return (
     <div style={{ padding: 16, backgroundColor: "#f0f0f0", minHeight: "100vh", fontFamily: "돋움", display: "flex", justifyContent: "center" }}>
-      <div style={{ width: "90%", maxWidth: 900 }}>
-        {/* 제목 + 로그아웃 */}
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 15, flexWrap: "wrap", gap: 8 }}>
-          <h2 style={{ fontSize: 20, margin: 0,fontWeight:"bold",color:"#007bff" }}>🏗️ 공정한 Works 💞 {author}</h2>
-          <button
-            onClick={() => {
-              localStorage.removeItem("authorName");
-              router.push("/");
-            }}
-            style={{ background: "#ddd", color: "#000" }}
-          >
-            로그아웃
-          </button>
-        </div>
-
+      <div style={{ width: "90%", maxWidth: 900 }}>    
         {/* 양식 선택 + 가져오기 */}
         <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
           <select

@@ -74,7 +74,7 @@ export async function POST(request) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { formName, fields, companyId } = await request.json();
+    const { formName, fields, fieldOptions, companyId } = await request.json();
 
     // 입력값 검증
     if (!formName || !fields || !Array.isArray(fields) || fields.length === 0) {
@@ -100,7 +100,8 @@ export async function POST(request) {
     const newForm = new Form({
       companyId: finalCompanyId,
       formName,
-      fields
+      fields,
+      fieldOptions: fieldOptions ? new Map(Object.entries(fieldOptions)) : new Map()
     });
 
     await newForm.save();

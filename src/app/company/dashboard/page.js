@@ -151,6 +151,7 @@ function GoogleSettings({ user }) {
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [testing, setTesting] = useState(false);
+  const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
     webAppUrl: '',
     spreadsheetId: '',
@@ -180,6 +181,10 @@ function GoogleSettings({ user }) {
           spreadsheetId: data.googleSettings.spreadsheetId || '',
           driveFolderId: data.googleSettings.driveFolderId || ''
         });
+        // 설정이 없으면 자동으로 편집 모드
+        if (!data.googleSettings.setupCompleted) {
+          setEditing(true);
+        }
       }
     } catch (error) {
       console.error('설정 조회 실패:', error);
@@ -208,6 +213,7 @@ function GoogleSettings({ user }) {
       
       if (data.success) {
         alert('Google 설정이 저장되었습니다.');
+        setEditing(false);
         fetchSettings();
       } else {
         alert(data.error || '저장 실패');
@@ -242,11 +248,30 @@ function GoogleSettings({ user }) {
     }
   };
 
+  const handleCancel = () => {
+    setEditing(false);
+    setFormData({
+      webAppUrl: settings?.webAppUrl || '',
+      spreadsheetId: settings?.spreadsheetId || '',
+      driveFolderId: settings?.driveFolderId || ''
+    });
+  };
+
   if (loading) return <div className="text-center py-10">로딩 중...</div>;
 
   return (
     <div className="w-full">
-      <h2 className="text-xl font-bold mb-4">Google Apps Script 설정</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-bold">Google Apps Script 설정</h2>
+        {settings?.setupCompleted && !editing && (
+          <button
+            onClick={() => setEditing(true)}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+          >
+            ✏️ 수정
+          </button>
+        )}
+      </div>
 
       {settings?.setupCompleted && (
         <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
@@ -267,65 +292,140 @@ function GoogleSettings({ user }) {
       )}
 
       <div className="bg-white p-4 rounded-lg shadow">
-        <form onSubmit={handleUpdate} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Apps Script 웹앱 URL <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="url"
-              value={formData.webAppUrl}
-              onChange={(e) => setFormData({ ...formData, webAppUrl: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="https://script.google.com/macros/s/..."
-              required
-            />
-          </div>
+        {!editing && settings?.setupCompleted ? (
+          // 조회 모드
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Apps Script 웹앱 URL
+              </label>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm break-all">
+                {settings.webAppUrl || '(없음)'}
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Spreadsheet ID <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              value={formData.spreadsheetId}
-              onChange={(e) => setFormData({ ...formData, spreadsheetId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="스프레드시트 URL의 ID 부분"
-              required
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Spreadsheet ID
+              </label>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                {settings.spreadsheetId || '(없음)'}
+              </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Google Drive 폴더 ID
-            </label>
-            <input
-              type="text"
-              value={formData.driveFolderId}
-              onChange={(e) => setFormData({ ...formData, driveFolderId: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-              placeholder="드라이브 폴더 URL의 ID 부분 (선택사항)"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Drive 폴더 ID
+              </label>
+              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
+                {settings.driveFolderId || '(없음)'}
+              </div>
+            </div>
 
-          <div className="flex gap-3">
-            <button
-              type="submit"
-              className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
-            >
-              설정 저장
-            </button>
             <button
               type="button"
               onClick={handleTest}
-              disabled={testing || !formData.webAppUrl}
-              className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400"
+              disabled={testing}
+              className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400"
             >
-              {testing ? '테스트 중...' : '연결 테스트'}
+              {testing ? '테스트 중...' : '🔍 연결 테스트'}
             </button>
           </div>
-        </form>
+        ) : (
+          // 편집 모드
+          <form onSubmit={handleUpdate} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Apps Script 웹앱 URL <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="url"
+                value={formData.webAppUrl}
+                onChange={(e) => setFormData({ ...formData, webAppUrl: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="https://script.google.com/macros/s/..."
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Google Apps Script 배포 후 받은 웹앱 URL을 입력하세요
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Spreadsheet ID <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.spreadsheetId}
+                onChange={(e) => setFormData({ ...formData, spreadsheetId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="스프레드시트 URL의 ID 부분"
+                required
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                예: https://docs.google.com/spreadsheets/d/<strong>YOUR_ID_HERE</strong>/edit
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Google Drive 폴더 ID
+              </label>
+              <input
+                type="text"
+                value={formData.driveFolderId}
+                onChange={(e) => setFormData({ ...formData, driveFolderId: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="드라이브 폴더 URL의 ID 부분 (선택사항)"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                사진을 저장할 Google Drive 폴더 (선택사항)
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                type="submit"
+                className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
+              >
+                💾 설정 저장
+              </button>
+              {settings?.setupCompleted && (
+                <button
+                  type="button"
+                  onClick={handleCancel}
+                  className="flex-1 bg-gray-400 text-white py-3 rounded-lg hover:bg-gray-500 font-medium"
+                >
+                  ✖️ 취소
+                </button>
+              )}
+            </div>
+
+            {formData.webAppUrl && (
+              <button
+                type="button"
+                onClick={handleTest}
+                disabled={testing}
+                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400 mt-2"
+              >
+                {testing ? '테스트 중...' : '🔍 연결 테스트'}
+              </button>
+            )}
+          </form>
+        )}
+      </div>
+
+      {/* 설정 가이드 */}
+      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 className="text-sm font-bold text-blue-900 mb-2">📖 설정 가이드</h3>
+        <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
+          <li>Google Apps Script를 작성하고 배포합니다</li>
+          <li>배포 후 받은 웹앱 URL을 복사하여 위에 입력합니다</li>
+          <li>데이터를 저장할 Google Spreadsheet ID를 입력합니다</li>
+          <li>"설정 저장" 버튼을 눌러 저장합니다</li>
+          <li>"연결 테스트"로 정상 작동을 확인합니다</li>
+        </ol>
       </div>
     </div>
   );
@@ -989,7 +1089,8 @@ function FormManagement({ user }) {
     const newForm = {
       _id: 'new',
       formName: '',
-      description: '',
+      fields: [],
+      fieldOptions: {},
       isActive: true
     };
     setForms([newForm, ...forms]);
@@ -1000,7 +1101,13 @@ function FormManagement({ user }) {
 
   const handleEdit = (form) => {
     setEditingId(form._id);
-    setEditData({ ...form });
+    // fieldOptions가 없으면 빈 객체로 초기화
+    const fieldOptions = form.fieldOptions || {};
+    setEditData({ 
+      ...form,
+      fields: Array.isArray(form.fields) ? form.fields : [],
+      fieldOptions: fieldOptions
+    });
   };
 
   const handleCancel = () => {
@@ -1067,6 +1174,24 @@ function FormManagement({ user }) {
     setEditData({ ...editData, [field]: value });
   };
 
+  const handleFieldsChange = (value) => {
+    // 쉼표로 구분된 문자열을 배열로 변환
+    const fieldsArray = value.split(',').map(f => f.trim()).filter(f => f);
+    setEditData({ ...editData, fields: fieldsArray });
+  };
+
+  const handleFieldOptionChange = (fieldName, value) => {
+    // 쉼표로 구분된 문자열을 배열로 변환
+    const optionsArray = value.split(',').map(o => o.trim()).filter(o => o);
+    setEditData({
+      ...editData,
+      fieldOptions: {
+        ...editData.fieldOptions,
+        [fieldName]: optionsArray
+      }
+    });
+  };
+
   const toggleExpand = (formId) => {
     if (expandedId === formId) {
       setExpandedId(null);
@@ -1101,10 +1226,8 @@ function FormManagement({ user }) {
               <div className="flex items-center gap-3 flex-1 min-w-0">
                 <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
                 <span className="text-sm font-medium truncate">{form.formName}</span>
-                <span className={`px-2 py-1 rounded text-xs ${
-                  form.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {form.isActive ? '활성' : '비활성'}
+                <span className="text-xs text-gray-500">
+                  [{Array.isArray(form.fields) ? form.fields.join(', ') : ''}]
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -1125,19 +1248,54 @@ function FormManagement({ user }) {
                         value={editData.formName || ''}
                         onChange={(e) => handleCellChange('formName', e.target.value)}
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="양식명"
+                        placeholder="예: DL연간단가"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs text-gray-600 mb-1">설명</label>
+                      <label className="block text-xs text-gray-600 mb-1">항목명 (쉼표로 구분)</label>
                       <input
                         type="text"
-                        value={editData.description || ''}
-                        onChange={(e) => handleCellChange('description', e.target.value)}
+                        value={Array.isArray(editData.fields) ? editData.fields.join(', ') : ''}
+                        onChange={(e) => handleFieldsChange(e.target.value)}
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="설명"
+                        placeholder="예: 현장명, 일자, 공종코드, 물량, 공사단계"
                       />
                     </div>
+
+                    {/* 각 항목별 옵션 리스트 입력 */}
+                    {Array.isArray(editData.fields) && editData.fields.length > 0 && (
+                      <div className="border-t pt-3 mt-3">
+                        <label className="block text-sm font-semibold text-gray-700 mb-2">
+                          항목별 선택 옵션 설정
+                        </label>
+                        <div className="space-y-2">
+                          {editData.fields.map((field, idx) => (
+                            <div key={idx}>
+                              <label className="block text-xs text-gray-600 mb-1">
+                                {field} (쉼표로 구분)
+                              </label>
+                              <input
+                                type="text"
+                                value={
+                                  editData.fieldOptions && editData.fieldOptions[field]
+                                    ? editData.fieldOptions[field].join(', ')
+                                    : ''
+                                }
+                                onChange={(e) => handleFieldOptionChange(field, e.target.value)}
+                                className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                placeholder={
+                                  field === '현장명' ? '예: 양주신도시, 옥정더퍼스트, 옥정메트로포레' :
+                                  field === '공종코드' ? '예: 1, 2, 3, 4, 5' :
+                                  field === '공사단계' ? '예: 전, 중, 후' :
+                                  '옵션을 입력하세요 (선택사항)'
+                                }
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">상태</label>
                       <select
@@ -1166,11 +1324,35 @@ function FormManagement({ user }) {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div className="grid grid-cols-1 gap-3 text-sm">
                       <div>
-                        <span className="text-gray-600">양식명:</span>
+                        <span className="text-gray-600 font-semibold">양식명:</span>
                         <span className="ml-2 font-medium">{form.formName}</span>
                       </div>
+                      <div>
+                        <span className="text-gray-600 font-semibold">항목명:</span>
+                        <span className="ml-2 text-blue-600">
+                          [{Array.isArray(form.fields) ? form.fields.join(', ') : ''}]
+                        </span>
+                      </div>
+                      
+                      {/* 항목별 옵션 리스트 표시 */}
+                      {form.fieldOptions && Object.keys(form.fieldOptions).length > 0 && (
+                        <div className="border-t pt-2 mt-2">
+                          <span className="text-gray-600 font-semibold block mb-2">항목별 옵션:</span>
+                          <div className="space-y-1 pl-4">
+                            {Object.entries(form.fieldOptions).map(([fieldName, options]) => (
+                              <div key={fieldName} className="text-xs">
+                                <span className="font-medium text-gray-700">{fieldName}:</span>
+                                <span className="ml-2 text-green-600">
+                                  [{Array.isArray(options) ? options.join(', ') : ''}]
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div>
                         <span className="text-gray-600">상태:</span>
                         <span className={`ml-2 px-2 py-1 rounded text-xs ${
@@ -1178,10 +1360,6 @@ function FormManagement({ user }) {
                         }`}>
                           {form.isActive ? '활성' : '비활성'}
                         </span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600">설명:</span>
-                        <span className="ml-2">{form.description}</span>
                       </div>
                     </div>
 
@@ -1209,6 +1387,7 @@ function FormManagement({ user }) {
 
       <div className="mt-4 text-sm text-gray-600">
         <p>💡 양식명을 클릭하면 상세정보가 펼쳐집니다.</p>
+        <p>💡 항목별 옵션을 설정하면 입력 시 선택 목록이 표시됩니다.</p>
       </div>
     </div>
   );

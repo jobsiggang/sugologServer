@@ -15,6 +15,12 @@ const formSchema = new mongoose.Schema({
     type: String,
     required: true
   }],
+  // 항목별 옵션 리스트 (예: { "현장명": ["양주신도시", "옥정더퍼스트"], "공종코드": ["1", "2", "3"] })
+  fieldOptions: {
+    type: Map,
+    of: [String],
+    default: new Map()
+  },
   isActive: {
     type: Boolean,
     default: true

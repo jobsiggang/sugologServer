@@ -14,9 +14,36 @@ export default function LoginPage() {
   const [isSupervisor, setIsSupervisor] = useState(false);
 
   useEffect(() => {
+    checkExistingAuth();
     checkSupervisor();
     fetchCompanies();
   }, []);
+
+  const checkExistingAuth = () => {
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        const user = JSON.parse(userStr);
+        console.log('이미 로그인된 사용자 감지:', user.role);
+        
+        // 역할에 따라 적절한 페이지로 리다이렉트
+        if (user.role === 'supervisor') {
+          router.push('/admin');
+        } else if (user.role === 'company_admin') {
+          router.push('/company/dashboard');
+        } else if (user.role === 'employee') {
+          router.push('/');
+        }
+      } catch (error) {
+        console.error('기존 로그인 정보 파싱 실패:', error);
+        // 파싱 실패 시 로그인 정보 삭제
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+      }
+    }
+  };
 
   const fetchCompanies = async () => {
     try {
@@ -87,7 +114,8 @@ export default function LoginPage() {
       } else if (data.role === 'company_admin') {
         router.push("/company/dashboard");
       } else {
-        router.push("/upload");
+        // 직원은 메인 페이지에서 업로드 UI를 사용
+        router.push("/");
       }
     } else {
       setError(data.message || "로그인 실패");

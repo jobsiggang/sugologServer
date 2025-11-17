@@ -19,24 +19,35 @@ if (!cached) {
 
 async function connectDB() {
   if (cached.conn) {
+    console.log('Using cached MongoDB connection');
     return cached.conn;
   }
 
   if (!cached.promise) {
     const opts = {
       bufferCommands: false,
+      serverSelectionTimeoutMS: 10000, // 10초 타임아웃
+      socketTimeoutMS: 45000, // 45초 소켓 타임아웃
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
-      console.log('MongoDB 연결 성공');
-      return mongoose;
-    });
+    console.log('Creating new MongoDB connection...');
+    cached.promise = mongoose.connect(MONGODB_URI, opts)
+      .then((mongoose) => {
+        console.log('✅ MongoDB 연결 성공');
+        return mongoose;
+      })
+      .catch((error) => {
+        console.error('❌ MongoDB 연결 실패:', error);
+        cached.promise = null; // 실패 시 promise 초기화
+        throw error;
+      });
   }
 
   try {
     cached.conn = await cached.promise;
   } catch (e) {
     cached.promise = null;
+    console.error('❌ MongoDB connection error in connectDB:', e);
     throw e;
   }
 

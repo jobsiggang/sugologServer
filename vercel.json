@@ -1,0 +1,50 @@
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "admin.(?<domain>.*)"
+        }
+      ],
+      "destination": "/admin/:path*"
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "manage.(?<domain>.*)"
+        }
+      ],
+      "destination": "/company/dashboard/:path*"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/upload",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
+}

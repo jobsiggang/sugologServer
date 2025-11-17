@@ -58,7 +58,7 @@ export default function EmployeeDashboard() {
   };
 
   const goToUpload = () => {
-    router.push('/upload');
+    router.push('/');
   };
 
   if (!user) {

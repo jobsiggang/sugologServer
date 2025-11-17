@@ -8,7 +8,10 @@ export async function POST(req) {
     const body = await req.json();
     const { username, password, companyId } = body;
 
-    console.log('Login attempt:', { username, hasCompanyId: !!companyId });
+    console.log('=== 로그인 시도 ===');
+    console.log('Username:', username);
+    console.log('CompanyId:', companyId);
+    console.log('시간:', new Date().toISOString());
 
     if (!username || !password) {
       return NextResponse.json({
@@ -17,8 +20,20 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // MongoDB 연결
-    await connectDB();
+    // MongoDB 연결 (타임아웃 추가)
+    console.log('MongoDB 연결 시작...');
+    const startTime = Date.now();
+    
+    try {
+      await connectDB();
+      console.log(`MongoDB 연결 완료 (${Date.now() - startTime}ms)`);
+    } catch (dbError) {
+      console.error('MongoDB 연결 실패:', dbError);
+      return NextResponse.json({
+        success: false,
+        message: "데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.",
+      }, { status: 503 });
+    }
 
     // 사용자 찾기 (회사 ID가 있으면 회사별로 조회)
     let query = { username, isActive: true };
@@ -33,15 +48,29 @@ export async function POST(req) {
 
     console.log('Query:', JSON.stringify(query));
 
-    const user = await User.findOne(query).populate('companyId');
+    let user;
+    try {
+      user = await User.findOne(query).populate('companyId');
+      console.log('User 조회 완료:', !!user);
+    } catch (findError) {
+      console.error('User 조회 실패:', findError);
+      return NextResponse.json({
+        success: false,
+        message: "사용자 조회 중 오류가 발생했습니다.",
+      }, { status: 500 });
+    }
 
-    console.log('User found:', !!user, user?.username, user?.role);
     if (user) {
-      console.log('User companyId:', user.companyId);
-      console.log('User companyId type:', typeof user.companyId);
+      console.log('User 정보:', {
+        username: user.username,
+        role: user.role,
+        hasCompanyId: !!user.companyId,
+        hasPassword: !!user.password
+      });
     }
 
     if (!user) {
+      console.log('❌ 사용자를 찾을 수 없음');
       return NextResponse.json({
         success: false,
         message: "아이디 또는 비밀번호가 올바르지 않습니다.",
@@ -49,9 +78,21 @@ export async function POST(req) {
     }
 
     // 비밀번호 확인
-    const isPasswordValid = await user.comparePassword(password);
+    console.log('비밀번호 확인 시작...');
+    let isPasswordValid;
+    try {
+      isPasswordValid = await user.comparePassword(password);
+      console.log('비밀번호 확인 결과:', isPasswordValid);
+    } catch (pwError) {
+      console.error('비밀번호 확인 중 오류:', pwError);
+      return NextResponse.json({
+        success: false,
+        message: "비밀번호 확인 중 오류가 발생했습니다.",
+      }, { status: 500 });
+    }
 
     if (!isPasswordValid) {
+      console.log('❌ 비밀번호 불일치');
       return NextResponse.json({
         success: false,
         message: "아이디 또는 비밀번호가 올바르지 않습니다.",
@@ -64,6 +105,7 @@ export async function POST(req) {
 
     // JWT 토큰 생성
     const token = generateToken(user._id, user.role, userCompanyId);
+    console.log('✅ 토큰 생성 완료');
 
     // 응답 생성
     const response = NextResponse.json({
@@ -88,6 +130,7 @@ export async function POST(req) {
       maxAge: 60 * 60 * 24 * 7, // 7일
     });
 
+    console.log('=== 로그인 성공 ===\n');
     return response;
   } catch (error) {
     console.error('❌ Login error:', error);

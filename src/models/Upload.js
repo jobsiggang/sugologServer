@@ -37,13 +37,17 @@ const uploadSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  imageUrls: {
+    type: [String],
+    default: []
+  },
   googleSheetRowId: {
     type: String,
     required: false
   },
   status: {
     type: String,
-    enum: ['pending', 'uploaded', 'failed'],
+    enum: ['pending', 'uploaded', 'failed', 'completed'],
     default: 'uploaded'
   },
   createdAt: {

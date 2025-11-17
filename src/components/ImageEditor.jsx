@@ -275,21 +275,52 @@ export default function ImageEditor({ author }) {
       }
 
       // 2) 업로드 단계 — 각 파일 업로드 완료 시점에 진행률 갱신
-      // uploadPhoto (단일 업로드)가 있으면 파일별로 호출해서 진행률을 매번 갱신
+      const uploadedUrls = [];
+      
       if (typeof uploadPhoto === "function") {
         for (let i = 0; i < processed.length; i++) {
           const item = processed[i];
           const res = await uploadPhoto(item.base64, item.filename, item.entryData);
           if (!res || !res.success) throw new Error(res?.error || "업로드 실패");
+          if (res.url) uploadedUrls.push(res.url);
           setUploadingProgress(Math.round(((i + 1) / processed.length) * 100));
         }
       } else if (typeof uploadPhotosBatch === "function") {
         // 배치 업로드만 지원하는 경우: 호출 전 업로드Progress 0, 호출 후 100
         const res = await uploadPhotosBatch(processed);
         if (!res || !res.success) throw new Error(res?.error || "배치 업로드 실패");
+        if (res.urls) uploadedUrls.push(...res.urls);
         setUploadingProgress(100);
       } else {
         throw new Error("업로드 함수(uploadPhoto 또는 uploadPhotosBatch)가 없습니다.");
+      }
+
+      // 3) MongoDB에 업로드 정보 저장
+      try {
+        const token = localStorage.getItem('token');
+        const uploadRecord = {
+          formName: selectedForm,
+          siteName: entryData['현장명'] || '',
+          data: entryData,
+          imageUrls: uploadedUrls
+        };
+
+        const saveResponse = await fetch('/api/uploads', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(uploadRecord)
+        });
+
+        const saveData = await saveResponse.json();
+        if (!saveData.success) {
+          console.error('DB 저장 실패:', saveData.error);
+        }
+      } catch (dbErr) {
+        console.error('DB 저장 중 오류:', dbErr);
+        // DB 저장 실패해도 업로드는 완료된 것으로 처리
       }
 
       // 완료 처리

@@ -8,24 +8,44 @@ export async function GET(request) {
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+      return NextResponse.json({ 
+        success: false,
+        error: '인증이 필요합니다.' 
+      }, { status: 401 });
     }
 
     const decoded = verifyToken(token);
     if (!decoded) {
-      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+      return NextResponse.json({ 
+        success: false,
+        error: '유효하지 않은 토큰입니다.' 
+      }, { status: 401 });
     }
+
+    console.log('Sites GET - decoded:', { userId: decoded.userId, role: decoded.role, companyId: decoded.companyId });
 
     await connectDB();
 
     // 슈퍼바이저는 모든 현장, 업체관리자/직원은 자기 회사 현장만
-    const query = decoded.role === 'supervisor' 
-      ? {} 
-      : { companyId: decoded.companyId };
+    let query = {};
+    
+    if (decoded.role === 'supervisor') {
+      query = {};
+    } else {
+      if (!decoded.companyId) {
+        return NextResponse.json({ 
+          success: false,
+          error: '회사 정보가 없습니다. 다시 로그인해주세요.' 
+        }, { status: 400 });
+      }
+      query = { companyId: decoded.companyId };
+    }
 
     const sites = await Site.find(query)
       .populate('companyId', 'name')
       .sort({ createdAt: -1 });
+
+    console.log('Sites found:', sites.length);
 
     return NextResponse.json({
       success: true,
@@ -34,7 +54,9 @@ export async function GET(request) {
   } catch (error) {
     console.error('Get sites error:', error);
     return NextResponse.json({ 
-      error: '현장 목록 조회 중 오류가 발생했습니다.' 
+      success: false,
+      error: '현장 목록 조회 중 오류가 발생했습니다.',
+      details: error.message
     }, { status: 500 });
   }
 }

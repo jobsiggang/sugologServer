@@ -35,6 +35,14 @@ export default function UploadPage() {
     router.push('/login');
   };
 
+  const goToDashboard = () => {
+    if (user.role === 'employee') {
+      router.push('/employee');
+    } else if (user.role === 'company_admin') {
+      router.push('/company/dashboard');
+    }
+  };
+
   if (!user) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <p className="text-gray-600">로그인 정보를 불러오는 중...</p>
@@ -57,6 +65,23 @@ export default function UploadPage() {
             로그아웃
           </button>
         </div>
+
+        {/* 탭 메뉴 (직원만) */}
+        {user.role === 'employee' && (
+          <div className="flex border-t border-gray-200">
+            <button
+              className="flex-1 px-4 py-3 text-sm font-medium bg-blue-50 text-blue-700"
+            >
+              📸 사진 업로드
+            </button>
+            <button
+              onClick={goToDashboard}
+              className="flex-1 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 border-l border-gray-200"
+            >
+              📋 업로드 내역
+            </button>
+          </div>
+        )}
       </header>
 
       {/* 메인 컨텐츠 */}

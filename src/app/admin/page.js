@@ -12,6 +12,7 @@ export default function SupervisorDashboard() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
   const [formData, setFormData] = useState({
     companyName: '',
     companyDescription: '',
@@ -217,6 +218,16 @@ export default function SupervisorDashboard() {
     } catch (error) {
       console.error('상태 변경 오류:', error);
       alert('상태 변경 중 오류가 발생했습니다.');
+    }
+  };
+
+  const toggleExpand = (companyId) => {
+    if (expandedId === companyId) {
+      setExpandedId(null);
+    } else {
+      setExpandedId(companyId);
+      setShowEditForm(false);
+      setEditingCompany(null);
     }
   };
 
@@ -431,81 +442,128 @@ export default function SupervisorDashboard() {
           </div>
         )}
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white rounded-lg shadow overflow-hidden">
           {companies.length === 0 ? (
-            <div className="col-span-full text-center py-12 bg-white rounded-lg shadow">
+            <div className="text-center py-12">
               <p className="text-gray-500">등록된 업체가 없습니다.</p>
               <p className="text-sm text-gray-400 mt-2">위의 "업체 추가" 버튼을 눌러 새 업체를 등록하세요.</p>
             </div>
           ) : (
-            companies.map((company) => (
-              <div key={company._id} className="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-gray-800">{company.name}</h3>
-                    {!company.isActive && (
-                      <span className="inline-block mt-1 px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
-                        비활성
-                      </span>
-                    )}
-                  </div>
-                  {company.googleSetupCompleted ? (
-                    <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                      설정완료
-                    </span>
-                  ) : (
-                    <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                      미설정
-                    </span>
-                  )}
-                </div>
-
-                {company.description && (
-                  <p className="text-sm text-gray-600 mb-4">{company.description}</p>
-                )}
-
-                <div className="border-t pt-4 space-y-2 mb-4">
-                  <div className="flex items-center text-sm">
-                    <span className="text-gray-500 w-20">관리자:</span>
-                    <span className="font-medium">
-                      {company.admin ? `${company.admin.name} (${company.admin.username})` : '없음'}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-sm">
-                    <span className="text-gray-500 w-20">등록일:</span>
-                    <span className="text-gray-700">
-                      {new Date(company.createdAt).toLocaleDateString('ko-KR')}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleEdit(company)}
-                    className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
-                  >
-                    수정
-                  </button>
-                  <button
-                    onClick={() => handleToggleActive(company)}
-                    className={`flex-1 px-3 py-2 text-sm rounded-lg ${
-                      company.isActive
-                        ? 'bg-orange-600 text-white hover:bg-orange-700'
-                        : 'bg-green-600 text-white hover:bg-green-700'
-                    }`}
-                  >
-                    {company.isActive ? '비활성화' : '활성화'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(company)}
-                    className="flex-1 px-3 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700"
-                  >
-                    삭제
-                  </button>
-                </div>
-              </div>
-            ))
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">업체명</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">관리자</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Google</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
+                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">관리</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {companies.map((company, index) => (
+                    <tr 
+                      key={company._id} 
+                      className={`hover:bg-gray-50 transition-colors ${
+                        expandedId === company._id ? 'bg-blue-50' : ''
+                      }`}
+                    >
+                      <td className="px-4 py-3 text-sm text-gray-500">{index + 1}</td>
+                      <td 
+                        onClick={() => toggleExpand(company._id)}
+                        className="px-4 py-3 cursor-pointer"
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-medium text-gray-900">{company.name}</span>
+                          <span className={`w-2 h-2 rounded-full ${
+                            expandedId === company._id ? 'bg-blue-600' : 'bg-gray-400'
+                          }`}></span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {company.admin ? `${company.admin.name} (${company.admin.username})` : '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
+                        {company.description || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {company.googleSetupCompleted ? (
+                          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                            완료
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
+                            미설정
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {company.isActive ? (
+                          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                            활성
+                          </span>
+                        ) : (
+                          <span className="inline-block px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                            비활성
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        {expandedId === company._id ? (
+                          <div className="flex gap-1 justify-center">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEdit(company);
+                              }}
+                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                              title="수정"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleToggleActive(company);
+                              }}
+                              className={`px-2 py-1 text-xs rounded ${
+                                company.isActive
+                                  ? 'bg-orange-600 text-white hover:bg-orange-700'
+                                  : 'bg-green-600 text-white hover:bg-green-700'
+                              }`}
+                              title={company.isActive ? '비활성화' : '활성화'}
+                            >
+                              {company.isActive ? '🔒' : '🔓'}
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(company);
+                              }}
+                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                              title="삭제"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="text-center text-gray-400 text-xs">
+                            클릭
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
+        </div>
+
+        <div className="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded">
+          <p>💡 <strong>업체명</strong>을 클릭하면 관리 버튼이 표시됩니다.</p>
         </div>
           </div>
         )}

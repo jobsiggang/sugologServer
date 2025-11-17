@@ -83,16 +83,6 @@ export default function CompanyDashboard() {
             📋 입력양식 관리
           </button>
           <button
-            onClick={() => setActiveTab('keys')}
-            className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'keys'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-600 hover:text-gray-800'
-            }`}
-          >
-            🔑 유사키 관리
-          </button>
-          <button
             onClick={() => setActiveTab('google')}
             className={`flex-shrink-0 px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
               activeTab === 'google'
@@ -110,7 +100,6 @@ export default function CompanyDashboard() {
         {activeTab === 'google' && <GoogleSettings user={user} />}
         {activeTab === 'employees' && <EmployeeManagement user={user} />}
         {activeTab === 'forms' && <FormManagement user={user} />}
-        {activeTab === 'keys' && <KeyMappingManagement user={user} />}
       </main>
     </div>
   );
@@ -875,6 +864,32 @@ function FormManagement({ user }) {
     });
   };
 
+  const handleAddFolderItem = () => {
+    const folderStructure = editData.folderStructure || [];
+    setEditData({
+      ...editData,
+      folderStructure: [...folderStructure, '']
+    });
+  };
+
+  const handleFolderItemChange = (index, value) => {
+    const folderStructure = [...(editData.folderStructure || [])];
+    folderStructure[index] = value;
+    setEditData({
+      ...editData,
+      folderStructure
+    });
+  };
+
+  const handleRemoveFolderItem = (index) => {
+    const folderStructure = [...(editData.folderStructure || [])];
+    folderStructure.splice(index, 1);
+    setEditData({
+      ...editData,
+      folderStructure
+    });
+  };
+
   const toggleExpand = (formId) => {
     if (expandedId === formId) {
       setExpandedId(null);
@@ -979,6 +994,56 @@ function FormManagement({ user }) {
                       </div>
                     )}
 
+                    {/* 파일 저장 폴더 구조 설정 */}
+                    {Array.isArray(editData.fields) && editData.fields.length > 0 && (
+                      <div className="border-t pt-3 mt-3">
+                        <div className="flex justify-between items-center mb-2">
+                          <label className="block text-sm font-semibold text-gray-700">
+                            📁 파일저장 폴더 구조 설정
+                          </label>
+                          <button
+                            type="button"
+                            onClick={handleAddFolderItem}
+                            className="px-2 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            + 추가
+                          </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mb-2">
+                          💡 Google Drive에 저장될 폴더 구조 순서를 설정하세요 (예: 일자 &gt; 현장명 &gt; 위치 &gt; 공종)
+                        </p>
+                        <div className="space-y-2">
+                          {(editData.folderStructure || []).map((folderItem, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 w-6">{idx + 1}.</span>
+                              <select
+                                value={folderItem}
+                                onChange={(e) => handleFolderItemChange(idx, e.target.value)}
+                                className="flex-1 px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                              >
+                                <option value="">항목 선택</option>
+                                {editData.fields.map((field) => (
+                                  <option key={field} value={field}>{field}</option>
+                                ))}
+                              </select>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveFolderItem(idx)}
+                                className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                              >
+                                삭제
+                              </button>
+                            </div>
+                          ))}
+                          {(!editData.folderStructure || editData.folderStructure.length === 0) && (
+                            <p className="text-xs text-gray-400 italic">
+                              "+ 추가" 버튼을 눌러 폴더 구조를 설정하세요
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">상태</label>
                       <select
@@ -1036,6 +1101,18 @@ function FormManagement({ user }) {
                         </div>
                       )}
 
+                      {/* 파일 저장 폴더 구조 표시 */}
+                      {form.folderStructure && form.folderStructure.length > 0 && (
+                        <div className="border-t pt-2 mt-2">
+                          <span className="text-gray-600 font-semibold block mb-2">📁 폴더 구조:</span>
+                          <div className="pl-4 text-sm">
+                            <span className="text-purple-600 font-mono">
+                              {form.folderStructure.join(' > ')}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
                       <div>
                         <span className="text-gray-600">상태:</span>
                         <span className={`ml-2 px-2 py-1 rounded text-xs ${
@@ -1071,284 +1148,6 @@ function FormManagement({ user }) {
       <div className="mt-4 text-sm text-gray-600">
         <p>💡 양식명을 클릭하면 상세정보가 펼쳐집니다.</p>
         <p>💡 항목별 옵션을 설정하면 입력 시 선택 목록이 표시됩니다.</p>
-      </div>
-    </div>
-  );
-}
-
-// 유사키 관리 컴포넌트
-function KeyMappingManagement({ user }) {
-  const [keyMappings, setKeyMappings] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [editingId, setEditingId] = useState(null);
-  const [editData, setEditData] = useState({});
-  const [expandedId, setExpandedId] = useState(null);
-
-  useEffect(() => {
-    fetchKeyMappings();
-  }, []);
-
-  const fetchKeyMappings = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/key-mappings', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await response.json();
-      if (data.success) {
-        setKeyMappings(data.keyMappings);
-      }
-    } catch (error) {
-      console.error('유사키 목록 조회 실패:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddRow = () => {
-    const newMapping = {
-      _id: 'new',
-      masterKey: '',
-      originalKey: '',
-      similarKeys: '',
-      description: ''
-    };
-    setKeyMappings([newMapping, ...keyMappings]);
-    setEditingId('new');
-    setEditData(newMapping);
-    setExpandedId('new');
-  };
-
-  const handleEdit = (mapping) => {
-    setEditingId(mapping._id);
-    setEditData({ 
-      ...mapping,
-      similarKeys: Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join('; ') : mapping.similarKeys
-    });
-  };
-
-  const handleCancel = () => {
-    if (editingId === 'new') {
-      setKeyMappings(keyMappings.filter(k => k._id !== 'new'));
-      setExpandedId(null);
-    }
-    setEditingId(null);
-    setEditData({});
-  };
-
-  const handleSave = async () => {
-    try {
-      const token = localStorage.getItem('token');
-      const isNew = editingId === 'new';
-      const url = isNew ? '/api/key-mappings' : `/api/key-mappings/${editingId}`;
-      const method = isNew ? 'POST' : 'PUT';
-
-      const dataToSend = {
-        ...editData,
-        similarKeys: typeof editData.similarKeys === 'string' 
-          ? editData.similarKeys.split(';').map(s => s.trim()).filter(s => s)
-          : editData.similarKeys
-      };
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(dataToSend)
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        setEditingId(null);
-        setEditData({});
-        fetchKeyMappings();
-      } else {
-        alert(data.error || '저장 실패');
-      }
-    } catch (error) {
-      alert('오류가 발생했습니다.');
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (!confirm('정말 삭제하시겠습니까?')) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`/api/key-mappings/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        fetchKeyMappings();
-        setExpandedId(null);
-      }
-    } catch (error) {
-      alert('삭제 실패');
-    }
-  };
-
-  const handleCellChange = (field, value) => {
-    setEditData({ ...editData, [field]: value });
-  };
-
-  const toggleExpand = (mappingId) => {
-    if (expandedId === mappingId) {
-      setExpandedId(null);
-    } else {
-      setExpandedId(mappingId);
-    }
-  };
-
-  if (loading) return <div className="text-center py-10">로딩 중...</div>;
-
-  return (
-    <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">유사키 관리</h2>
-        <button
-          onClick={handleAddRow}
-          className="px-3 py-2 text-sm bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          + 추가
-        </button>
-      </div>
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {keyMappings.map((mapping, index) => (
-          <div key={mapping._id} className="border-b last:border-b-0">
-            <div
-              onClick={() => editingId !== mapping._id && toggleExpand(mapping._id)}
-              className={`px-4 py-2 flex items-center justify-between cursor-pointer hover:bg-gray-50 ${
-                expandedId === mapping._id ? 'bg-blue-50' : ''
-              }`}
-            >
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
-                <span className="text-sm font-medium truncate">{mapping.masterKey}</span>
-                <span className="text-sm text-gray-600 truncate">({mapping.originalKey || '기본키 없음'})</span>
-              </div>
-              <div className="flex items-center gap-2 flex-shrink-0">
-                <span className={`w-2 h-2 rounded-full ${
-                  expandedId === mapping._id ? 'bg-blue-600' : 'bg-gray-400'
-                }`}></span>
-              </div>
-            </div>
-
-            {expandedId === mapping._id && (
-              <div className="px-4 py-4 bg-gray-50 border-t">
-                {editingId === mapping._id ? (
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">마스터키</label>
-                      <input
-                        type="text"
-                        value={editData.masterKey || ''}
-                        onChange={(e) => handleCellChange('masterKey', e.target.value)}
-                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="마스터키"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">기본키</label>
-                      <input
-                        type="text"
-                        value={editData.originalKey || ''}
-                        onChange={(e) => handleCellChange('originalKey', e.target.value)}
-                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="기본키"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">유사키 (세미콜론으로 구분)</label>
-                      <input
-                        type="text"
-                        value={editData.similarKeys || ''}
-                        onChange={(e) => handleCellChange('similarKeys', e.target.value)}
-                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="유사키1; 유사키2; 유사키3"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs text-gray-600 mb-1">설명</label>
-                      <input
-                        type="text"
-                        value={editData.description || ''}
-                        onChange={(e) => handleCellChange('description', e.target.value)}
-                        className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        placeholder="설명"
-                      />
-                    </div>
-                    <div className="flex gap-2 pt-2">
-                      <button
-                        onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
-                      >
-                        💾 저장
-                      </button>
-                      <button
-                        onClick={handleCancel}
-                        className="flex-1 px-4 py-2 bg-gray-400 text-white text-sm rounded hover:bg-gray-500"
-                      >
-                        ✖️ 취소
-                      </button>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-3 text-sm">
-                      <div>
-                        <span className="text-gray-600">마스터키:</span>
-                        <span className="ml-2 font-medium">{mapping.masterKey}</span>
-                      </div>
-                      <div>
-                        <span className="text-gray-600">기본키:</span>
-                        <span className="ml-2">{mapping.originalKey || '-'}</span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600">유사키:</span>
-                        <span className="ml-2 text-blue-600">
-                          {Array.isArray(mapping.similarKeys) ? mapping.similarKeys.join('; ') : mapping.similarKeys}
-                        </span>
-                      </div>
-                      <div className="col-span-2">
-                        <span className="text-gray-600">설명:</span>
-                        <span className="ml-2">{mapping.description}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2 pt-2 border-t">
-                      <button
-                        onClick={() => handleEdit(mapping)}
-                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
-                      >
-                        ✏️ 수정
-                      </button>
-                      <button
-                        onClick={() => handleDelete(mapping._id)}
-                        className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-                      >
-                        🗑️ 삭제
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-
-      <div className="mt-4 text-sm text-gray-600">
-        <p>💡 마스터키를 클릭하면 상세정보가 펼쳐집니다.</p>
       </div>
     </div>
   );

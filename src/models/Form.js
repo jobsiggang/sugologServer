@@ -21,6 +21,10 @@ const formSchema = new mongoose.Schema({
     of: [String],
     default: new Map()
   },
+  // 파일 저장 폴더 구조 (예: ["일자", "현장명", "위치", "공종"])
+  folderStructure: [{
+    type: String
+  }],
   isActive: {
     type: Boolean,
     default: true

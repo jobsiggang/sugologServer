@@ -326,9 +326,33 @@ export default function ImageEditor({ author, userId }) {
         outCanvas = tmp;
       }
 
+      // 썸네일 생성 (200x200)
+      const thumbnailCanvas = document.createElement("canvas");
+      const thumbSize = 200;
+      thumbnailCanvas.width = thumbSize;
+      thumbnailCanvas.height = thumbSize;
+      const thumbCtx = thumbnailCanvas.getContext("2d");
+      
+      // 비율 유지하면서 잘라내기
+      const aspectRatio = canvas.width / canvas.height;
+      let sx = 0, sy = 0, sWidth = canvas.width, sHeight = canvas.height;
+      
+      if (aspectRatio > 1) {
+        // 가로가 더 긴 경우
+        sWidth = canvas.height;
+        sx = (canvas.width - canvas.height) / 2;
+      } else {
+        // 세로가 더 긴 경우
+        sHeight = canvas.width;
+        sy = (canvas.height - canvas.width) / 2;
+      }
+      
+      thumbCtx.drawImage(canvas, sx, sy, sWidth, sHeight, 0, 0, thumbSize, thumbSize);
+      const thumbnail = thumbnailCanvas.toDataURL("image/jpeg", 0.6); // 60% 품질로 압축
+
       const base64 = outCanvas.toDataURL("image/jpeg", 0.75).split(",")[1];
       const filename = Object.values(entryData).filter(Boolean).join("_") + "_" + file.name;
-      return { base64, filename, entryData };
+      return { base64, filename, entryData, thumbnail };
     };
 
     try {
@@ -376,12 +400,17 @@ export default function ImageEditor({ author, userId }) {
       try {
         console.log('💾 DB 저장 시작');
         const token = localStorage.getItem('token');
+        
+        // 썸네일 배열 추출
+        const thumbnails = processed.map(p => p.thumbnail);
+        
         const uploadRecord = {
           formName: selectedForm,
           siteName: entryData['현장명'] || '',
           data: entryData,
           imageUrls: uploadedUrls,
-          imageCount: processed.length
+          imageCount: processed.length,
+          thumbnails: thumbnails
         };
 
         console.log('저장할 데이터:', uploadRecord);
@@ -537,7 +566,7 @@ export default function ImageEditor({ author, userId }) {
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 {uploadHistory.map((record, idx) => (
                   <div key={record._id} style={{ padding: 12, background: "#fff", borderRadius: 6, border: "1px solid #e5e7eb" }}>
-                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8, gap: 10 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: "600", fontSize: 14, color: "#111827" }}>
                           {record.siteName} - {record.formName}
@@ -560,6 +589,33 @@ export default function ImageEditor({ author, userId }) {
                         {record.status === 'uploaded' ? '완료' : record.status === 'pending' ? '대기' : '실패'}
                       </span>
                     </div>
+                    
+                    {/* 썸네일 이미지 표시 */}
+                    {record.thumbnails && record.thumbnails.length > 0 && (
+                      <div style={{ display: "flex", gap: 4, marginBottom: 8, overflowX: "auto", padding: "4px 0" }}>
+                        {record.thumbnails.map((thumb, thumbIdx) => (
+                          <img 
+                            key={thumbIdx}
+                            src={thumb}
+                            alt={`썸네일 ${thumbIdx + 1}`}
+                            style={{
+                              width: 60,
+                              height: 60,
+                              objectFit: "cover",
+                              borderRadius: 4,
+                              border: "1px solid #d1d5db",
+                              cursor: "pointer"
+                            }}
+                            onClick={() => {
+                              // 클릭 시 새 창에서 크게 보기
+                              const newWindow = window.open();
+                              newWindow.document.write(`<img src="${thumb}" style="max-width:100%; height:auto;">`);
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                    
                     <details style={{ cursor: "pointer" }}>
                       <summary style={{ fontSize: 12, color: "#2563eb", fontWeight: "500" }}>상세보기</summary>
                       <div style={{ marginTop: 8, padding: 8, background: "#f3f4f6", borderRadius: 4, fontSize: 12 }}>

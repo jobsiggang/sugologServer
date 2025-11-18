@@ -812,6 +812,25 @@ function EmployeeManagement({ user }) {
                                    upload.status === 'pending' ? '대기' : '실패'}
                                 </span>
                               </div>
+                              
+                              {/* 썸네일 이미지 표시 */}
+                              {upload.thumbnails && upload.thumbnails.length > 0 && (
+                                <div className="flex gap-1 mb-2 overflow-x-auto pb-1">
+                                  {upload.thumbnails.map((thumb, thumbIdx) => (
+                                    <img 
+                                      key={thumbIdx}
+                                      src={thumb}
+                                      alt={`썸네일 ${thumbIdx + 1}`}
+                                      className="w-12 h-12 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-80"
+                                      onClick={() => {
+                                        const newWindow = window.open();
+                                        newWindow.document.write(`<img src="${thumb}" style="max-width:100%; height:auto;">`);
+                                      }}
+                                    />
+                                  ))}
+                                </div>
+                              )}
+                              
                               <details className="cursor-pointer">
                                 <summary className="text-blue-600 hover:text-blue-800">
                                   상세보기

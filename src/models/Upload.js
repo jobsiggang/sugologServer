@@ -45,6 +45,10 @@ const uploadSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  thumbnails: {
+    type: [String],
+    default: []
+  },
   googleSheetRowId: {
     type: String,
     required: false

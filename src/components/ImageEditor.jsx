@@ -603,13 +603,7 @@ export default function ImageEditor({ author, userId }) {
                               height: 60,
                               objectFit: "cover",
                               borderRadius: 4,
-                              border: "1px solid #d1d5db",
-                              cursor: "pointer"
-                            }}
-                            onClick={() => {
-                              // 클릭 시 새 창에서 크게 보기
-                              const newWindow = window.open();
-                              newWindow.document.write(`<img src="${thumb}" style="max-width:100%; height:auto;">`);
+                              border: "1px solid #d1d5db"
                             }}
                           />
                         ))}

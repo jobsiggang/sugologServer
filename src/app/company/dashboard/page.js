@@ -800,11 +800,7 @@ function EmployeeManagement({ user }) {
                                       key={thumbIdx}
                                       src={thumb}
                                       alt={`썸네일 ${thumbIdx + 1}`}
-                                      className="w-12 h-12 object-cover rounded border border-gray-300 cursor-pointer hover:opacity-80"
-                                      onClick={() => {
-                                        const newWindow = window.open();
-                                        newWindow.document.write(`<img src="${thumb}" style="max-width:100%; height:auto;">`);
-                                      }}
+                                      className="w-12 h-12 object-cover rounded border border-gray-300"
                                     />
                                   ))}
                                 </div>

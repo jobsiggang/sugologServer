@@ -151,20 +151,13 @@ export default function ImageEditor({ author }) {
         // ✅ 양식 ID를 localStorage에 저장 (업로드 시 사용)
         localStorage.setItem('selectedFormId', form._id);
         console.log('✅ 양식 선택:', form.formName, 'ID:', form._id);
+        console.log('📋 원본 fieldOptions:', form.fieldOptions);
+        console.log('📋 fieldOptions 타입:', typeof form.fieldOptions);
         
-        // ✅ fieldOptions 저장 (Map 객체를 일반 객체로 변환)
-        const options = {};
-        if (form.fieldOptions) {
-          if (form.fieldOptions instanceof Map) {
-            form.fieldOptions.forEach((value, key) => {
-              options[key] = value;
-            });
-          } else if (typeof form.fieldOptions === 'object') {
-            Object.assign(options, form.fieldOptions);
-          }
-        }
+        // ✅ fieldOptions 저장 (이미 toJSON에서 변환됨)
+        const options = form.fieldOptions || {};
         setFieldOptions(options);
-        console.log('✅ fieldOptions 설정:', options);
+        console.log('✅ 최종 fieldOptions 설정:', options);
         
         // fields 배열이 있으면 사용, 없으면 기본값
         const fields = form.fields || [];

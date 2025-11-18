@@ -13,6 +13,11 @@ const baseInputStyle = {
 
 function EntryRow({ entry, options, onChangeDebounced, onBlur }) {
   const hasOptions = options && options.length > 0;
+  
+  // 디버깅 로그
+  if (entry.field === "현장명" || entry.field === "위치" || entry.field === "공종") {
+    console.log(`📝 ${entry.field} - hasOptions:`, hasOptions, 'options:', options);
+  }
 
   return (
     <div

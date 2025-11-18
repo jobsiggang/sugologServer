@@ -38,7 +38,25 @@ const formSchema = new mongoose.Schema({
     default: Date.now
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: {
+    transform: function(doc, ret) {
+      // Map을 일반 객체로 변환
+      if (ret.fieldOptions instanceof Map) {
+        ret.fieldOptions = Object.fromEntries(ret.fieldOptions);
+      }
+      return ret;
+    }
+  },
+  toObject: {
+    transform: function(doc, ret) {
+      // Map을 일반 객체로 변환
+      if (ret.fieldOptions instanceof Map) {
+        ret.fieldOptions = Object.fromEntries(ret.fieldOptions);
+      }
+      return ret;
+    }
+  }
 });
 
 // 복합 인덱스 생성

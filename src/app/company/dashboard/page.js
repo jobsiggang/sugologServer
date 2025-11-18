@@ -922,6 +922,7 @@ function FormManagement({ user }) {
       const method = isNew ? 'POST' : 'PUT';
 
       console.log('양식 저장 요청:', editData);
+      console.log('📝 fieldOptions 전송:', JSON.stringify(editData.fieldOptions, null, 2));
 
       const response = await fetch(url, {
         method,
@@ -934,6 +935,7 @@ function FormManagement({ user }) {
 
       const data = await response.json();
       console.log('양식 저장 응답:', data);
+      console.log('📝 저장된 form.fieldOptions:', data.form?.fieldOptions);
       
       if (data.success) {
         setEditingId(null);

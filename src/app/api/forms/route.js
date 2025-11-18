@@ -78,6 +78,7 @@ export async function POST(request) {
     const { formName, fields, fieldOptions, folderStructure, companyId } = await request.json();
 
     console.log('📝 양식 생성 요청:', { formName, fields, fieldOptions, folderStructure });
+    console.log('📝 fieldOptions 상세:', JSON.stringify(fieldOptions, null, 2));
 
     // 입력값 검증
     if (!formName || !fields || !Array.isArray(fields) || fields.length === 0) {

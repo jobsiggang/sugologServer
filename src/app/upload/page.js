@@ -10,7 +10,7 @@ export default function UploadPage() {
 
   useEffect(() => {
     checkAuth();
-  }, [router]);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');

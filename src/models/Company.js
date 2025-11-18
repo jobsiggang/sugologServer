@@ -19,18 +19,6 @@ const companySchema = new mongoose.Schema({
       trim: true,
       description: '업체관리자가 배포한 Google Apps Script 웹앱 URL'
     },
-    spreadsheetId: {
-      type: String,
-      default: '',
-      trim: true,
-      description: '업체의 Google Spreadsheet ID'
-    },
-    driveFolderId: {
-      type: String,
-      default: '',
-      trim: true,
-      description: '업체의 Google Drive 폴더 ID (공정한웍스)'
-    },
     setupCompleted: {
       type: Boolean,
       default: false,

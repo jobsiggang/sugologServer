@@ -112,9 +112,7 @@ function GoogleSettings({ user }) {
   const [testing, setTesting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [formData, setFormData] = useState({
-    webAppUrl: '',
-    spreadsheetId: '',
-    driveFolderId: ''
+    webAppUrl: ''
   });
 
   useEffect(() => {
@@ -136,9 +134,7 @@ function GoogleSettings({ user }) {
       if (data.success && data.googleSettings) {
         setSettings(data.googleSettings);
         setFormData({
-          webAppUrl: data.googleSettings.webAppUrl || '',
-          spreadsheetId: data.googleSettings.spreadsheetId || '',
-          driveFolderId: data.googleSettings.driveFolderId || ''
+          webAppUrl: data.googleSettings.webAppUrl || ''
         });
         // 설정이 없으면 자동으로 편집 모드
         if (!data.googleSettings.setupCompleted) {
@@ -210,9 +206,7 @@ function GoogleSettings({ user }) {
   const handleCancel = () => {
     setEditing(false);
     setFormData({
-      webAppUrl: settings?.webAppUrl || '',
-      spreadsheetId: settings?.spreadsheetId || '',
-      driveFolderId: settings?.driveFolderId || ''
+      webAppUrl: settings?.webAppUrl || ''
     });
   };
 
@@ -263,24 +257,6 @@ function GoogleSettings({ user }) {
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Spreadsheet ID
-              </label>
-              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                {settings.spreadsheetId || '(없음)'}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Drive 폴더 ID
-              </label>
-              <div className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm">
-                {settings.driveFolderId || '(없음)'}
-              </div>
-            </div>
-
             <button
               type="button"
               onClick={handleTest}
@@ -293,6 +269,45 @@ function GoogleSettings({ user }) {
         ) : (
           // 편집 모드
           <form onSubmit={handleUpdate} className="space-y-4">
+            {/* 설정 안내 */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+              <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+                📚 Google Apps Script 설정 가이드
+              </h3>
+              <ol className="text-sm text-blue-800 space-y-2 list-decimal list-inside">
+                <li>
+                  <strong>템플릿 복사:</strong>{' '}
+                  <a 
+                    href="https://docs.google.com/spreadsheets/d/YOUR_TEMPLATE_ID/copy" 
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 underline hover:text-blue-800"
+                  >
+                    구글 시트 템플릿
+                  </a>
+                  에서 "사본 만들기" 클릭
+                </li>
+                <li>
+                  <strong>스크립트 열기:</strong> 확장 프로그램 → Apps Script 메뉴 클릭
+                </li>
+                <li>
+                  <strong>배포:</strong> 상단 "배포" 버튼 → "새 배포" 클릭
+                </li>
+                <li>
+                  <strong>설정:</strong> 유형 = "웹 앱", 액세스 = "모든 사용자"로 설정
+                </li>
+                <li>
+                  <strong>URL 복사:</strong> 배포 후 생성된 웹 앱 URL을 아래에 붙여넣기
+                </li>
+              </ol>
+              <div className="mt-3 pt-3 border-t border-blue-300">
+                <p className="text-xs text-blue-700">
+                  💡 <strong>참고:</strong> 시트 ID나 폴더 ID는 입력할 필요 없습니다. 
+                  Apps Script가 자동으로 연결된 시트를 사용하고 "공정한웍스" 폴더를 생성합니다.
+                </p>
+              </div>
+            </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Google Apps Script 웹앱 URL <span className="text-red-500">*</span>
@@ -306,40 +321,7 @@ function GoogleSettings({ user }) {
                 required
               />
               <p className="text-xs text-gray-500 mt-1">
-                Google Apps Script 배포 후 받은 웹앱 URL을 입력하세요
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Spreadsheet ID <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.spreadsheetId}
-                onChange={(e) => setFormData({ ...formData, spreadsheetId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="스프레드시트 URL의 ID 부분"
-                required
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                예: https://docs.google.com/spreadsheets/d/<strong>YOUR_ID_HERE</strong>/edit
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Google Drive 폴더 ID
-              </label>
-              <input
-                type="text"
-                value={formData.driveFolderId}
-                onChange={(e) => setFormData({ ...formData, driveFolderId: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                placeholder="드라이브 폴더 URL의 ID 부분 (선택사항)"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                사진을 저장할 Google Drive 폴더 (선택사항)
+                Apps Script 배포 후 받은 웹 앱 URL 전체를 붙여넣으세요
               </p>
             </div>
 

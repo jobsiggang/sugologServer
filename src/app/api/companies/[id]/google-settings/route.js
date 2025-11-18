@@ -53,7 +53,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { webAppUrl, spreadsheetId, driveFolderId } = await request.json();
+    const { webAppUrl } = await request.json();
 
     await connectDB();
 
@@ -69,12 +69,9 @@ export async function PUT(request, { params }) {
 
     // Google 설정 업데이트
     if (webAppUrl !== undefined) company.googleSettings.webAppUrl = webAppUrl;
-    if (spreadsheetId !== undefined) company.googleSettings.spreadsheetId = spreadsheetId;
-    if (driveFolderId !== undefined) company.googleSettings.driveFolderId = driveFolderId;
 
-    // 모든 필수 설정이 입력되면 setupCompleted를 true로
-    if (company.googleSettings.webAppUrl && 
-        company.googleSettings.spreadsheetId) {
+    // webAppUrl이 입력되면 setupCompleted를 true로
+    if (company.googleSettings.webAppUrl) {
       company.googleSettings.setupCompleted = true;
     }
 

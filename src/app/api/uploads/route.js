@@ -53,6 +53,7 @@ export async function GET(req) {
         formName: u.formName,
         data: Object.fromEntries(u.data || new Map()),
         imageUrls: u.imageUrls || [],
+        imageCount: u.imageCount || 0,
         photoUrl: u.photoUrl,
         status: u.status,
         createdAt: u.createdAt
@@ -81,7 +82,7 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { formName, siteName, data, imageUrls } = body;
+    const { formName, siteName, data, imageUrls, imageCount } = body;
 
     await connectDB();
 
@@ -92,6 +93,7 @@ export async function POST(req) {
       siteName,
       data: new Map(Object.entries(data || {})),
       imageUrls: imageUrls || [],
+      imageCount: imageCount || (imageUrls ? imageUrls.length : 0),
       status: 'uploaded'
     });
 

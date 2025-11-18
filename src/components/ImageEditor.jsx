@@ -173,8 +173,9 @@ export default function ImageEditor({ author, userId }) {
     };
   }, []);
 
-  const handleLoadForm = async () => {
-    if (!selectedForm) return;
+  const handleLoadForm = async (formName) => {
+    const targetForm = formName || selectedForm;
+    if (!targetForm) return;
     
     try {
       const token = localStorage.getItem('token');
@@ -186,7 +187,7 @@ export default function ImageEditor({ author, userId }) {
       const data = await response.json();
       
       if (data.success) {
-        const form = data.forms.find((f) => f.formName === selectedForm);
+        const form = data.forms.find((f) => f.formName === targetForm);
         if (!form) return;
         
         // ✅ 양식 ID를 localStorage에 저장 (업로드 시 사용)
@@ -379,7 +380,8 @@ export default function ImageEditor({ author, userId }) {
           formName: selectedForm,
           siteName: entryData['현장명'] || '',
           data: entryData,
-          imageUrls: uploadedUrls
+          imageUrls: uploadedUrls,
+          imageCount: processed.length
         };
 
         console.log('저장할 데이터:', uploadRecord);
@@ -453,19 +455,26 @@ export default function ImageEditor({ author, userId }) {
   return (
     <div style={{ padding: 16, backgroundColor: "#f0f0f0", minHeight: "100vh", fontFamily: "돋움", display: "flex", justifyContent: "center" }}>
       <div style={{ width: "90%", maxWidth: 900 }}>    
-        {/* 양식 선택 + 가져오기 */}
-        <div style={{ display: "flex", gap: 8, marginBottom: 10, flexWrap: "wrap" }}>
+        {/* 양식 선택 */}
+        <div style={{ marginBottom: 10 }}>
           <select
             value={selectedForm}
-            onChange={(e) => setSelectedForm(e.target.value)}
+            onChange={(e) => {
+              setSelectedForm(e.target.value);
+              if (e.target.value) {
+                // 양식 선택 시 자동으로 불러오기
+                setTimeout(() => handleLoadForm(e.target.value), 100);
+              }
+            }}
             style={{
               color: "#000",
-              flex: "1 1 200px",
+              width: "100%",
               height: 32,
               borderRadius: 8,
               background: "#ffcc00",
               fontWeight: "bold",
-              fontSize: 13, // 글자 크기 조정
+              fontSize: 13,
+              padding: "0 8px",
             }}
           >
             <option value="">--입력 양식 선택--</option>
@@ -475,9 +484,6 @@ export default function ImageEditor({ author, userId }) {
               </option>
             ))}
           </select>
-          <button onClick={handleLoadForm} style={buttonStyle}>
-            가져오기
-          </button>
         </div>
 
         {/* 입력 폼 */}
@@ -532,12 +538,15 @@ export default function ImageEditor({ author, userId }) {
                 {uploadHistory.map((record, idx) => (
                   <div key={record._id} style={{ padding: 12, background: "#fff", borderRadius: 6, border: "1px solid #e5e7eb" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8 }}>
-                      <div>
+                      <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: "600", fontSize: 14, color: "#111827" }}>
                           {record.siteName} - {record.formName}
                         </div>
                         <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
                           {new Date(record.createdAt).toLocaleString('ko-KR')}
+                        </div>
+                        <div style={{ fontSize: 12, color: "#3b82f6", marginTop: 2, fontWeight: "500" }}>
+                          📷 이미지 {record.imageCount || 0}개
                         </div>
                       </div>
                       <span style={{

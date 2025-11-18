@@ -794,10 +794,13 @@ function EmployeeManagement({ user }) {
                           {uploads[emp._id].map((upload, idx) => (
                             <div key={upload._id} className="p-3 bg-white rounded border text-xs">
                               <div className="flex justify-between items-start mb-2">
-                                <div>
+                                <div className="flex-1">
                                   <div className="font-medium">{upload.siteName} - {upload.formName}</div>
                                   <div className="text-gray-500 mt-1">
                                     {new Date(upload.createdAt).toLocaleString('ko-KR')}
+                                  </div>
+                                  <div className="text-blue-600 mt-1 font-medium">
+                                    📷 이미지 {upload.imageCount || 0}개
                                   </div>
                                 </div>
                                 <span className={`px-2 py-1 rounded text-xs ${

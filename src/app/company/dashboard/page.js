@@ -880,6 +880,7 @@ function FormManagement({ user }) {
       formName: '',
       fields: [],
       fieldOptions: {},
+      folderStructure: [],
       isActive: true
     };
     setForms([newForm, ...forms]);
@@ -895,7 +896,8 @@ function FormManagement({ user }) {
     setEditData({ 
       ...form,
       fields: Array.isArray(form.fields) ? form.fields : [],
-      fieldOptions: fieldOptions
+      fieldOptions: fieldOptions,
+      folderStructure: Array.isArray(form.folderStructure) ? form.folderStructure : []
     });
     setFieldInput('');
     setOptionInputs({});

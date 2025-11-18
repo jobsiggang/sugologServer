@@ -74,7 +74,9 @@ export async function POST(request) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { formName, fields, fieldOptions, companyId } = await request.json();
+    const { formName, fields, fieldOptions, folderStructure, companyId } = await request.json();
+
+    console.log('📝 양식 생성 요청:', { formName, fields, fieldOptions, folderStructure });
 
     // 입력값 검증
     if (!formName || !fields || !Array.isArray(fields) || fields.length === 0) {
@@ -101,7 +103,8 @@ export async function POST(request) {
       companyId: finalCompanyId,
       formName,
       fields,
-      fieldOptions: fieldOptions ? new Map(Object.entries(fieldOptions)) : new Map()
+      fieldOptions: fieldOptions ? new Map(Object.entries(fieldOptions)) : new Map(),
+      folderStructure: folderStructure || []
     });
 
     await newForm.save();

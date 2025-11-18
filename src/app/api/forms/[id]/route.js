@@ -55,7 +55,9 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { formName, fields, fieldOptions, isActive } = await request.json();
+    const { formName, fields, fieldOptions, folderStructure, isActive } = await request.json();
+
+    console.log('📝 양식 수정 요청:', { formName, fields, fieldOptions, folderStructure, isActive });
 
     await connectDB();
 
@@ -74,6 +76,7 @@ export async function PUT(request, { params }) {
     if (formName) form.formName = formName;
     if (fields && Array.isArray(fields)) form.fields = fields;
     if (fieldOptions) form.fieldOptions = new Map(Object.entries(fieldOptions));
+    if (folderStructure !== undefined) form.folderStructure = folderStructure;
     if (typeof isActive === 'boolean') form.isActive = isActive;
 
     await form.save();

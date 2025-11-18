@@ -5,6 +5,17 @@ import User from "@/models/User";
 // 슈퍼바이저 존재 여부 확인
 export async function GET() {
   try {
+    // 환경변수로 setup 비활성화 체크
+    const setupEnabled = process.env.ENABLE_ADMIN_SETUP === 'true';
+    
+    if (!setupEnabled) {
+      return NextResponse.json({
+        success: true,
+        disabled: true,
+        message: 'Setup is disabled'
+      });
+    }
+    
     await connectDB();
     
     const supervisor = await User.findOne({ role: 'supervisor' });
@@ -12,7 +23,8 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       exists: !!supervisor,
-      needsSetup: !supervisor
+      needsSetup: !supervisor,
+      disabled: false
     });
   } catch (error) {
     console.error('Check supervisor error:', error);
@@ -25,6 +37,15 @@ export async function GET() {
 // 슈퍼바이저 초기 설정
 export async function POST(request) {
   try {
+    // 환경변수로 setup 비활성화 체크
+    const setupEnabled = process.env.ENABLE_ADMIN_SETUP === 'true';
+    
+    if (!setupEnabled) {
+      return NextResponse.json({ 
+        error: 'Setup is disabled. Set ENABLE_ADMIN_SETUP=true in environment variables.' 
+      }, { status: 403 });
+    }
+    
     await connectDB();
     
     // 이미 슈퍼바이저가 있는지 확인

@@ -47,10 +47,14 @@ npm run dev
 
 ### 3. 초기 설정
 
-1. `/admin/setup` 접속 → 슈퍼바이저 계정 생성
-2. `/supervisor/login` 로그인 → 업체 등록
-3. 업체관리자 계정 생성
-4. `/admin/login` 로그인 → Google 연동 설정
+⚠️ **보안 중요:** 초기 설정 후 반드시 `/admin/setup` 접근을 차단하세요!
+
+1. **최초 1회만** `.env.local`에서 `ENABLE_ADMIN_SETUP=true` 설정
+2. `/admin/setup` 접속 → 슈퍼바이저 계정 생성
+3. **즉시** `ENABLE_ADMIN_SETUP=false`로 변경 (보안)
+4. `/supervisor/login` 로그인 → 업체 등록
+5. 업체관리자 계정 생성
+6. `/admin/login` 로그인 → Google 연동 설정
 
 ---
 
@@ -68,10 +72,15 @@ vercel --prod
 
 ### 환경변수 설정 (Vercel Dashboard)
 
+⚠️ **필수 환경변수:**
+
 ```
 MONGODB_URI=mongodb+srv://...
 JWT_SECRET=your-secret-key
+ENABLE_ADMIN_SETUP=false   # 🔒 운영환경에서는 반드시 false
 ```
+
+**중요:** 운영환경에서는 `ENABLE_ADMIN_SETUP=false`로 설정하여 `/admin/setup` 접근을 차단하세요.
 
 **배포 URL:** https://fairworks.vercel.app
 

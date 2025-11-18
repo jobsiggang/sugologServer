@@ -9,7 +9,7 @@ import toast from "react-hot-toast";
 import { createCompositeImage } from "@/lib/createComposite";
 import { canvasConfig } from "@/lib/compositeConfig";
 
-export default function ImageEditor({ author }) {
+export default function ImageEditor({ author, userId }) {
   const router = useRouter();
   const canvasWidth = canvasConfig.width;
   const canvasHeight = canvasConfig.height;
@@ -26,6 +26,10 @@ export default function ImageEditor({ author }) {
   // 분리된 진행률: 합성(처리) / 업로드
   const [processingProgress, setProcessingProgress] = useState(0); // 합성(이미지 처리) 진행률 0-100
   const [uploadingProgress, setUploadingProgress] = useState(0); // 업로드 진행률 0-100
+  // 전송기록 관련 state
+  const [showHistory, setShowHistory] = useState(false);
+  const [uploadHistory, setUploadHistory] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(false);
   const kstTimeoutRef = useRef(null);
   const kstIntervalRef = useRef(null);
 
@@ -89,6 +93,45 @@ export default function ImageEditor({ author }) {
     };
     fetchData();
   }, []);
+
+  // 전송기록 불러오기
+  const fetchUploadHistory = async () => {
+    if (!userId) {
+      toast.error('사용자 정보가 없습니다.');
+      return;
+    }
+
+    setLoadingHistory(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`/api/uploads?userId=${userId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        // 최신 5개만 표시
+        setUploadHistory(data.uploads.slice(0, 5));
+      } else {
+        toast.error(data.error || '전송기록을 불러올 수 없습니다.');
+      }
+    } catch (error) {
+      console.error('전송기록 조회 실패:', error);
+      toast.error('전송기록을 불러오는데 실패했습니다.');
+    } finally {
+      setLoadingHistory(false);
+    }
+  };
+
+  // 전송기록 토글
+  const toggleHistory = () => {
+    if (!showHistory) {
+      fetchUploadHistory();
+    }
+    setShowHistory(!showHistory);
+  };
 
   // 📅 작성자 로컬스토리지 일주일 삭제
   useEffect(() => {
@@ -474,7 +517,58 @@ export default function ImageEditor({ author }) {
           <button disabled={uploading || saving} onClick={() => document.getElementById("galleryInput").click()} style={buttonStyle}>🖼️ 사진 선택</button>
 
           <button disabled={uploading || saving} onClick={handleUpload} style={buttonStyle}>{uploading ? "전송 중..." : "🚀 사진 전송"}</button>
+          <button onClick={toggleHistory} style={{...buttonStyle, background: "#6b7280"}}>{showHistory ? "기록 닫기" : "📋 전송기록"}</button>
         </div>
+
+        {/* 전송기록 표시 */}
+        {showHistory && (
+          <div style={{ marginTop: 20, padding: 15, background: "#f9fafb", borderRadius: 8, border: "1px solid #e5e7eb" }}>
+            <h3 style={{ fontSize: 16, fontWeight: "bold", marginBottom: 10, color: "#374151" }}>📋 최근 전송기록 (5개)</h3>
+            {loadingHistory ? (
+              <div style={{ textAlign: "center", padding: 20, color: "#6b7280" }}>로딩 중...</div>
+            ) : uploadHistory.length === 0 ? (
+              <div style={{ textAlign: "center", padding: 20, color: "#6b7280" }}>전송 기록이 없습니다.</div>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {uploadHistory.map((record, idx) => (
+                  <div key={record._id} style={{ padding: 12, background: "#fff", borderRadius: 6, border: "1px solid #e5e7eb" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8 }}>
+                      <div>
+                        <div style={{ fontWeight: "600", fontSize: 14, color: "#111827" }}>
+                          {record.siteName} - {record.formName}
+                        </div>
+                        <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
+                          {new Date(record.createdAt).toLocaleString('ko-KR')}
+                        </div>
+                      </div>
+                      <span style={{
+                        padding: "4px 8px",
+                        borderRadius: 4,
+                        fontSize: 11,
+                        fontWeight: "600",
+                        background: record.status === 'uploaded' ? '#d1fae5' : record.status === 'pending' ? '#fef3c7' : '#fee2e2',
+                        color: record.status === 'uploaded' ? '#065f46' : record.status === 'pending' ? '#92400e' : '#991b1b'
+                      }}>
+                        {record.status === 'uploaded' ? '완료' : record.status === 'pending' ? '대기' : '실패'}
+                      </span>
+                    </div>
+                    <details style={{ cursor: "pointer" }}>
+                      <summary style={{ fontSize: 12, color: "#2563eb", fontWeight: "500" }}>상세보기</summary>
+                      <div style={{ marginTop: 8, padding: 8, background: "#f3f4f6", borderRadius: 4, fontSize: 12 }}>
+                        {Object.entries(record.data || {}).map(([key, value]) => (
+                          <div key={key} style={{ marginBottom: 4 }}>
+                            <span style={{ fontWeight: "600", color: "#374151" }}>{key}:</span>{" "}
+                            <span style={{ color: "#6b7280" }}>{value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* 썸네일 + 미리보기 */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 10 }}>

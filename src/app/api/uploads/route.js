@@ -92,7 +92,7 @@ export async function POST(req) {
       siteName,
       data: new Map(Object.entries(data || {})),
       imageUrls: imageUrls || [],
-      status: 'completed'
+      status: 'uploaded'
     });
 
     return NextResponse.json({

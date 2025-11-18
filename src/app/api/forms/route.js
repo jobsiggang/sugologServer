@@ -101,11 +101,18 @@ export async function POST(request) {
     }
 
     // 새 양식 생성
+    // fieldOptions가 빈 객체가 아닌 경우에만 Map으로 변환
+    let fieldOptionsMap = new Map();
+    if (fieldOptions && typeof fieldOptions === 'object' && Object.keys(fieldOptions).length > 0) {
+      fieldOptionsMap = new Map(Object.entries(fieldOptions));
+      console.log('✅ fieldOptions Map 변환:', Array.from(fieldOptionsMap.entries()));
+    }
+
     const newForm = new Form({
       companyId: finalCompanyId,
       formName,
       fields,
-      fieldOptions: fieldOptions ? new Map(Object.entries(fieldOptions)) : new Map(),
+      fieldOptions: fieldOptionsMap,
       folderStructure: folderStructure || []
     });
 

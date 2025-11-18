@@ -89,7 +89,7 @@ export default function HomePage() {
 
       {/* 메인 컨텐츠 */}
       <main>
-        <ImageEditor author={user.name} />
+        <ImageEditor author={user.name} userId={user.id} />
       </main>
     </div>
   );

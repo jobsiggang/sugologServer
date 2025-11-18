@@ -20,7 +20,7 @@ export default function AdminLogin() {
 
   const fetchCompanies = async () => {
     try {
-      const response = await fetch("/api/companies");
+      const response = await fetch("/api/companies/list");
       const data = await response.json();
       if (data.success) {
         setCompanies(data.companies);

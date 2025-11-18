@@ -6,9 +6,8 @@ const RUNTIME_CACHE = 'fair-runtime-v1';
 const PRECACHE_URLS = [
   '/login',
   '/upload',
-  '/manifest.json',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  '/manifest.json'
+  // 아이콘은 존재할 때만 캐시에 추가
 ];
 
 // 설치 이벤트: 필수 파일 캐싱

@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
 
 export default withPWA({
   dest: "public",
-  disable: process.env.NODE_ENV === "development",
+  disable: true, // PWA 완전 비활성화 (아이콘 준비 전까지)
   register: true,
   cacheOnFrontEndNav: true,
   reloadOnOnline: true,

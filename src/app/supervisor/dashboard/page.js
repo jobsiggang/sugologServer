@@ -3,9 +3,28 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
-export default function AdminEntry() {
+export default function SupervisorDashboard() {
   const router = useRouter();
+  const [user, setUser] = useState(null);
+  const [activeTab, setActiveTab] = useState('companies');
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showAddForm, setShowAddForm] = useState(false);
+  const [editingCompany, setEditingCompany] = useState(null);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [expandedId, setExpandedId] = useState(null);
+  const [formData, setFormData] = useState({
+    companyName: '',
+    companyDescription: '',
+    adminUsername: '',
+    adminPassword: '',
+    adminName: ''
+  });
+  const [editFormData, setEditFormData] = useState({
+    name: '',
+    description: '',
+    isActive: true
+  });
 
   useEffect(() => {
     checkAuth();
@@ -13,38 +32,24 @@ export default function AdminEntry() {
 
   const checkAuth = async () => {
     const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
-
-    if (!token || !userStr) {
-      // 로그인 안되어 있으면 관리자 로그인 페이지로
-      router.push('/admin/login');
+    if (!token) {
+      router.push('/supervisor/login');
       return;
     }
 
-    try {
-      const user = JSON.parse(userStr);
-      
-      // 업체 관리자만 접근 가능
-      if (user.role === 'company_admin') {
-        router.push('/company/dashboard');
-      } else {
-        // 다른 역할은 관리자 로그인 페이지로
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        router.push('/admin/login');
-      }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      router.push('/admin/login');
+    const userData = JSON.parse(localStorage.getItem('user'));
+    if (!userData || userData.role !== 'supervisor') {
+      alert('슈퍼바이저만 접근 가능합니다.');
+      router.push('/supervisor/login');
+      return;
     }
+
+    setUser(userData);
+    fetchCompanies();
   };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-600 to-green-800">
-      <div className="text-white text-xl">로딩 중...</div>
-    </div>
-  );
-}
+  const fetchCompanies = async () => {
+    try {
       const token = localStorage.getItem('token');
       const response = await fetch('/api/supervisor/companies', {
         headers: {
@@ -110,7 +115,7 @@ export default function AdminEntry() {
   const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    router.push('/login');
+    router.push('/supervisor/login');
   };
 
   const handleEdit = (company) => {

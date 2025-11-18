@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
+import Company from "@/models/Company";
 import Form from "@/models/Form";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
@@ -118,8 +119,14 @@ export async function POST(request) {
     }, { status: 201 });
   } catch (error) {
     console.error('Create form error:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    console.error('Error stack:', error.stack);
     return NextResponse.json({ 
-      error: '양식 등록 중 오류가 발생했습니다.' 
+      success: false,
+      error: '양식 등록 중 오류가 발생했습니다.',
+      details: error.message,
+      errorName: error.name
     }, { status: 500 });
   }
 }

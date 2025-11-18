@@ -921,6 +921,8 @@ function FormManagement({ user }) {
       const url = isNew ? '/api/forms' : `/api/forms/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
+      console.log('양식 저장 요청:', editData);
+
       const response = await fetch(url, {
         method,
         headers: {
@@ -931,15 +933,19 @@ function FormManagement({ user }) {
       });
 
       const data = await response.json();
+      console.log('양식 저장 응답:', data);
+      
       if (data.success) {
         setEditingId(null);
         setEditData({});
         fetchForms();
       } else {
-        alert(data.error || '저장 실패');
+        alert(data.error || data.details || '저장 실패');
+        console.error('저장 실패:', data);
       }
     } catch (error) {
-      alert('오류가 발생했습니다.');
+      console.error('저장 오류:', error);
+      alert('오류가 발생했습니다: ' + error.message);
     }
   };
 

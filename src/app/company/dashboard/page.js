@@ -373,9 +373,6 @@ function GoogleSettings({ user }) {
           >
             📄 Google Sheets 템플릿 사본 만들기
           </a>
-          <p className="text-xs text-purple-600 mt-2">
-            💡 사본을 만든 후, URL에서 Spreadsheet ID를 복사하여 위 설정에 입력하세요
-          </p>
         </div>
 
         {/* 설정 가이드 */}

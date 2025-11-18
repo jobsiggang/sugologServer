@@ -13,20 +13,33 @@ export default function UploadPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const checkAuth = async () => {
+    console.log('Upload page: checkAuth 시작');
     const token = localStorage.getItem('token');
+    console.log('Upload page: token 존재?', !!token);
+    
     if (!token) {
       console.warn("⚠️ 로그인 정보 없음 → 로그인 페이지로 이동");
       router.push("/login");
       return;
     }
 
-    const userData = JSON.parse(localStorage.getItem('user'));
-    if (!userData) {
+    const userStr = localStorage.getItem('user');
+    console.log('Upload page: user 존재?', !!userStr);
+    
+    if (!userStr) {
+      console.warn("⚠️ 사용자 정보 없음 → 로그인 페이지로 이동");
       router.push("/login");
       return;
     }
 
-    setUser(userData);
+    try {
+      const userData = JSON.parse(userStr);
+      console.log('Upload page: 사용자 정보 파싱 성공', userData);
+      setUser(userData);
+    } catch (error) {
+      console.error('Upload page: 사용자 정보 파싱 실패', error);
+      router.push("/login");
+    }
   };
 
   const handleLogout = () => {

@@ -35,6 +35,11 @@ self.addEventListener('activate', (event) => {
 
 // 네트워크 요청 가로채기
 self.addEventListener('fetch', (event) => {
+  // chrome-extension, devtools 등 특수 스키마는 무시
+  if (!event.request.url.startsWith('http')) {
+    return;
+  }
+
   // API 요청은 항상 네트워크 우선
   if (event.request.url.includes('/api/')) {
     event.respondWith(
@@ -68,8 +73,8 @@ self.addEventListener('fetch', (event) => {
 
         return caches.open(RUNTIME_CACHE).then((cache) => {
           return fetch(event.request).then((response) => {
-            // 성공한 응답만 캐싱
-            if (response.status === 200) {
+            // 성공한 HTTP 응답만 캐싱
+            if (response && response.status === 200 && response.type === 'basic') {
               cache.put(event.request, response.clone());
             }
             return response;

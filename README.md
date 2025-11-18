@@ -86,9 +86,9 @@ JWT_SECRET=your-secret-key
    - 확장 프로그램 → Apps Script 클릭
 
 2. **스크립트 배포**
-   ```javascript
-   // docs/GOOGLE_APPS_SCRIPT_V2.js 내용 복사
-   ```
+   - Google Apps Script 코드는 보안상 별도 제공
+   - 프로젝트 관리자에게 문의하여 최신 스크립트 파일 받기
+   - Apps Script 에디터에 코드 복사
    
 3. **웹 앱 배포**
    - 배포 → 새 배포

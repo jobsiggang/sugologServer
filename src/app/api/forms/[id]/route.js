@@ -75,7 +75,14 @@ export async function PUT(request, { params }) {
     // 업데이트할 필드
     if (formName) form.formName = formName;
     if (fields && Array.isArray(fields)) form.fields = fields;
-    if (fieldOptions) form.fieldOptions = new Map(Object.entries(fieldOptions));
+    
+    // fieldOptions 처리 (빈 객체도 허용)
+    if (fieldOptions !== undefined) {
+      const entries = Object.entries(fieldOptions);
+      form.fieldOptions = entries.length > 0 ? new Map(entries) : new Map();
+      console.log('✅ fieldOptions 업데이트:', Array.from(form.fieldOptions.entries()));
+    }
+    
     if (folderStructure !== undefined) form.folderStructure = folderStructure;
     if (typeof isActive === 'boolean') form.isActive = isActive;
 

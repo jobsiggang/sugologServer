@@ -33,25 +33,24 @@ export default function ImageEditor({ author, userId }) {
   const kstTimeoutRef = useRef(null);
   const kstIntervalRef = useRef(null);
 
-  // 🎨 공통 버튼 스타일
+  // 🎨 공통 버튼 스타일 (크기 축소 및 색상 통일)
   const buttonStyle = {
-    color: "#000",
-    height: 30,
-    padding: "4px 8px",
+    padding: "6px 12px",
     cursor: "pointer",
     borderRadius: 6,
-    fontWeight: "bold",
-    background: "#ffcc00",
+    fontWeight: "500",
+    background: "#3b82f6",
+    color: "#fff",
+    border: "none",
     transition: "0.2s",
     flex: "1 1 auto",
-    fontSize: 14,
+    fontSize: 13,
     margin: 2,
   };
 
   const saveButtonStyle = {
     ...buttonStyle,
-    background: "#00cc88",
-    color: "#fff",
+    background: "#10b981",
   };
 
   // 📋 MongoDB에서 현장과 입력양식 데이터 로드
@@ -625,14 +624,15 @@ export default function ImageEditor({ author, userId }) {
                 position: "absolute",
                 bottom: 8,
                 right: 8,
-                width: 36,
-                height: 36,
-                borderRadius: 4,
-                fontWeight: "bold",
+                width: 32,
+                height: 32,
+                borderRadius: 6,
+                fontWeight: "500",
                 cursor: "pointer",
-                background: "#007bff",
+                background: "#3b82f6",
                 color: "#fff",
                 border: "none",
+                fontSize: 16,
               }}
             >↻</button>
           </div>

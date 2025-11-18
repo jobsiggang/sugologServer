@@ -921,8 +921,14 @@ function FormManagement({ user }) {
       const url = isNew ? '/api/forms' : `/api/forms/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
-      console.log('양식 저장 요청:', editData);
-      console.log('📝 fieldOptions 전송:', JSON.stringify(editData.fieldOptions, null, 2));
+      // fieldOptions를 명시적으로 복사 (프로토타입 체인 문제 해결)
+      const payload = {
+        ...editData,
+        fieldOptions: editData.fieldOptions ? {...editData.fieldOptions} : {}
+      };
+
+      console.log('양식 저장 요청:', payload);
+      console.log('📝 fieldOptions 전송:', JSON.stringify(payload.fieldOptions, null, 2));
 
       const response = await fetch(url, {
         method,
@@ -930,7 +936,7 @@ function FormManagement({ user }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(editData)
+        body: JSON.stringify(payload)
       });
 
       const data = await response.json();
@@ -1171,7 +1177,7 @@ function FormManagement({ user }) {
                         <button
                           type="button"
                           onClick={handleAddField}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 whitespace-nowrap"
+                          className="px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 whitespace-nowrap"
                         >
                           완료
                         </button>
@@ -1407,14 +1413,14 @@ function FormManagement({ user }) {
                     <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(form)}
-                        className="flex-1 px-4 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        className="flex-1 px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
                       >
                         ✏️ 수정
                       </button>
                       { !form.isActive ? (
                         <button
                           onClick={() => handleDelete(form._id)}
-                          className="flex-1 px-4 py-2 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                          className="flex-1 px-4 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700"
                         >
                           🗑️ 삭제
                         </button>
@@ -1422,7 +1428,7 @@ function FormManagement({ user }) {
                         <button
                           disabled
                           title="비활성화 상태에서만 삭제 가능"
-                          className="flex-1 px-4 py-2 bg-gray-300 text-white text-sm rounded opacity-60 cursor-not-allowed"
+                          className="flex-1 px-4 py-1.5 bg-gray-300 text-white text-sm rounded opacity-60 cursor-not-allowed"
                         >
                           🗑️ 삭제
                         </button>

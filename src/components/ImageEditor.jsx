@@ -4,7 +4,6 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import InputForm from "./InputForm";
 import ImageCanvas from "./ImageCanvas";
-import { fetchSheetData } from "@/lib/googleSheet";
 import { uploadPhoto, uploadPhotosBatch } from "@/lib/googleDrive";
 import toast from "react-hot-toast";
 import { createCompositeImage } from "@/lib/createComposite";

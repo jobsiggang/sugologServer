@@ -27,7 +27,7 @@ export default function EmployeeLogin() {
       try {
         const user = JSON.parse(userStr);
         if (user.role === 'employee') {
-          router.push('/upload');
+          router.push('/');
         }
       } catch (error) {
         localStorage.removeItem('token');
@@ -78,6 +78,7 @@ export default function EmployeeLogin() {
         // 직원만 허용
         if (data.role !== 'employee') {
           toast.error("직원 계정만 로그인할 수 있습니다.");
+          setLoading(false);
           return;
         }
 
@@ -85,9 +86,9 @@ export default function EmployeeLogin() {
         localStorage.setItem("user", JSON.stringify(data.user));
         
         toast.success("로그인 성공!");
-        setTimeout(() => {
-          router.push("/upload");
-        }, 500);
+        
+        // 메인 페이지로 리디렉션
+        router.replace("/");
       } else {
         toast.error(data.message || "로그인 실패");
       }

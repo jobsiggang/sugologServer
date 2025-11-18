@@ -45,9 +45,7 @@ export default function SupervisorLogin() {
         localStorage.setItem("user", JSON.stringify(data.user));
         
         toast.success("로그인 성공!");
-        setTimeout(() => {
-          router.push("/supervisor/dashboard");
-        }, 500);
+        router.replace("/supervisor");
       } else {
         toast.error(data.message || "로그인 실패");
       }

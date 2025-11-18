@@ -67,9 +67,7 @@ export default function AdminLogin() {
         localStorage.setItem("user", JSON.stringify(data.user));
         
         toast.success("로그인 성공!");
-        setTimeout(() => {
-          router.push("/company/dashboard");
-        }, 500);
+        router.replace("/admin");
       } else {
         toast.error(data.message || "로그인 실패");
       }

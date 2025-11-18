@@ -4,8 +4,8 @@ const RUNTIME_CACHE = 'fair-runtime-v1';
 
 // 오프라인에서도 접근 가능한 필수 파일들
 const PRECACHE_URLS = [
+  '/',
   '/login',
-  '/upload',
   '/manifest.json'
   // 아이콘은 존재할 때만 캐시에 추가
 ];

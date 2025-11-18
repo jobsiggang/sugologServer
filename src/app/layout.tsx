@@ -2,8 +2,14 @@ import "./globals.css";
 import { ReactNode } from "react";
 
 export const metadata = {
-  title: "공정한 Works 현장 관리",
-  description: "공정한 Works 현장 관리 앱",
+  title: "현장사진 업로드",
+  description: "현장 사진 촬영 및 업로드 전용 앱",
+  applicationName: "현장사진 업로드",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "현장사진",
+  },
   icons: {
     icon: "/icons/icon-192.png",
     apple: "/icons/icon-512.png",
@@ -15,7 +21,7 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#f0f0f0",
+  themeColor: "#9333ea",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -23,7 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ko">
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#f0f0f0" />
+        <meta name="theme-color" content="#9333ea" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
 

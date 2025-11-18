@@ -1,22 +1,26 @@
 {
-  "name": "공정한 Works 현장 관리",
-  "short_name": "공정한Works",
-  "start_url": "/",
+  "name": "현장사진 업로드",
+  "short_name": "현장사진",
+  "description": "현장 사진 촬영 및 업로드 전용 앱",
+  "start_url": "/login",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffff",
-  "theme_color": "#f0f0f0",
+  "background_color": "#9333ea",
+  "theme_color": "#9333ea",
+  "categories": ["business", "productivity"],
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

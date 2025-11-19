@@ -14,7 +14,6 @@ export default function ImageEditor({ author, userId }) {
   const canvasWidth = canvasConfig.width;
   const canvasHeight = canvasConfig.height;
 
-  const [siteData, setSiteData] = useState([]);
   const [entries, setEntries] = useState([]);
   const [formList, setFormList] = useState([]);
   const [selectedForm, setSelectedForm] = useState("");
@@ -393,7 +392,6 @@ export default function ImageEditor({ author, userId }) {
         
         const uploadRecord = {
           formName: selectedForm,
-          siteName: entryData['현장명'] || '',
           data: entryData,
           imageUrls: uploadedUrls,
           imageCount: processed.length,
@@ -506,7 +504,6 @@ export default function ImageEditor({ author, userId }) {
         <InputForm 
           entries={entries} 
           setEntries={setEntries} 
-          siteData={siteData} 
           fieldOptions={fieldOptions}
         />
 
@@ -556,7 +553,7 @@ export default function ImageEditor({ author, userId }) {
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start", marginBottom: 8, gap: 10 }}>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontWeight: "600", fontSize: 14, color: "#111827" }}>
-                          {record.siteName} - {record.formName}
+                          {record.formName}
                         </div>
                         <div style={{ fontSize: 12, color: "#6b7280", marginTop: 4 }}>
                           {new Date(record.createdAt).toLocaleString('ko-KR')}

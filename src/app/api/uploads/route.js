@@ -36,12 +36,15 @@ export async function GET(req) {
       query.userId = decoded.userId;
     }
 
+    console.log('Executing query with:', query);
+
     const uploads = await Upload.find(query)
       .populate('userId', 'username name')
-      .populate('siteId', 'siteName')
       .populate('formId', 'formName')
       .sort({ createdAt: -1 })
       .limit(1000);
+
+    console.log('Query result:', uploads);
 
     return NextResponse.json({
       success: true,
@@ -49,7 +52,6 @@ export async function GET(req) {
         _id: u._id,
         userName: u.userId?.name || '알 수 없음',
         username: u.userId?.username || '',
-        siteName: u.siteName || null, // Ensure siteName is optional in the response
         formName: u.formName,
         data: Object.fromEntries(u.data || new Map()),
         imageUrls: u.imageUrls || [],
@@ -64,7 +66,7 @@ export async function GET(req) {
     console.error('업로드 목록 조회 실패:', error);
     return NextResponse.json({ 
       success: false, 
-      error: '업로드 목록 조회 중 오류가 발생했습니다.' 
+      error: `업로드 목록 조회 중 오류가 발생했습니다: ${error.message}` 
     }, { status: 500 });
   }
 }

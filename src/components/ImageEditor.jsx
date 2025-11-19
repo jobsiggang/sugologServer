@@ -59,21 +59,8 @@ export default function ImageEditor({ author, userId }) {
       try {
         const token = localStorage.getItem('token');
         
-        // 현장 목록 가져오기
-        const sitesResponse = await fetch('/api/sites', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const sitesData = await sitesResponse.json();
-        if (sitesData.success) {
-          setSiteData(sitesData.sites.map(s => ({
-            현장명: s.siteName,
-            프로젝트명: s.projectName,
-            공종코드: s.workTypeCode,
-            공종명: s.workTypeName
-          })));
-        }
+;
+     
 
         // 입력양식 목록 가져오기
         const formsResponse = await fetch('/api/forms', {

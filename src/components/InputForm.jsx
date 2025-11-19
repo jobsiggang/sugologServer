@@ -100,39 +100,22 @@ function EntryRow({ entry, options, onChangeDebounced, onBlur }) {
 
 const MemoEntryRow = React.memo(EntryRow);
 
-const InputFormImpl = function InputForm({ entries, setEntries, siteData, fieldOptions = {} }, ref) {
+const InputFormImpl = function InputForm({ entries, setEntries, fieldOptions = {} }, ref) {
   // field -> unique options map (캐시)
-  // 우선순위: fieldOptions (양식에서 정의) > siteData (과거 데이터)
+  // 우선순위: fieldOptions (양식에서 정의)
   const optionsMap = useMemo(() => {
     const map = {};
-    
-    // 1. 먼저 양식의 fieldOptions 사용
+
+    // 1. 양식의 fieldOptions 사용
     Object.keys(fieldOptions).forEach((key) => {
       if (Array.isArray(fieldOptions[key]) && fieldOptions[key].length > 0) {
         map[key] = fieldOptions[key];
       }
     });
-    
-    // 2. siteData에서 추가 옵션 수집 (중복 제거)
-    if (Array.isArray(siteData)) {
-      for (const row of siteData) {
-        for (const key of Object.keys(row)) {
-          const val = row[key];
-          if (!val) continue;
-          if (!map[key]) {
-            map[key] = [];
-          }
-          // 중복되지 않은 값만 추가
-          if (!map[key].includes(val)) {
-            map[key].push(val);
-          }
-        }
-      }
-    }
-    
+
     console.log('📋 InputForm optionsMap:', map);
     return map;
-  }, [siteData, fieldOptions]);
+  }, [fieldOptions]);
 
   // 키별 디바운스 타이머 및 최신 값 저장
   // timersRef.current[key] = { timer: TimeoutId, value: latestValue }

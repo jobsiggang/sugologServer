@@ -49,7 +49,7 @@ export async function GET(req) {
         _id: u._id,
         userName: u.userId?.name || '알 수 없음',
         username: u.userId?.username || '',
-        siteName: u.siteName,
+        siteName: u.siteName || null, // Ensure siteName is optional in the response
         formName: u.formName,
         data: Object.fromEntries(u.data || new Map()),
         imageUrls: u.imageUrls || [],
@@ -91,7 +91,7 @@ export async function POST(req) {
       userId: decoded.userId,
       companyId: decoded.companyId,
       formName,
-      siteName,
+      siteName: siteName || null, // Make siteName optional
       data: new Map(Object.entries(data || {})),
       imageUrls: imageUrls || [],
       imageCount: imageCount || (imageUrls ? imageUrls.length : 0),

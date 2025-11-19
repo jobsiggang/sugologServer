@@ -19,7 +19,10 @@ export async function GET(req) {
       return NextResponse.json({ success: false, error: '유효하지 않은 토큰입니다.' }, { status: 401 });
     }
 
+    console.log('Decoded token:', decoded);
+
     await connectDB();
+    console.log('Database connection established');
 
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
@@ -64,6 +67,21 @@ export async function GET(req) {
     });
   } catch (error) {
     console.error('업로드 목록 조회 실패:', error);
+
+    if (error.name === 'ValidationError') {
+      return NextResponse.json({
+        success: false,
+        error: 'Validation error occurred while processing the request.'
+      }, { status: 400 });
+    }
+
+    if (error.name === 'MongoError') {
+      return NextResponse.json({
+        success: false,
+        error: 'Database error occurred while processing the request.'
+      }, { status: 500 });
+    }
+
     return NextResponse.json({ 
       success: false, 
       error: `업로드 목록 조회 중 오류가 발생했습니다: ${error.message}` 

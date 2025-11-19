@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useCallback, useRef, useImperativeHandle, forwardRef } from "react";
+import React, { useMemo, useCallback, useRef, useImperativeHandle, forwardRef, useEffect } from "react";
 
 const baseInputStyle = {
   padding: "2px 4px",
@@ -115,6 +115,11 @@ const InputFormImpl = function InputForm({ entries, setEntries, fieldOptions = {
 
     console.log('📋 InputForm optionsMap:', map);
     return map;
+  }, [fieldOptions]);
+
+  // Added logging to debug optionsMap
+  useEffect(() => {
+    console.log('InputForm optionsMap:', fieldOptions);
   }, [fieldOptions]);
 
   // 키별 디바운스 타이머 및 최신 값 저장

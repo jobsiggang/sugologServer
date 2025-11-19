@@ -140,7 +140,7 @@ export default function EmployeeDashboard() {
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
                     <h3 className="font-semibold text-gray-800">{upload.formName || '양식명 없음'}</h3>
-                    <p className="text-sm text-gray-600">{upload.siteName || upload.data?.현장명 || '현장명 없음'}</p>
+                    
                   </div>
                   <span className="text-xs text-gray-500">
                     {new Date(upload.createdAt).toLocaleDateString('ko-KR')}

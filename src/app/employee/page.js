@@ -40,12 +40,20 @@ export default function EmployeeDashboard() {
           'Authorization': `Bearer ${token}`
         }
       });
+
+      if (!response.ok) {
+        console.error('업로드 목록 조회 실패:', response.statusText);
+        return;
+      }
+
       const data = await response.json();
       if (data.success) {
         setUploads(data.uploads);
+      } else {
+        console.error('업로드 목록 조회 실패:', data.error);
       }
     } catch (error) {
-      console.error('업로드 목록 조회 실패:', error);
+      console.error('업로드 목록 조회 중 오류:', error);
     } finally {
       setLoading(false);
     }

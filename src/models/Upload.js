@@ -11,20 +11,13 @@ const uploadSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
-  siteId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Site',
-    required: false
-  },
+
   formId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Form',
     required: false
   },
-  siteName: {
-    type: String,
-    required: true
-  },
+
   formName: {
     type: String,
     required: true

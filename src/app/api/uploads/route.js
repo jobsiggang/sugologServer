@@ -83,7 +83,7 @@ export async function POST(req) {
     }
 
     const body = await req.json();
-    const { formName, siteName, data, imageUrls, imageCount, thumbnails } = body;
+    const { formName, data, imageUrls, imageCount, thumbnails } = body;
 
     await connectDB();
 
@@ -91,7 +91,6 @@ export async function POST(req) {
       userId: decoded.userId,
       companyId: decoded.companyId,
       formName,
-      siteName: siteName || null, // Make siteName optional
       data: new Map(Object.entries(data || {})),
       imageUrls: imageUrls || [],
       imageCount: imageCount || (imageUrls ? imageUrls.length : 0),
@@ -99,15 +98,12 @@ export async function POST(req) {
       status: 'uploaded'
     });
 
-    return NextResponse.json({
-      success: true,
-      upload
-    });
+    return NextResponse.json({ success: true, upload });
   } catch (error) {
     console.error('업로드 정보 저장 실패:', error);
     return NextResponse.json({
       success: false,
-      error: error.message
+      error: '업로드 정보 저장 중 오류가 발생했습니다.'
     }, { status: 500 });
   }
 }

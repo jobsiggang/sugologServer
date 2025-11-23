@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
+import Company from '@/models/Company';
 import { verifyToken } from "@/lib/auth"; // 토큰 검증 함수를 가정
 
 // @desc    로그인된 사용자의 활성 상태 및 전체 정보 확인 (POST 방식, Body에 토큰 포함)

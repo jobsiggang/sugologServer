@@ -1,15 +1,19 @@
-// src/app/api/userStatus/route.js
-
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { verifyToken } from "@/lib/auth"; // 토큰 검증 함수를 가정
 
-// @desc    로그인된 사용자의 활성 상태 및 전체 정보 확인
-// @route   GET /api/user/status
-export async function GET(req) {
-    const authorizationHeader = req.headers.get('authorization');
-    const token = authorizationHeader?.startsWith('Bearer ') ? authorizationHeader.substring(7) : null;
+// @desc    로그인된 사용자의 활성 상태 및 전체 정보 확인 (POST 방식, Body에 토큰 포함)
+// @route   POST /api/userStatus
+export async function POST(req) {
+    let body;
+    try {
+        body = await req.json();
+    } catch (e) {
+        return NextResponse.json({ success: false, message: "잘못된 요청 형식입니다." }, { status: 400 });
+    }
+
+    const { token, userId } = body; // 클라이언트에서 보낸 토큰과 userId를 Body에서 추출
 
     if (!token) {
         return NextResponse.json({
@@ -20,12 +24,14 @@ export async function GET(req) {
 
     let decoded;
     try {
+        // 1. 토큰 검증
         decoded = verifyToken(token); 
         
-        if (!decoded || !decoded.id) {
-            return NextResponse.json({
+        // 토큰 내의 ID와 클라이언트가 보낸 userId가 일치하는지 확인 (선택적 보안 강화)
+        if (!decoded || !decoded.id || decoded.id.toString() !== userId) {
+             return NextResponse.json({
                 success: false,
-                message: "토큰이 유효하지 않습니다.",
+                message: "토큰 정보가 사용자 ID와 일치하지 않거나 유효하지 않습니다.",
             }, { status: 401 });
         }
     } catch (tokenError) {
@@ -36,7 +42,7 @@ export async function GET(req) {
         }, { status: 401 });
     }
 
-    // MongoDB 연결
+    // 2. MongoDB 연결
     try {
         await connectDB();
     } catch (dbError) {
@@ -47,12 +53,11 @@ export async function GET(req) {
         }, { status: 503 });
     }
 
-    // 사용자 정보 조회 (companyId Populate 추가)
+    // 3. 사용자 정보 조회 (isActive 상태 및 회사 정보 포함)
     try {
-        // 토큰에 있는 ID를 사용하여 사용자를 조회하며, companyId 필드를 채웁니다.
         const user = await User.findById(decoded.id)
             .select('username name role companyId isActive')
-            .populate('companyId', 'name'); // 회사 이름(name)을 가져오도록 populate 설정
+            .populate('companyId', 'name'); 
         
         if (!user) {
             return NextResponse.json({
@@ -64,11 +69,9 @@ export async function GET(req) {
         // 🚨 [핵심] isActive 상태 확인
         if (user.isActive === false) {
              return NextResponse.json({
-                success: false, // 활성 계정 확인에는 실패했으므로 false를 반환
+                success: false, 
                 message: "계정이 현재 비활성화 상태입니다. 관리자에게 문의하세요.",
-                user: {
-                    isActive: false,
-                }
+                user: { isActive: false }
             }, { status: 403 }); // Forbidden
         }
 
@@ -87,7 +90,7 @@ export async function GET(req) {
                 companyName: userCompanyName,
                 isActive: user.isActive, // true
             },
-            token: token, // 🚨 현재 유효한 토큰을 다시 반환
+            token: token, // 현재 유효한 토큰을 다시 반환
             message: "사용자 세션 및 계정 활성 상태 확인 완료",
         };
         

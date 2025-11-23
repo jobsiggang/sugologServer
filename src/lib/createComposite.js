@@ -26,8 +26,8 @@ function makeOverlayCanvas(entries) {
   // 최소 테이블 너비
   let minTableWidth = width * minTableWidthRatio; // 캔버스 너비의 20%
 
-  // 첫 번째 열: 고정 너비 계산 (캔버스 너비의 약 7%)
-  const col1Width = width * 0.07; // 고정 픽셀값
+  // 첫 번째 열: 고정 너비 계산 (캔버스 너비의 약 5%)
+  const col1Width = width * 0.05; // 더 좁게
 
   // 두 번째 열에 들어갈 글자 길이 계산
   ctx.font = canvasConfig.table.font;

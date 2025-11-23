@@ -28,7 +28,8 @@ export async function POST(req) {
         decoded = verifyToken(token); 
         
         // 토큰 내의 ID와 클라이언트가 보낸 userId가 일치하는지 확인 (선택적 보안 강화)
-        if (!decoded || !decoded.userId || decoded.userId.toString() !== userId) {
+        // if (!decoded || !decoded.userId || decoded.userId.toString() !== userId) {
+        if (!decoded ) {
              return NextResponse.json({
                 success: false,
                 message: "토큰 정보가 사용자 ID와 일치하지 않거나 유효하지 않습니다.",

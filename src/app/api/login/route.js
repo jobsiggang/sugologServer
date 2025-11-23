@@ -112,7 +112,7 @@ export async function POST(req) {
       success: true,
       role: user.role,
       user: {
-        id: user._id,
+        _id: user._id,
         username: user.username,
         name: user.name,
         role: user.role,

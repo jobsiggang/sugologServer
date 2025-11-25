@@ -4,7 +4,7 @@ import Company from "@/models/Company";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
-// 업체 목록 조회 (슈퍼바이저 전용)
+// 회사 목록 조회 (슈퍼바이저 전용)
 export async function GET(req) {
   try {
     const token = getTokenFromRequest(req);
@@ -26,7 +26,7 @@ export async function GET(req) {
 
     const companies = await Company.find().sort({ createdAt: -1 });
 
-    // 각 업체의 관리자 정보도 함께 조회
+    // 각 회사의 관리자 정보도 함께 조회
     const companiesWithAdmin = await Promise.all(
       companies.map(async (company) => {
         const admin = await User.findOne({ 
@@ -53,12 +53,12 @@ export async function GET(req) {
   } catch (error) {
     console.error('Get companies error:', error);
     return NextResponse.json({ 
-      error: '업체 목록 조회 실패' 
+      error: '회사 목록 조회 실패' 
     }, { status: 500 });
   }
 }
 
-// 업체 생성 (슈퍼바이저 전용)
+// 회사 생성 (슈퍼바이저 전용)
 export async function POST(req) {
   try {
     const token = getTokenFromRequest(req);
@@ -86,11 +86,11 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // 중복 업체명 확인
+    // 중복 회사명 확인
     const existingCompany = await Company.findOne({ name: companyName });
     if (existingCompany) {
       return NextResponse.json({ 
-        error: '이미 존재하는 업체명입니다.' 
+        error: '이미 존재하는 회사입니다.' 
       }, { status: 400 });
     }
 
@@ -102,7 +102,7 @@ export async function POST(req) {
       }, { status: 400 });
     }
 
-    // 업체 생성
+    // 회사 생성
     const company = await Company.create({
       name: companyName,
       description: companyDescription || '',
@@ -114,7 +114,7 @@ export async function POST(req) {
       }
     });
 
-    // 업체 관리자 생성
+    // 회사 관리자 생성
     const admin = await User.create({
       username: adminUsername,
       password: adminPassword,
@@ -138,7 +138,7 @@ export async function POST(req) {
   } catch (error) {
     console.error('Create company error:', error);
     return NextResponse.json({ 
-      error: '업체 생성 실패',
+      error: '회사 생성 실패',
       details: error.message
     }, { status: 500 });
   }

@@ -4,7 +4,7 @@ import Company from "@/models/Company";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
-// 특정 업체 조회
+// 특정 회사 조회
 export async function GET(req, { params }) {
   try {
     const token = getTokenFromRequest(req);
@@ -28,7 +28,7 @@ export async function GET(req, { params }) {
     const company = await Company.findById(id);
 
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
     // 관리자 정보 조회
@@ -60,12 +60,12 @@ export async function GET(req, { params }) {
   } catch (error) {
     console.error('Get company error:', error);
     return NextResponse.json({ 
-      error: '업체 조회 실패' 
+      error: '회사 조회 실패' 
     }, { status: 500 });
   }
 }
 
-// 업체 정보 수정
+// 회사 정보 수정
 export async function PUT(req, { params }) {
   try {
     const token = getTokenFromRequest(req);
@@ -90,15 +90,15 @@ export async function PUT(req, { params }) {
 
     const company = await Company.findById(id);
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체명 변경 시 중복 확인
+    // 회사명 변경 시 중복 확인
     if (name && name !== company.name) {
       const existingCompany = await Company.findOne({ name, _id: { $ne: id } });
       if (existingCompany) {
         return NextResponse.json({ 
-          error: '이미 존재하는 업체명입니다.' 
+          error: '이미 존재하는 회사명입니다.' 
         }, { status: 400 });
       }
       company.name = name;
@@ -126,13 +126,13 @@ export async function PUT(req, { params }) {
   } catch (error) {
     console.error('Update company error:', error);
     return NextResponse.json({ 
-      error: '업체 수정 실패',
+      error: '회사 수정 실패',
       details: error.message
     }, { status: 500 });
   }
 }
 
-// 업체 삭제
+// 회사 삭제
 export async function DELETE(req, { params }) {
   try {
     const token = getTokenFromRequest(req);
@@ -156,15 +156,15 @@ export async function DELETE(req, { params }) {
     const company = await Company.findById(id);
 
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체에 속한 사용자 수 확인
+    // 회사에 속한 사용자 수 확인
     const userCount = await User.countDocuments({ companyId: id });
 
     if (userCount > 0) {
       return NextResponse.json({ 
-        error: `업체에 ${userCount}명의 사용자가 등록되어 있습니다. 먼저 모든 사용자를 삭제해주세요.`,
+        error: `회사에 ${userCount}명의 사용자가 등록되어 있습니다. 먼저 모든 사용자를 삭제해주세요.`,
         userCount
       }, { status: 400 });
     }
@@ -173,12 +173,12 @@ export async function DELETE(req, { params }) {
 
     return NextResponse.json({ 
       success: true,
-      message: '업체가 삭제되었습니다.'
+      message: '회사가 삭제되었습니다.'
     });
   } catch (error) {
     console.error('Delete company error:', error);
     return NextResponse.json({ 
-      error: '업체 삭제 실패',
+      error: '회사 삭제 실패',
       details: error.message
     }, { status: 500 });
   }

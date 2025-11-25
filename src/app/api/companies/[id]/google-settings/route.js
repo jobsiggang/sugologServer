@@ -20,10 +20,10 @@ export async function GET(request, { params }) {
 
     const company = await Company.findById(params.id);
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사만 조회 가능
+    // 회사관리자는 자기 회사만 조회 가능
     if (decoded.role === 'company_admin' && company._id.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
@@ -59,10 +59,10 @@ export async function PUT(request, { params }) {
 
     const company = await Company.findById(params.id);
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사만 수정 가능
+    // 회사관리자는 자기 회사만 수정 가능
     if (decoded.role === 'company_admin' && company._id.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
@@ -108,10 +108,10 @@ export async function POST(request, { params }) {
 
     const company = await Company.findById(params.id);
     if (!company) {
-      return NextResponse.json({ error: '업체를 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사만 테스트 가능
+    // 회사관리자는 자기 회사만 테스트 가능
     if (decoded.role === 'company_admin' && company._id.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }

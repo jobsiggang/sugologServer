@@ -26,7 +26,7 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사 직원만 조회 가능
+    // 회사관리자는 자기 회사 직원만 조회 가능
     if (decoded.role === 'company_admin' && 
         employee.companyId._id.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
@@ -66,7 +66,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사 직원만 수정 가능
+    // 회사관리자는 자기 회사 직원만 수정 가능
     if (decoded.role === 'company_admin' && 
         employee.companyId.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
@@ -115,7 +115,7 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 업체관리자는 자기 회사 직원만 삭제 가능
+    // 회사관리자는 자기 회사 직원만 삭제 가능
     if (decoded.role === 'company_admin' && 
         employee.companyId.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });

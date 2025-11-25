@@ -18,7 +18,7 @@ export async function GET(request) {
 
     await connectDB();
 
-    // 슈퍼바이저는 모든 직원, 업체관리자는 자기 회사 직원만
+    // 슈퍼바이저는 모든 직원, 회사관리자는 자기 회사 직원만
     const query = decoded.role === 'supervisor' 
       ? {} 
       : { companyId: decoded.companyId };
@@ -82,14 +82,14 @@ export async function POST(request) {
       }, { status: 400 });
     }
 
-    // 업체관리자는 자기 회사에만 직원 추가 가능
+    // 회사관리자는 자기 회사에만 직원 추가 가능
     const finalCompanyId = decoded.role === 'supervisor' 
       ? companyId 
       : decoded.companyId;
 
     if (!finalCompanyId) {
       return NextResponse.json({ 
-        error: '업체 정보가 필요합니다.' 
+        error: '회사 정보가 필요합니다.' 
       }, { status: 400 });
     }
 

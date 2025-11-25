@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
 
-// 모든 활성 업체 목록 조회 (로그인 화면용)
+// 모든 활성 회사 목록 조회 (로그인 화면용)
 export async function GET() {
   try {
     await connectDB();
@@ -18,7 +18,7 @@ export async function GET() {
   } catch (error) {
     console.error('Get companies list error:', error);
     return NextResponse.json({ 
-      error: '업체 목록 조회 실패' 
+      error: '회사 목록 조회 실패' 
     }, { status: 500 });
   }
 }

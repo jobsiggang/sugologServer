@@ -43,7 +43,8 @@ export async function POST(req) {
         
         // 토큰 내의 ID와 클라이언트가 보낸 userId가 일치하는지 확인
         // 클라이언트가 보낸 userId는 문자열, decoded._id는 ObjectId일 수 있으므로 동등 비교 사용
-        if (!decoded || !(decoded._id == userId)) {
+        // if (!decoded || !(decoded._id == userId)) {
+        if (!decoded || String(decoded._id) !== String(userId)) {
             return NextResponse.json({
                 success: false,
                 message: "토큰 정보가 사용자 ID와 일치하지 않거나 유효하지 않습니다.",

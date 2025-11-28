@@ -71,7 +71,7 @@ export async function POST(req) {
 
     // 4. 사용자 정보 조회 및 isActive 상태 확인
     try {
-        const user = await User.findById(decoded._id) // 💡 decoded._id (소문자 i)로 수정
+        const user = await User.findById(decoded.user._id) // 💡 decoded._id (소문자 i)로 수정
             .select('username name role companyId isActive')
             .populate('companyId', 'name'); 
         

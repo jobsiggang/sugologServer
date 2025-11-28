@@ -78,7 +78,7 @@ export async function POST(req) {
         if (!user) {
             return NextResponse.json({
                 success: false,
-                message: "사용자 정보를 찾을 수 없습니다.",
+                message: "사용자 정보를 찾을 수 없습니다."+decoded._id,
             }, { status: 404 });
         }
 

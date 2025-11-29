@@ -70,17 +70,18 @@ export async function POST(req) {
     }
 
     // 4. 사용자 정보 조회 및 isActive 상태 확인
-    try {
-        const user = await User.findById(decoded._id) // 💡 decoded._id (소문자 i)로 수정
-            .select('username name role companyId isActive')
-            .populate('companyId', 'name'); 
-        
-        if (!user) {
-            return NextResponse.json({
-                success: false,
-                message: "사용자 정보를 찾을 수 없습니다."+decoded._id,
-            }, { status: 404 });
-        }
+try {
+        // 💡 토큰 생성 시 사용한 필드 이름인 'userId'로 접근
+        const user = await User.findById(decoded.userId) 
+            .select('username name role companyId isActive')
+            .populate('companyId', 'name'); 
+        
+        if (!user) {
+            return NextResponse.json({
+                success: false,
+                message: "사용자 정보를 찾을 수 없습니다." + decoded.userId, // 💡 출력 메시지도 수정
+            }, { status: 404 });
+        }
 
         // 🚨 isActive 상태 확인
         if (user.isActive === false) {

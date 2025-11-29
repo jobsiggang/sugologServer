@@ -52,7 +52,7 @@ export async function POST(req) {
         // 2. 요청 본문 파싱
         const { formId, formName, images } = await req.json();
 
-        if (!formId || !images || !Array.isArray(images) || images.length === 0) {
+        if (!formId || !images || images.length === 0) {
             return NextResponse.json({ error: '필수 데이터 (formId, images 배열)가 누락되었습니다.' }, { status: 400 });
         }
         

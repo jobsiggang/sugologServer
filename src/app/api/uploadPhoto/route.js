@@ -87,15 +87,21 @@ export async function POST(req) {
         };
         
         // 5. GAS로 전송할 데이터 (GAS는 Base64를 요구하므로 Base64로 다시 포장)
-        const uploadData = {
-            base64Image: `data:image/jpeg;base64,${base64Image}`, // Data URL 형식으로 전달
-            filename,
-            formName: formName,
-            fieldData: enrichedFieldData,
-            folderStructure: form.folderStructure || [],
-            sheetName: `${enrichedFieldData['현장명'] || company.name}_${formName}` 
-        };
+       const folderNames = (form.folderStructure || []).filter(Boolean);
+      const folderPathStr = folderNames.join('_');
+      const ext = filename.includes('.') ? filename.substring(filename.lastIndexOf('.')) : '.jpg';
+      const fileIndex = enrichedFieldData['파일번호'] || 1; // 필요시 동적으로
+      const finalFilename = `${folderPathStr}${fileIndex ? `(${fileIndex})` : ''}${ext}`;
 
+      const uploadData = {
+          base64Image: `data:image/jpeg;base64,${base64Image}`,
+          filename: finalFilename,
+          formName: formName,
+          fieldData: enrichedFieldData,
+          folderStructure: form.folderStructure || [],
+          // sheetName: `${enrichedFieldData['현장명'] || company.name}_${formName}`
+      
+      };
         // 6. Google Apps Script 호출
         const gasRes = await fetch(SCRIPT_URL, {
             method: "POST",

@@ -1,4 +1,4 @@
-// src/app/api/uploadPhoto/route.js (서버 측 최종 코드)
+// src/app/api/uploadPhoto/route.js (Next.js API Route)
 
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
@@ -8,22 +8,22 @@ import Form from "@/models/Form";
 import Upload from "@/models/Upload"; // MongoDB Upload 모델
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
+// Node.js 환경에서 File 객체를 Base64로 변환하는 유틸리티 함수 (서버 측에서 사용)
+async function fileToBase64(file) {
+    // File 객체의 arrayBuffer()를 사용하여 바이너리 데이터 추출
+    const bytes = await file.arrayBuffer();
+    // Buffer로 변환 후 Base64 문자열로 인코딩
+    const buffer = Buffer.from(bytes);
+    return buffer.toString('base64');
+}
+
 /**
- * ⚡ 클라이언트로부터 일괄 이미지 데이터를 받아 GAS 업로드 및 개별 DB 기록
- * 요청 형식 (클라이언트 finalUploadPayload):
- * {
- * formId: "양식 ID",
- * formName: "양식 이름",
- * representativeData: { ... }, 
- * images: [ 
- * { filename: "photo_1.jpg", base64Image: "...", thumbnail: "...", fieldData: {...} },
- * ...
- * ]
- * }
+ * ⚡ MultiPart/form-data를 받아 GAS 업로드 및 개별 DB 기록
+ * 클라이언트에서 FormData로 전송된 파일을 처리합니다.
  */
 export async function POST(req) {
     try {
-        // 1. 인증 및 기본 설정 확인 (기존 로직 유지)
+        // 1. 인증 및 기본 설정 확인
         const token = getTokenFromRequest(req);
         if (!token) {
             return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
@@ -49,93 +49,97 @@ export async function POST(req) {
             }, { status: 400 });
         }
         
-        // 2. 요청 본문 파싱
-        const { formId, formName, images } = await req.json();
+        // 2. 🚨 [핵심 수정] MultiPart/form-data 파싱
+        const formData = await req.formData();
+        
+        const file = formData.get('file'); // 'file': 합성 이미지 (리사이징됨)
+        const thumbnail = formData.get('thumbnail'); // 'thumbnail': 썸네일 파일
+        
+        const formId = formData.get('formId');
+        const formName = formData.get('formName');
+        const fieldDataStr = formData.get('fieldData'); // JSON 문자열
+        // totalImageCount는 현재 단일 업로드이므로 '1'로 가정
 
-        if (!formId || !images || images.length === 0) {
-            return NextResponse.json({ error: '필수 데이터 (formId, images 배열)가 누락되었습니다.' }, { status: 400 });
+        if (!file || !thumbnail || !formId || !fieldDataStr) {
+            return NextResponse.json({ error: '필수 데이터가 누락되었습니다. (file, thumbnail, formId, fieldData 필요)' }, { status: 400 });
         }
         
+        // FormData에서 추출된 데이터 처리
+        const fieldData = JSON.parse(fieldDataStr);
+        const filename = file.name;
+
+        // 3. 파일 Base64 변환 (서버에서 GAS로 전달하기 위해 파일 데이터를 Base64로 변환)
+        const base64Image = await fileToBase64(file);
+        const base64Thumbnail = await fileToBase64(thumbnail);
+
         const form = await Form.findById(formId);
         if (!form) {
             return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
         }
 
-        const uploadedRecordIds = [];
+        // 4. 필드 데이터 보강
+        const enrichedFieldData = {
+            ...fieldData,
+            "사용자": user.name,
+            "사용자명": user.username,
+            "업체명": company.name,
+            "업로드_시점": new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
+        };
+        
+        // 5. GAS로 전송할 데이터 (GAS는 Base64를 요구하므로 Base64로 다시 포장)
+        const uploadData = {
+            base64Image: `data:image/jpeg;base64,${base64Image}`, // Data URL 형식으로 전달
+            filename,
+            formName: formName,
+            fieldData: enrichedFieldData,
+            folderStructure: form.folderStructure || [],
+            sheetName: `${enrichedFieldData['현장명'] || company.name}_${formName}` 
+        };
 
-        // 3. 🚨 CRITICAL: 이미지 배열 루프 및 GAS 업로드, **개별 DB 기록**
-        for (const [i, image] of images.entries()) {
-            const { base64Image, filename, thumbnail, fieldData } = image; 
+        // 6. Google Apps Script 호출
+        const gasRes = await fetch(SCRIPT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(uploadData),
+        });
+        
+        if (!gasRes.ok) {
+            console.error('❌ GAS 응답 오류:', gasRes.status, gasRes.statusText);
+            throw new Error(`Google Apps Script 요청 실패: ${gasRes.statusText}`);
+        }
 
-            // fieldData에 사용자/업체 정보 추가
-            const enrichedFieldData = {
-                ...fieldData,
-                "사용자": user.name,
-                "사용자명": user.username,
-                "업체명": company.name,
-                "업로드_시점": new Date().toLocaleString(),
-            };
-            
-            const uploadData = {
-                base64Image,
-                filename,
-                formName: formName,
-                fieldData: enrichedFieldData,
-                folderStructure: form.folderStructure || [],
-                // 시트명은 현장명과 양식명으로 구성 (개별 데이터의 현장명을 따름)
-                sheetName: `${enrichedFieldData['현장명'] || company.name}_${formName}` 
-            };
+        const data = await gasRes.json();
 
-            console.log(`📤 [${i + 1}/${images.length}] Google Apps Script로 업로드 중: ${filename}`);
+        if (!data.success) {
+            console.error('❌ GAS 오류:', data.error);
+            throw new Error(data.error || 'Google Drive 업로드 실패');
+        }
+        
+        // 7. 개별 DB 기록 (Upload 모델 사용)
+        const uploadRecord = await Upload.create({
+            userId: user._id,
+            companyId: company._id,
+            formId: form._id,
+            formName: formName,
+            data: enrichedFieldData, 
+            imageCount: 1,
+            imageUrls: [data.fileUrl], 
+            thumbnails: [`data:image/jpeg;base64,${base64Thumbnail}`], // 서버에서 변환한 Base64 썸네일 저장
+            folderPath: data.folderPath,
+        });
 
-            // 4. Google Apps Script 호출
-            const gasRes = await fetch(SCRIPT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(uploadData),
-            });
-            
-            if (!gasRes.ok) {
-                console.error(`❌ GAS 응답 오류 (${i + 1}):`, gasRes.status, gasRes.statusText);
-                throw new Error(`Google Apps Script 요청 실패 (${i + 1}): ${gasRes.statusText}`);
-            }
-
-            const data = await gasRes.json();
-
-            if (!data.success) {
-                console.error(`❌ GAS 오류 (${i + 1}):`, data.error);
-                throw new Error(data.error || `Google Drive 업로드 실패 (${i + 1})`);
-            }
-            
-            // 5. 🚨 개별 DB 기록 (Upload 모델 사용) - 요청하신 사항
-            const individualUploadRecord = await Upload.create({
-                userId: user._id,
-                companyId: company._id,
-                formId: form._id,
-                formName: formName,
-                // 💡 현재 이미지의 개별 데이터를 저장
-                data: enrichedFieldData, 
-                imageCount: 1, // 개별 레코드이므로 1
-                imageUrls: [data.fileUrl], // GAS에서 받은 파일 URL
-                thumbnails: [thumbnail], // 클라이언트에서 받은 썸네일
-                folderPath: data.folderPath,
-            });
-
-            uploadedRecordIds.push(individualUploadRecord._id);
-
-            console.log(`✅ [${i + 1}/${images.length}] DB 기록 성공: ${individualUploadRecord._id}`);
-        } // End of loop
-
-        // 6. Google 설정의 lastSync 업데이트
+        // 8. Google 설정의 lastSync 업데이트
         company.googleSettings.lastSync = new Date();
         await company.save();
 
+        console.log('✅ 업로드 및 DB 기록 성공:', uploadRecord._id);
         
-        // 7. 최종 응답 반환
+        // 9. 최종 응답 반환 (클라이언트 목록 업데이트용으로 Base64 썸네일을 다시 전달)
         return NextResponse.json({
             success: true,
-            message: `${images.length}개 이미지가 성공적으로 업로드 및 개별 DB에 기록되었습니다.`,
-            uploadRecordIds: uploadedRecordIds,
+            message: `이미지가 성공적으로 업로드 및 DB에 기록되었습니다.`,
+            uploadRecordId: uploadRecord._id,
+            thumbnails: [`data:image/jpeg;base64,${base64Thumbnail}`], 
         });
 
     } catch (err) {

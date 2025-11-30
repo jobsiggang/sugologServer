@@ -12,7 +12,7 @@ export async function GET(request) {
     }
 
     const decoded = verifyToken(token);
-    if (!decoded || !['supervisor', 'team_admin'].includes(decoded.role)) {
+    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
@@ -21,14 +21,14 @@ export async function GET(request) {
     // 슈퍼바이저는 모든 직원, 회사관리자는 자기 회사 직원만
     const query = decoded.role === 'supervisor' 
       ? {} 
-      : { teamId: decoded.teamId };
+      : { companyId: decoded.companyId };
 
     const employees = await User.find({
       ...query,
-      role: { $in: ['team_admin', 'employee'] }
+      role: { $in: ['company_admin', 'employee'] }
     })
     .select('-password')
-    .populate('teamId', 'name')
+    .populate('companyId', 'name')
     .sort({ createdAt: -1 });
 
     return NextResponse.json({
@@ -52,11 +52,11 @@ export async function POST(request) {
     }
 
     const decoded = verifyToken(token);
-    if (!decoded || !['supervisor', 'team_admin'].includes(decoded.role)) {
+    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { username, password, name, role, teamId } = await request.json();
+    const { username, password, name, role, companyId } = await request.json();
 
     // 입력값 검증
     if (!username || !password || !name || !role) {
@@ -66,7 +66,7 @@ export async function POST(request) {
     }
 
     // 역할 검증
-    if (!['team_admin', 'employee'].includes(role)) {
+    if (!['company_admin', 'employee'].includes(role)) {
       return NextResponse.json({ 
         error: '올바르지 않은 역할입니다.' 
       }, { status: 400 });
@@ -83,11 +83,11 @@ export async function POST(request) {
     }
 
     // 회사관리자는 자기 회사에만 직원 추가 가능
-    const finalteamId = decoded.role === 'supervisor' 
-      ? teamId 
-      : decoded.teamId;
+    const finalCompanyId = decoded.role === 'supervisor' 
+      ? companyId 
+      : decoded.companyId;
 
-    if (!finalteamId) {
+    if (!finalCompanyId) {
       return NextResponse.json({ 
         error: '회사 정보가 필요합니다.' 
       }, { status: 400 });
@@ -99,7 +99,7 @@ export async function POST(request) {
       password,
       name,
       role,
-      teamId: finalteamId
+      companyId: finalCompanyId
     });
 
     await newUser.save();

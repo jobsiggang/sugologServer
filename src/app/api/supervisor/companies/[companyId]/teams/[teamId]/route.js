@@ -1,184 +1,70 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
-import team from "@/models/team";
-import User from "@/models/User";
+import Team from "@/models/Team";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
-// 특정 팀 조회
-export async function GET(req, { params }) {
+// 단일 팀 정보 조회
+export async function GET(request, { params }) {
   try {
-    const token = getTokenFromRequest(req);
-    if (!token) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    }
-
+    const token = getTokenFromRequest(request);
+    if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    if (!decoded || !['supervisor', 'company_admin', 'team_admin'].includes(decoded.role)) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
-
     await connectDB();
-
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'team_admin' && user.role !== 'supervisor') {
-      return NextResponse.json({ error: '회사관리자만 접근 가능합니다.' }, { status: 403 });
+    const team = await Team.findById(params.teamId).populate('companyId', 'name');
+    if (!team) return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
+    // 권한 체크 예시
+    if (decoded.role === 'company_admin' && team.companyId._id.toString() !== decoded.companyId.toString()) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
-
-    const { id } = params;
-    const team = await team.findById(id);
-
-    if (!team) {
-      return NextResponse.json({ error: '팀를 찾을 수 없습니다.' }, { status: 404 });
+    if (decoded.role === 'team_admin' && team._id.toString() !== decoded.teamId.toString()) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
-
-    // 관리자 정보 조회
-    const admin = await User.findOne({ 
-      teamId: team._id, 
-      role: 'team_admin' 
-    }).select('username name');
-
-    // 직원 수 조회
-    const employeeCount = await User.countDocuments({
-      teamId: team._id,
-      role: 'employee'
-    });
-
-    return NextResponse.json({ 
-      success: true, 
-      team: {
-        _id: team._id,
-        name: team.name,
-        description: team.description,
-        isActive: team.isActive,
-        admin: admin ? { username: admin.username, name: admin.name } : null,
-        employeeCount,
-        createdAt: team.createdAt,
-        updatedAt: team.updatedAt
-      }
-    });
+    return NextResponse.json({ success: true, team });
   } catch (error) {
-    console.error('Get team error:', error);
-    return NextResponse.json({ 
-      error: '팀 조회 실패' 
-    }, { status: 500 });
+    return NextResponse.json({ error: '팀 조회 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
 
-// 팀 정보 수정
-export async function PUT(req, { params }) {
+// 단일 팀 정보 수정
+export async function PUT(request, { params }) {
   try {
-    const token = getTokenFromRequest(req);
-    if (!token) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    }
-
+    const token = getTokenFromRequest(request);
+    if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
-
+    const { name, description } = await request.json();
     await connectDB();
-
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'supervisor') {
-      return NextResponse.json({ error: '슈퍼바이저만 접근 가능합니다.' }, { status: 403 });
-    }
-
-    const { id } = params;
-    const { name, description, isActive } = await req.json();
-
-    const team = await team.findById(id);
-    if (!team) {
-      return NextResponse.json({ error: '팀를 찾을 수 없습니다.' }, { status: 404 });
-    }
-
-    // 팀명 변경 시 중복 확인
-    if (name && name !== team.name) {
-      const existingTeam = await team.findOne({ name, _id: { $ne: id } });
-      if (existingTeam) {
-        return NextResponse.json({ 
-          error: '이미 존재하는 팀명입니다.' 
-        }, { status: 400 });
-      }
-      team.name = name;
-    }
-
-    if (description !== undefined) {
-      team.description = description;
-    }
-
-    if (isActive !== undefined) {
-      team.isActive = isActive;
-    }
-
+    const team = await Team.findById(params.teamId);
+    if (!team) return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
+    if (name) team.name = name;
+    if (description) team.description = description;
     await team.save();
-
-    return NextResponse.json({ 
-      success: true,
-      team: {
-        _id: team._id,
-        name: team.name,
-        description: team.description,
-        isActive: team.isActive
-      }
-    });
+    return NextResponse.json({ success: true, message: '팀 정보가 수정되었습니다.', team });
   } catch (error) {
-    console.error('Update team error:', error);
-    return NextResponse.json({ 
-      error: '팀 수정 실패',
-      details: error.message
-    }, { status: 500 });
+    return NextResponse.json({ error: '팀 정보 수정 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }
 
-// 팀 삭제
-export async function DELETE(req, { params }) {
+// 단일 팀 삭제
+export async function DELETE(request, { params }) {
   try {
-    const token = getTokenFromRequest(req);
-    if (!token) {
-      return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    }
-
+    const token = getTokenFromRequest(request);
+    if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
     const decoded = verifyToken(token);
-    if (!decoded) {
-      return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
-
     await connectDB();
-
-    const user = await User.findById(decoded.userId);
-    if (!user || user.role !== 'supervisor') {
-      return NextResponse.json({ error: '슈퍼바이저만 접근 가능합니다.' }, { status: 403 });
-    }
-
-    const { id } = params;
-    const team = await team.findById(id);
-
-    if (!team) {
-      return NextResponse.json({ error: '팀를 찾을 수 없습니다.' }, { status: 404 });
-    }
-
-    // 팀에 속한 사용자 수 확인
-    const userCount = await User.countDocuments({ teamId: id });
-
-    if (userCount > 0) {
-      return NextResponse.json({ 
-        error: `팀에 ${userCount}명의 사용자가 등록되어 있습니다. 먼저 모든 사용자를 삭제해주세요.`,
-        userCount
-      }, { status: 400 });
-    }
-
-    await team.findByIdAndDelete(id);
-
-    return NextResponse.json({ 
-      success: true,
-      message: '팀가 삭제되었습니다.'
-    });
+    const team = await Team.findById(params.teamId);
+    if (!team) return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
+    await Team.findByIdAndDelete(params.teamId);
+    return NextResponse.json({ success: true, message: '팀이 삭제되었습니다.' });
   } catch (error) {
-    console.error('Delete team error:', error);
-    return NextResponse.json({ 
-      error: '팀 삭제 실패',
-      details: error.message
-    }, { status: 500 });
+    return NextResponse.json({ error: '팀 삭제 중 오류가 발생했습니다.' }, { status: 500 });
   }
 }

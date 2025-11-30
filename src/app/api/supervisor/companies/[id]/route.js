@@ -50,7 +50,6 @@ export async function GET(req, { params }) {
         name: company.name,
         description: company.description,
         isActive: company.isActive,
-        googleSettings: company.googleSettings,
         admin: admin ? { username: admin.username, name: admin.name } : null,
         employeeCount,
         createdAt: company.createdAt,

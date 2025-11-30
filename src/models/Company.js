@@ -11,25 +11,7 @@ const companySchema = new mongoose.Schema({
     type: String,
     default: ''
   },
-  // Google Apps Script 설정
-  googleSettings: {
-    webAppUrl: {
-      type: String,
-      default: '',
-      trim: true,
-      description: '업체관리자가 배포한 Google Apps Script 웹앱 URL'
-    },
-    setupCompleted: {
-      type: Boolean,
-      default: false,
-      description: 'Google 설정 완료 여부'
-    },
-    lastSync: {
-      type: Date,
-      description: '마지막 동기화 시간'
-    }
-  },
-  isActive: {
+   isActive: {
     type: Boolean,
     default: true
   },

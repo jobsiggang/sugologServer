@@ -23,7 +23,7 @@ export default function EmployeeLogin() {
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
-            router.replace('/');
+            router.replace('/company_team/dashboard');
         }
     }, [router]);
 
@@ -100,7 +100,7 @@ export default function EmployeeLogin() {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 toast.success("로그인 성공!");
-                router.replace("/");
+                router.replace("/company_team/dashboard");
             } else {
                 toast.error(data.message || "로그인 실패: 자격 증명을 확인하세요.");
             }
@@ -119,7 +119,7 @@ export default function EmployeeLogin() {
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
                 <div className="text-center mb-8">
                     <h1 className="text-3xl font-bold text-gray-800">현장 기록 시스템</h1>
-                    <p className="text-gray-500 mt-2">팀/직원 로그인</p>
+                    <p className="text-gray-500 mt-2">팀장 로그인</p>
                 </div>
                 {/* 회사명 입력 */}
                 {!selectedCompany && (
@@ -180,7 +180,7 @@ export default function EmployeeLogin() {
                                 value={formData.username}
                                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                                placeholder="직원/팀장 아이디"
+                                placeholder="팀장 아이디"
                                 disabled={loading}
                                 required
                             />

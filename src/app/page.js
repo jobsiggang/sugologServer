@@ -8,50 +8,29 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    console.log('Home page: checkAuth 시작');
     const token = localStorage.getItem('token');
     const userStr = localStorage.getItem('user');
-    console.log('Home page: token, user 존재?', !!token, !!userStr);
-
     if (!token || !userStr) {
-      // 로그인 안되어 있으면 직원 로그인 페이지로
-      console.log('Home page: 로그인 안됨 → /login');
-      router.push('/login');
+      router.replace('/login');
       return;
     }
-
     try {
       const userData = JSON.parse(userStr);
-      console.log('Home page: 사용자 역할:', userData.role);
+      // 팀장과 직원만 접근 가능, 그 외는 모두 로그인 페이지로
       
-      // 직원만 접근 가능
-      if (userData.role === 'employee') {
-        console.log('Home page: 직원 확인 → 업로드 페이지 표시');
+      if ((userData.role === 'employee' || userData.role === 'team_admin') && userData.teamId) {
         setUser(userData);
       } else {
-        // 다른 역할은 각자의 페이지로
-        console.log('Home page: 직원 아님 → 해당 페이지로 이동');
-        if (userData.role === 'company_admin') {
-          router.push('/admin');
-        } else if (userData.role === 'supervisor') {
-          router.push('/supervisor');
-        } else {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          router.push('/login');
-        }
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        router.replace('/login');
       }
-    } catch (error) {
-      console.error('Home page: Auth check error:', error);
+    } catch {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      router.push('/login');
+      router.replace('/login');
     }
-  };
+  }, [router]);
 
   const handleLogout = () => {
     localStorage.removeItem('token');
@@ -59,37 +38,33 @@ export default function HomePage() {
     router.push('/login');
   };
 
-  // 로딩 중
   if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-600 to-purple-800">
-        <div className="text-white text-xl">로딩 중...</div>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500 text-lg">로딩 중...</div>
       </div>
     );
   }
 
-  // 직원 업로드 페이지
+  // 직원(팀 소속)만 이미지 에디터 사용 가능
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* 상단 헤더 */}
-      <header className="bg-white shadow-sm sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-3">
+      <header className="bg-white border-b sticky top-0 z-50">
+        <div className="flex items-center justify-between px-4 py-2">
           <div>
-            <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
+            <h1 className="text-base font-bold text-gray-800">{user.teamName}</h1>
             <p className="text-xs text-gray-500">{user.name} ({user.username})</p>
           </div>
           <button
             onClick={handleLogout}
-            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
           >
             로그아웃
           </button>
         </div>
       </header>
-
-      {/* 메인 컨텐츠 */}
       <main>
-        <ImageEditor author={user.name} userId={user.id} />
+        <ImageEditor author={user.name} userId={user._id} />
       </main>
     </div>
   );

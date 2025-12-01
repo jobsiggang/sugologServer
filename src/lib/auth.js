@@ -2,9 +2,9 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
-export const generateToken = (userId, role, companyId = null) => {
+export const generateToken = (userId, role, companyId = null, teamId = null) => {
   return jwt.sign(
-    { userId, role, companyId },
+    { userId, role, companyId, teamId },
     JWT_SECRET,
     { expiresIn: '7d' }
   );

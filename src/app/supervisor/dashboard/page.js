@@ -62,7 +62,7 @@ export default function SupervisorDashboard() {
         setCompanies(data.companies);
       }
     } catch (error) {
-      console.error('업체 목록 조회 실패:', error);
+      console.error('회사 목록 조회 실패:', error);
     } finally {
       setLoading(false);
     }
@@ -94,7 +94,7 @@ export default function SupervisorDashboard() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`업체 "${data.company.name}"와 관리자 계정이 생성되었습니다.`);
+        alert(`회사 "${data.company.name}"와 관리자 계정이 생성되었습니다.`);
         setShowAddForm(false);
         setFormData({
           companyName: '',
@@ -105,7 +105,7 @@ export default function SupervisorDashboard() {
         });
         fetchCompanies();
       } else {
-        alert(data.error || '업체 생성 실패');
+        alert(data.error || '회사 생성 실패');
       }
     } catch (error) {
       alert('오류가 발생했습니다.');
@@ -132,7 +132,7 @@ export default function SupervisorDashboard() {
     e.preventDefault();
 
     if (!editFormData.name) {
-      alert('업체명을 입력해주세요.');
+      alert('회사명을 입력해주세요.');
       return;
     }
 
@@ -149,21 +149,21 @@ export default function SupervisorDashboard() {
 
       const data = await response.json();
       if (data.success) {
-        alert('업체 정보가 수정되었습니다.');
+        alert('회사 정보가 수정되었습니다.');
         setShowEditForm(false);
         setEditingCompany(null);
         fetchCompanies();
       } else {
-        alert(data.error || '업체 수정 실패');
+        alert(data.error || '회사 수정 실패');
       }
     } catch (error) {
-      console.error('업체 수정 오류:', error);
-      alert('업체 수정 중 오류가 발생했습니다.');
+      console.error('회사 수정 오류:', error);
+      alert('회사 수정 중 오류가 발생했습니다.');
     }
   };
 
   const handleDelete = async (company) => {
-    if (!confirm(`"${company.name}" 업체를 삭제하시겠습니까?\n\n⚠️ 주의: 업체에 등록된 사용자가 있으면 삭제할 수 없습니다.`)) {
+    if (!confirm(`"${company.name}" 회사를 삭제하시겠습니까?\n\n⚠️ 주의: 회사에 등록된 사용자가 있으면 삭제할 수 없습니다.`)) {
       return;
     }
 
@@ -178,14 +178,14 @@ export default function SupervisorDashboard() {
 
       const data = await response.json();
       if (data.success) {
-        alert('업체가 삭제되었습니다.');
+        alert('회사가 삭제되었습니다.');
         fetchCompanies();
       } else {
-        alert(data.error || '업체 삭제 실패');
+        alert(data.error || '회사 삭제 실패');
       }
     } catch (error) {
-      console.error('업체 삭제 오류:', error);
-      alert('업체 삭제 중 오류가 발생했습니다.');
+      console.error('회사 삭제 오류:', error);
+      alert('회사 삭제 중 오류가 발생했습니다.');
     }
   };
 
@@ -193,7 +193,7 @@ export default function SupervisorDashboard() {
     const newStatus = !company.isActive;
     const statusText = newStatus ? '활성화' : '비활성화';
 
-    if (!confirm(`"${company.name}" 업체를 ${statusText}하시겠습니까?`)) {
+    if (!confirm(`"${company.name}" 회사를 ${statusText}하시겠습니까?`)) {
       return;
     }
 
@@ -210,7 +210,7 @@ export default function SupervisorDashboard() {
 
       const data = await response.json();
       if (data.success) {
-        alert(`업체가 ${statusText}되었습니다.`);
+        alert(`회사가 ${statusText}되었습니다.`);
         fetchCompanies();
       } else {
         alert(data.error || '상태 변경 실패');
@@ -266,7 +266,7 @@ export default function SupervisorDashboard() {
                 : 'border-transparent text-gray-600 hover:text-gray-800'
             }`}
           >
-            🏢 업체 관리
+            🏢 회사 관리
           </button>
         </div>
       </header>
@@ -276,23 +276,23 @@ export default function SupervisorDashboard() {
         {activeTab === 'companies' && (
           <div>
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold">등록된 업체 목록</h2>
+              <h2 className="text-xl font-semibold">등록된 회사 목록</h2>
               <button
             onClick={() => setShowAddForm(!showAddForm)}
             className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
           >
-            {showAddForm ? '취소' : '+ 업체 추가'}
+            {showAddForm ? '취소' : '+ 회사 추가'}
           </button>
         </div>
 
         {showAddForm && (
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-            <h3 className="text-lg font-semibold mb-4">새 업체 및 관리자 등록</h3>
+            <h3 className="text-lg font-semibold mb-4">새 회사 및 관리자 등록</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    업체명 <span className="text-red-500">*</span>
+                    회사명 <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -305,13 +305,13 @@ export default function SupervisorDashboard() {
 
                 <div className="md:col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    업체 설명
+                    회사 설명
                   </label>
                   <textarea
                     value={formData.companyDescription}
                     onChange={(e) => setFormData({ ...formData, companyDescription: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                    placeholder="예: 도배, 타일 전문 업체"
+                    placeholder="예: 도배, 타일 전문 회사"
                     rows={2}
                   />
                 </div>
@@ -361,7 +361,7 @@ export default function SupervisorDashboard() {
                   type="submit"
                   className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
                 >
-                  업체 및 관리자 등록
+                  회사 및 관리자 등록
                 </button>
                 <button
                   type="button"
@@ -377,11 +377,11 @@ export default function SupervisorDashboard() {
 
         {showEditForm && editingCompany && (
           <div className="bg-white p-6 rounded-lg shadow-lg mb-6">
-            <h3 className="text-lg font-semibold mb-4">업체 정보 수정</h3>
+            <h3 className="text-lg font-semibold mb-4">회사 정보 수정</h3>
             <form onSubmit={handleUpdateSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  업체명 <span className="text-red-500">*</span>
+                  회사명 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -394,13 +394,13 @@ export default function SupervisorDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  업체 설명
+                  회사 설명
                 </label>
                 <textarea
                   value={editFormData.description}
                   onChange={(e) => setEditFormData({ ...editFormData, description: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  placeholder="예: 도배, 타일 전문 업체"
+                  placeholder="예: 도배, 타일 전문 회사"
                   rows={3}
                 />
               </div>
@@ -416,7 +416,7 @@ export default function SupervisorDashboard() {
                   <span className="text-sm font-medium text-gray-700">활성 상태</span>
                 </label>
                 <p className="text-xs text-gray-500 mt-1 ml-6">
-                  비활성화하면 해당 업체의 사용자들이 로그인할 수 없습니다.
+                  비활성화하면 해당 회사의 사용자들이 로그인할 수 없습니다.
                 </p>
               </div>
 
@@ -445,8 +445,8 @@ export default function SupervisorDashboard() {
         <div className="bg-white rounded-lg shadow overflow-hidden">
           {companies.length === 0 ? (
             <div className="text-center py-12">
-              <p className="text-gray-500">등록된 업체가 없습니다.</p>
-              <p className="text-sm text-gray-400 mt-2">위의 "업체 추가" 버튼을 눌러 새 업체를 등록하세요.</p>
+              <p className="text-gray-500">등록된 회사가 없습니다.</p>
+              <p className="text-sm text-gray-400 mt-2">위의 "회사 추가" 버튼을 눌러 새 회사를 등록하세요.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -454,10 +454,9 @@ export default function SupervisorDashboard() {
                 <thead className="bg-gray-50 border-b">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">업체명</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">회사명</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">관리자</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
-                    <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Google</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
                     <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">관리</th>
                   </tr>
@@ -488,17 +487,7 @@ export default function SupervisorDashboard() {
                       <td className="px-4 py-3 text-sm text-gray-600 max-w-xs truncate">
                         {company.description || '-'}
                       </td>
-                      <td className="px-4 py-3 text-center">
-                        {company.googleSetupCompleted ? (
-                          <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
-                            완료
-                          </span>
-                        ) : (
-                          <span className="inline-block px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">
-                            미설정
-                          </span>
-                        )}
-                      </td>
+                     
                       <td className="px-4 py-3 text-center">
                         {company.isActive ? (
                           <span className="inline-block px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
@@ -563,7 +552,7 @@ export default function SupervisorDashboard() {
         </div>
 
         <div className="mt-4 text-sm text-gray-600 bg-blue-50 p-3 rounded">
-          <p>💡 <strong>업체명</strong>을 클릭하면 관리 버튼이 표시됩니다.</p>
+          <p>💡 <strong>회사명</strong>을 클릭하면 관리 버튼이 표시됩니다.</p>
         </div>
           </div>
         )}

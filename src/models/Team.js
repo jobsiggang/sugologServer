@@ -1,48 +1,35 @@
+// src/models/Team.js
 import mongoose from 'mongoose';
 
 const teamSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true
-  },
-  description: {
-    type: String,
-    default: ''
-  },
-  // Google Apps Script 설정
-  googleSettings: {
-    webAppUrl: {
-      type: String,
-      default: '',
-      trim: true,
-      description: '팀관리자가 배포한 Google Apps Script 웹앱 URL'
-    },
-    setupCompleted: {
-      type: Boolean,
-      default: false,
-      description: 'Google 설정 완료 여부'
-    },
-    lastSync: {
-      type: Date,
-      description: '마지막 동기화 시간'
-    }
-  },
-  isActive: {
-    type: Boolean,
-    default: true
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
-  },
-  updatedAt: {
-    type: Date,
-    default: Date.now
-  }
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  companyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Company',
+    required: true
+  },
+  adminId: { // 팀 책임자(관리자) User _id
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: false
+  },
+  isActive: {
+    type: Boolean,
+    default: true
+  },
 }, {
-  timestamps: true
+  timestamps: true // 🟢 [수정] createdAt, updatedAt 자동 생성 옵션 사용
 });
+
+// 회사별로 팀명 유니크 인덱스
+teamSchema.index({ companyId: 1, name: 1 }, { unique: true });
 
 export default mongoose.models.Team || mongoose.model('Team', teamSchema);

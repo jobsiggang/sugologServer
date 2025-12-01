@@ -7,7 +7,7 @@ import Company from '@/models/Company';
 export async function POST(req) {
   try {
     const body = await req.json();
-    const { username, password, companyId } = body;
+    const { username, password, companyId, teamId } = body;
 
     console.log('=== 로그인 시도 ===');
     console.log('Username:', username);
@@ -36,17 +36,12 @@ export async function POST(req) {
       }, { status: 503 });
     }
 
-    // 사용자 찾기 (회사 ID가 있으면 회사별로 조회)
-    let query = { username, isActive: true };
-    
-    // companyId가 있으면 해당 회사의 사용자만 조회
-    if (companyId) {
-      query.companyId = companyId;
-    } else {
-      // companyId가 없으면 슈퍼바이저만 조회
-      query.role = 'supervisor';
-    }
 
+    // 사용자 찾기 (회사+팀+username 조합)
+    let query = { username, isActive: true };
+    if (companyId) query.companyId = companyId;
+    if (teamId) query.teamId = teamId;
+    if (!companyId) query.role = 'company_admin';
     console.log('Query:', JSON.stringify(query));
 
     let user;
@@ -102,10 +97,12 @@ export async function POST(req) {
 
     // companyId를 안전하게 추출
     const userCompanyId = user.companyId?._id || user.companyId;
+    const userTeamId = user.teamId?._id || user.teamId;
     console.log('Extracted companyId for token:', userCompanyId);
+    console.log('Extracted teamId for token:', userTeamId);
 
     // JWT 토큰 생성
-    const token = generateToken(user._id, user.role, userCompanyId);
+    const token = generateToken(user._id, user.role, userCompanyId, userTeamId);
     console.log('✅ 토큰 생성 완료');
 
     // 응답 생성
@@ -119,6 +116,8 @@ export async function POST(req) {
         role: user.role,
         companyId: user.companyId?._id,
         companyName: user.companyId?.name,
+        teamId: user.teamId,
+        teamName: user.teamId?.name || undefined,
       },
       token,
     });

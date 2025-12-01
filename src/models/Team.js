@@ -25,7 +25,12 @@ const teamSchema = new mongoose.Schema({
     type: Boolean,
     default: true
   },
-}, {
+googleSettings: {
+    webAppUrl: { type: String, default: '' },
+    setupCompleted: { type: Boolean, default: false },
+    lastSync: { type: Date }
+}
+},{
   timestamps: true // 🟢 [수정] createdAt, updatedAt 자동 생성 옵션 사용
 });
 

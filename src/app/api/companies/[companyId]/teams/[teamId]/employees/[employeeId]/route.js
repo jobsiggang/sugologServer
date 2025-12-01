@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
+import { p } from "framer-motion/client";
 
 // 특정 직원 조회
 export async function GET(request, { params }) {
@@ -18,7 +19,7 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const employee = await User.findById(params.id)
+    const employee = await User.findById(params.employeeId)
       .select('-password')
       .populate('companyId', 'name');
 
@@ -46,6 +47,7 @@ export async function GET(request, { params }) {
 
 // 직원 정보 수정
 export async function PUT(request, { params }) {
+  console.log("PUT params:", params);
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
@@ -61,7 +63,7 @@ export async function PUT(request, { params }) {
 
     await connectDB();
 
-    const employee = await User.findById(params.id);
+    const employee = await User.findById(params.employeeId);
     if (!employee) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -112,7 +114,7 @@ export async function DELETE(request, { params }) {
 
     await connectDB();
 
-    const employee = await User.findById(params.id);
+    const employee = await User.findById(params.employeeId);
     if (!employee) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -126,7 +128,7 @@ export async function DELETE(request, { params }) {
     }
 
     // Hard delete - DB에서 완전히 삭제
-    await User.findByIdAndDelete(params.id);
+    await User.findByIdAndDelete(params.employeeId);
 
     return NextResponse.json({
       success: true,

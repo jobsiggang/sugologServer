@@ -22,15 +22,17 @@ export async function GET(request, { params }) {
 
         await connectDB();
         
+
         const companyId = params.companyId;
+        const teamId = params.teamId;
 
         // 🚨 URL 파라미터가 토큰 정보와 일치하는지 확인 (team_admin의 경우)
-        if (decoded.role === 'team_admin' && decoded.companyId !== companyId) {
+        if (decoded.role === 'team_admin' && (decoded.companyId !== companyId || decoded.teamId !== teamId)) {
             return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 해당 회사에 속한 모든 양식 조회
-        const forms = await Form.find({ companyId })
+        // 해당 팀에 속한 양식만 조회
+        const forms = await Form.find({ companyId, teamId })
             .select('-__v')
             .sort({ formName: 1 });
 

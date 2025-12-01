@@ -6,6 +6,12 @@ const formSchema = new mongoose.Schema({
     ref: 'Company',
     required: true
   },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    required: true
+    
+  },
   formName: {
     type: String,
     required: true,
@@ -59,7 +65,7 @@ const formSchema = new mongoose.Schema({
   }
 });
 
-// 복합 인덱스 생성
-formSchema.index({ companyId: 1, formName: 1 });
+// 회사+팀+폼명 복합 유니크 인덱스 (같은 회사 내 다른 팀에서 동일 폼명 허용)
+formSchema.index({ companyId: 1, teamId: 1, formName: 1 }, { unique: true });
 
 export default mongoose.models.Form || mongoose.model('Form', formSchema);

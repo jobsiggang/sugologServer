@@ -3,8 +3,9 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
-import { verifyToken, getTokenFromRequest } from "@/lib/auth";
+import Company from "@/models/Company";
 import Team from "@/models/Team";
+import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 import mongoose from 'mongoose';
 
 // 직원 목록 조회 (GET)
@@ -23,7 +24,7 @@ export async function GET(request, { params }) {
 
         // 2. URL 파라미터 추출 및 토큰 정보와의 일치 확인
         const { companyId, teamId } = params;
-        
+
         // 🚨 [핵심] companyId와 teamId가 토큰 정보와 완벽하게 일치해야 함
         if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
             return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
@@ -77,8 +78,9 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
         }
         
-        // 중복 사용자명 확인 (회사 내 유니크를 넘어 전역 유니크가 필요할 수 있으나, 현재 로직 유지)
-        if (await User.findOne({ username })) {
+            // 중복 사용자명 확인 (같은 회사+팀 내에서만 중복 불가)
+            const existingUser = await User.findOne({ username, companyId: decoded.companyId, teamId: decoded.teamId });
+            if (existingUser) {
             return NextResponse.json({ error: '이미 존재하는 사용자명입니다.' }, { status: 400 });
         }
 
@@ -92,7 +94,15 @@ export async function POST(request, { params }) {
             teamId: decoded.teamId // 🚨 토큰의 ID를 사용 (URL에서 가져온 ID와 일치함)
         });
 
-        await newUser.save();
+        try {
+            await newUser.save();
+        } catch (err) {
+            // MongoDB unique index 에러 처리 (companyId+username)
+            if (err.code === 11000) {
+                return NextResponse.json({ error: '같은 회사 내에 이미 존재하는 사용자명입니다.' }, { status: 400 });
+            }
+            throw err;
+        }
         // ... (비밀번호 제거 및 응답 구성)
         const userResponse = newUser.toObject();
         delete userResponse.password;

@@ -44,6 +44,7 @@ export async function GET(request, { params }) {
 
 // 양식 정보 수정
 export async function PUT(request, { params }) {
+  console.log("params:", params);
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
@@ -51,7 +52,7 @@ export async function PUT(request, { params }) {
     }
 
     const decoded = verifyToken(token);
-    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
+    if (!decoded || !['team_admin', 'company_admin'].includes(decoded.role)) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
@@ -67,7 +68,7 @@ export async function PUT(request, { params }) {
     }
 
     // 회사관리자는 자기 회사 양식만 수정 가능
-    if (decoded.role === 'company_admin' && 
+    if (decoded.role === 'team_admin' && 
         form.companyId.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
@@ -104,6 +105,7 @@ export async function PUT(request, { params }) {
 }
 
 // 양식 삭제
+
 export async function DELETE(request, { params }) {
   try {
     const token = getTokenFromRequest(request);
@@ -112,19 +114,18 @@ export async function DELETE(request, { params }) {
     }
 
     const decoded = verifyToken(token);
-    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
+    if (!decoded || !['team_admin', 'company_admin'].includes(decoded.role)) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
     await connectDB();
-
     const form = await Form.findById(params.id);
     if (!form) {
       return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
     }
 
     // 회사관리자는 자기 회사 양식만 삭제 가능
-    if (decoded.role === 'company_admin' && 
+    if (decoded.role === 'team_admin' && 
         form.companyId.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }

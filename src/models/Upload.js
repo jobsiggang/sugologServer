@@ -11,6 +11,11 @@ const uploadSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  teamId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team',
+    required: true
+  },
 
   formId: {
     type: mongoose.Schema.Types.ObjectId,

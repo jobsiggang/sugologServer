@@ -87,6 +87,11 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
+    // Google 설정 객체가 없으면 초기화
+    if (!team.googleSettings || typeof team.googleSettings !== 'object') {
+      team.googleSettings = {};
+    }
+
     // Google 설정 업데이트
     if (webAppUrl !== undefined) team.googleSettings.webAppUrl = webAppUrl;
 
@@ -144,6 +149,9 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
+    if (!team.googleSettings || typeof team.googleSettings !== 'object') {
+      team.googleSettings = {};
+    }
     if (!team.googleSettings.webAppUrl) {
       return NextResponse.json({ error: 'Google Apps Script WebApp URL이 설정되지 않았습니다.' }, { status: 400 });
     }

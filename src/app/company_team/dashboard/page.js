@@ -386,6 +386,7 @@ function GoogleSettings({ user }) {
               <strong>Google Sheets 템플릿 사본 만들기</strong>
               <p className="ml-5 text-blue-700">위 버튼을 클릭하여 사본을 생성합니다</p>
             </li>
+
                 <li>
               <strong>Apps Script 배포</strong>
               <p className="ml-5 text-blue-700">
@@ -973,13 +974,15 @@ function FormManagement({ user }) {
 
   const handleAddField = () => {
     if (!fieldInput.trim()) return;
-    
-    // 콤마로 구분된 항목들을 배열로 변환
-    const newFields = fieldInput.split(',').map(f => f.trim()).filter(f => f);
+    // 콤마로 구분된 항목들을 { name } 객체 배열로 변환
+    const newFields = fieldInput
+      .split(',')
+      .map(f => f.trim())
+      .filter(f => f)
+      .map(name => ({ name }));
     const currentFields = editData.fields || [];
-    
-    setEditData({ 
-      ...editData, 
+    setEditData({
+      ...editData,
       fields: [...currentFields, ...newFields]
     });
     setFieldInput('');
@@ -1043,23 +1046,23 @@ function FormManagement({ user }) {
     });
   };
 
-  // const handleFieldsChange = (value) => {
-  //   // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
-  //   const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
-  //   setEditData({ ...editData, fields: fieldsArray });
-  // };
+  const handleFieldsChange = (value) => {
+    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
+    const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
+    setEditData({ ...editData, fields: fieldsArray });
+  };
 
-  // const handleFieldOptionChange = (fieldName, value) => {
-  //   // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
-  //   const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
-  //   setEditData({
-  //     ...editData,
-  //     fieldOptions: {
-  //       ...editData.fieldOptions,
-  //       [fieldName]: optionsArray
-  //     }
-  //   });
-  // };
+  const handleFieldOptionChange = (fieldName, value) => {
+    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
+    const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
+    setEditData({
+      ...editData,
+      fieldOptions: {
+        ...editData.fieldOptions,
+        [fieldName]: optionsArray
+      }
+    });
+  };
 
   const handleAddFolderItem = () => {
     const folderStructure = editData.folderStructure || [];

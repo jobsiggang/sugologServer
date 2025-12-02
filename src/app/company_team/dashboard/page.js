@@ -1361,30 +1361,22 @@ function FormManagement({ user }) {
                         </span>
                       </div>
                       
-                      {/* 항목별 옵션 리스트 표시 */}
-                      {form.fieldOptions && Object.keys(form.fieldOptions).length > 0 && (
+                      {/* 항목별 옵션 리스트 표시 (form.fields 기반) */}
+                      {Array.isArray(form.fields) && form.fields.some(f => Array.isArray(f.options) && f.options.length > 0) && (
                         <div className="border-t pt-2 mt-2">
                           <span className="text-gray-600 font-semibold block mb-2">항목별 옵션:</span>
                           <div className="space-y-1 pl-4">
-                            {Object.entries(form.fieldOptions).map(([fieldName, optionObj]) => {
-                              let optionType = '';
-                              let optionList = [];
-                              if (optionObj && typeof optionObj === 'object' && 'options' in optionObj) {
-                                optionType = optionObj.type || '';
-                                optionList = Array.isArray(optionObj.options) ? optionObj.options : [];
-                              } else if (Array.isArray(optionObj)) {
-                                optionList = optionObj;
-                              }
-                              return (
-                                <div key={fieldName} className="text-xs">
-                                  <span className="font-medium text-gray-700">{fieldName}:</span>
+                            {form.fields.map((field) => (
+                              Array.isArray(field.options) && field.options.length > 0 && (
+                                <div key={field.name} className="text-xs">
+                                  <span className="font-medium text-gray-700">{field.name}:</span>
                                   <span className="ml-2 text-green-600">
-                                    {optionType && <span className="mr-1 text-gray-500">({optionType})</span>}
-                                    [{optionList.length > 0 ? optionList.join('; ') : '없음'}]
+                                    <span className="mr-1 text-gray-500">({field.type || 'text'})</span>
+                                    [{field.options.join('; ')}]
                                   </span>
                                 </div>
-                              );
-                            })}
+                              )
+                            ))}
                           </div>
                         </div>
                       )}

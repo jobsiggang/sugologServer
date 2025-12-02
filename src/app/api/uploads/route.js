@@ -53,7 +53,7 @@ export async function GET(req) {
       success: true,
       uploads: uploads.map(u => ({
         _id: u._id,
-        userName: u.userId?.name || '알 수 없음',
+       name: u.userId?.name || '알 수 없음',
         username: u.userId?.username || '',
         formName: u.formName,
         data: Object.fromEntries(u.data || new Map()),
@@ -116,6 +116,7 @@ export async function POST(req) {
     const upload = await Upload.create({
       userId: decoded.userId,
       companyId: decoded.companyId,
+      teamId: decoded.teamId,
       formName,
       data: new Map(Object.entries(data || {})),
       imageUrls: imageUrls || [],

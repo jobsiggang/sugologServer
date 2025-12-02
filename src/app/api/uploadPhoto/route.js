@@ -31,10 +31,18 @@ export async function POST(req) {
         const user = await User.findById(decoded.userId).populate('companyId');
         if (!user || !user.companyId) return NextResponse.json({ error: '사용자 또는 업체 정보를 찾을 수 없습니다.' }, { status: 404 });
 
-        const company = user.companyId;
-        const SCRIPT_URL = company.googleSettings?.webAppUrl;
-        if (!company.googleSettings?.setupCompleted || !SCRIPT_URL) {
-            return NextResponse.json({ error: '업체의 Google Apps Script가 설정되지 않았습니다. 관리자에게 문의하세요.' }, { status: 400 });
+        // 팀 정보 조회 및 검증
+        const teamId = decoded.teamId;
+        if (!teamId) return NextResponse.json({ error: '팀 정보가 필요합니다.' }, { status: 400 });
+        const team = await (await import('@/models/Team')).default.findById(teamId);
+        if (!team) return NextResponse.json({ error: '팀 정보를 찾을 수 없습니다.' }, { status: 404 });
+        if (team.companyId.toString() !== user.companyId._id.toString()) {
+            return NextResponse.json({ error: '팀이 회사에 속해있지 않습니다.' }, { status: 400 });
+        }
+
+        const SCRIPT_URL = team.googleSettings?.webAppUrl;
+        if (!team.googleSettings?.setupCompleted || !SCRIPT_URL) {
+            return NextResponse.json({ error: '팀의 Google Apps Script가 설정되지 않았습니다. 관리자에게 문의하세요.' }, { status: 400 });
         }
         
         // 2. MultiPart/form-data 파싱

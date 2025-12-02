@@ -33,8 +33,12 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 해당 팀에 속한 활성화된 양식만 조회
-        const forms = await Form.find({ companyId, teamId, isActive: true })
+        // 팀장은 모든 양식, 직원은 활성화된 양식만 조회
+        let formQuery = { companyId, teamId };
+        if (decoded.role === 'employee') {
+            formQuery.isActive = true;
+        }
+        const forms = await Form.find(formQuery)
             .select('-__v')
             .sort({ formName: 1 });
 

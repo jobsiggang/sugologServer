@@ -21,14 +21,20 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const form = await Form.findById(params.id).populate('companyId', 'name');
+    // 팀장: 팀의 모든 양식, 직원: 활성화된 양식만
+    let form;
+    if (decoded.role === 'employee') {
+      form = await Form.findOne({ _id: params.id, isActive: true }).populate('companyId', 'name');
+    } else {
+      form = await Form.findById(params.id).populate('companyId', 'name');
+    }
 
     if (!form) {
       return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 회사관리자/직원은 자기 회사 양식만 조회 가능
-    if (decoded.role !== 'supervisor' && 
+    // 팀장/직원은 자기 회사 양식만 조회 가능
+    if (["team_admin", "employee"].includes(decoded.role) && 
         form.companyId._id.toString() !== decoded.companyId.toString()) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
@@ -59,9 +65,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { formName, fields, fieldOptions, folderStructure, isActive } = await request.json();
-
-    console.log('📝 양식 수정 요청:', { formName, fields, fieldOptions, folderStructure, isActive });
+    const { formName, fields, folderStructure, isActive } = await request.json();
 
     await connectDB();
 
@@ -78,15 +82,13 @@ export async function PUT(request, { params }) {
 
     // 업데이트할 필드
     if (formName) form.formName = formName;
-    if (fields && Array.isArray(fields)) form.fields = fields;
-    
-    // fieldOptions 처리 (빈 객체도 허용)
-    if (fieldOptions !== undefined) {
-      const entries = Object.entries(fieldOptions);
-      form.fieldOptions = entries.length > 0 ? new Map(entries) : new Map();
-      console.log('✅ fieldOptions 업데이트:', Array.from(form.fieldOptions.entries()));
+    if (fields && Array.isArray(fields)) {
+      form.fields = fields.map(f => ({
+        name: f.name,
+        type: f.type || 'text',
+        options: Array.isArray(f.options) ? f.options : []
+      }));
     }
-    
     if (folderStructure !== undefined) form.folderStructure = folderStructure;
     if (typeof isActive === 'boolean') form.isActive = isActive;
 

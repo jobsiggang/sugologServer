@@ -868,7 +868,6 @@ function FormManagement({ user }) {
       _id: 'new',
       formName: '',
       fields: [],
-      fieldOptions: {},
       folderStructure: [],
       isActive: true
     };
@@ -880,12 +879,15 @@ function FormManagement({ user }) {
 
   const handleEdit = (form) => {
     setEditingId(form._id);
-    // fieldOptions가 없으면 빈 객체로 초기화
-    const fieldOptions = form.fieldOptions || {};
-    setEditData({ 
+    setEditData({
       ...form,
-      fields: Array.isArray(form.fields) ? form.fields : [],
-      fieldOptions: fieldOptions,
+      fields: Array.isArray(form.fields)
+        ? form.fields.map(f => ({
+            name: f.name,
+            type: f.type || 'text',
+            options: Array.isArray(f.options) ? f.options : []
+          }))
+        : [],
       folderStructure: Array.isArray(form.folderStructure) ? form.folderStructure : []
     });
     setFieldInput('');
@@ -910,14 +912,17 @@ function FormManagement({ user }) {
       const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/forms` : `/api/companies/${user.companyId}/teams/${user.teamId}/forms/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
-      // fieldOptions를 명시적으로 복사 (프로토타입 체인 문제 해결)
+      // fields를 스키마에 맞게 변환
       const payload = {
         ...editData,
-        fieldOptions: editData.fieldOptions ? {...editData.fieldOptions} : {}
+        fields: Array.isArray(editData.fields)
+          ? editData.fields.map(f => ({
+              name: f.name,
+              type: f.type || 'text',
+              options: Array.isArray(f.options) ? f.options : []
+            }))
+          : []
       };
-
-      console.log('양식 저장 요청:', payload);
-      console.log('📝 fieldOptions 전송:', JSON.stringify(payload.fieldOptions, null, 2));
 
       const response = await fetch(url, {
         method,
@@ -929,9 +934,6 @@ function FormManagement({ user }) {
       });
 
       const data = await response.json();
-      console.log('양식 저장 응답:', data);
-      console.log('📝 저장된 form.fieldOptions:', data.form?.fieldOptions);
-      
       if (data.success) {
         setEditingId(null);
         setEditData({});
@@ -974,12 +976,12 @@ function FormManagement({ user }) {
 
   const handleAddField = () => {
     if (!fieldInput.trim()) return;
-    // 콤마로 구분된 항목들을 { name } 객체 배열로 변환
+    // 콤마로 구분된 항목들을 { name, type, options } 객체 배열로 변환
     const newFields = fieldInput
       .split(',')
       .map(f => f.trim())
       .filter(f => f)
-      .map(name => ({ name }));
+      .map(name => ({ name, type: 'text', options: [] }));
     const currentFields = editData.fields || [];
     setEditData({
       ...editData,
@@ -990,17 +992,10 @@ function FormManagement({ user }) {
 
   const handleRemoveField = (index) => {
     const newFields = [...editData.fields];
-    const removedField = newFields[index];
     newFields.splice(index, 1);
-    
-    // 해당 필드의 옵션도 제거
-    const newFieldOptions = { ...editData.fieldOptions };
-    delete newFieldOptions[removedField];
-    
     setEditData({
       ...editData,
-      fields: newFields,
-      fieldOptions: newFieldOptions
+      fields: newFields
     });
   };
 

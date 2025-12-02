@@ -5,6 +5,7 @@ import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
 import User from "@/models/User";
 import Form from "@/models/Form";
+import Team from "@/models/Team";
 import Upload from "@/models/Upload"; 
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
@@ -34,7 +35,7 @@ export async function POST(req) {
         // 팀 정보 조회 및 검증
         const teamId = decoded.teamId;
         if (!teamId) return NextResponse.json({ error: '팀 정보가 필요합니다.' }, { status: 400 });
-        const team = await (await import('@/models/Team')).default.findById(teamId);
+        const team = await Team.findById(teamId);
         if (!team) return NextResponse.json({ error: '팀 정보를 찾을 수 없습니다.' }, { status: 404 });
         if (team.companyId.toString() !== user.companyId._id.toString()) {
             return NextResponse.json({ error: '팀이 회사에 속해있지 않습니다.' }, { status: 400 });
@@ -91,7 +92,8 @@ export async function POST(req) {
                 ...fieldData,
                 "사용자": user.name,
                 "사용자명": user.username,
-                "업체명": company.name,
+                "회사명": user.companyId.name,
+                "팀명": user.teamId.name,
                 "업로드_시점": new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
             };
             

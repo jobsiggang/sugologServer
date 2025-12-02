@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Form from "@/models/Form";
+import User from "@/models/User"; // User 모델 (인증/권한 확인용)
+import Company from "@/models/Company";
+import Team from "@/models/Team";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
 // 특정 양식 조회

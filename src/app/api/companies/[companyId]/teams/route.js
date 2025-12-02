@@ -13,7 +13,7 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
     const companyId = params.companyId;
-    const teams = await Team.find({ companyId }).sort({ createdAt: -1 });
+    const teams = await Team.find({ companyId, isActive: true }).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, teams });
   } catch (error) {
     console.error('팀 목록 조회 오류:', error);

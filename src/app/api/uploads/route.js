@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Upload from '@/models/Upload';
-import User from '@/models/User';
+import Company from "@/models/Company";
+import User from "@/models/User";
+import Form from "@/models/Form";
+import Team from "@/models/Team";
+import Upload from "@/models/Upload"
 import { verifyToken } from '@/lib/auth';
 
 // Enhanced logging and error handling for debugging

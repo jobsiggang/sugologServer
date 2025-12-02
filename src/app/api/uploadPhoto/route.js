@@ -137,7 +137,7 @@ export async function POST(req) {
             // 9. 개별 DB 기록
             const individualUploadRecord = await Upload.create({
                 userId: user._id,
-                companyId: company._id,
+                companyId: user.companyId._id,
                 formId: form._id,
                 formName: formName,
                 data: enrichedFieldData, 
@@ -151,8 +151,8 @@ export async function POST(req) {
         } // End of loop
 
         // 10. Google 설정의 lastSync 업데이트 및 최종 응답
-        company.googleSettings.lastSync = new Date();
-        await company.save();
+        team.googleSettings.lastSync = new Date();
+        await team.save();
 
         return NextResponse.json({
             success: true,

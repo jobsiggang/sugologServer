@@ -18,8 +18,8 @@ export async function GET(request, { params }) {
         const decoded = verifyToken(token);
         
         // 권한 확인: team_admin 이상 허용
-        if (!decoded || !['team_admin', 'company_admin'].includes(decoded.role)) {
-            return NextResponse.json({ error: '팀 관리자 이상만 접근 가능합니다.' }, { status: 403 });
+        if (!decoded ) {
+            return NextResponse.json({ error: '로그인사용자만 접근 가능합니다.' }, { status: 403 });
         }
 
         await connectDB();
@@ -29,12 +29,12 @@ export async function GET(request, { params }) {
         const teamId = params.teamId;
 
         // 🚨 URL 파라미터가 토큰 정보와 일치하는지 확인 (team_admin의 경우)
-        if (decoded.role === 'team_admin' && (decoded.companyId !== companyId || decoded.teamId !== teamId)) {
+        if ((decoded.role === 'team_admin'|| decoded.role === 'employee') && (decoded.companyId !== companyId || decoded.teamId !== teamId)) {
             return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 해당 팀에 속한 양식만 조회
-        const forms = await Form.find({ companyId, teamId })
+        // 해당 팀에 속한 활성화된 양식만 조회
+        const forms = await Form.find({ companyId, teamId, isActive: true })
             .select('-__v')
             .sort({ formName: 1 });
 

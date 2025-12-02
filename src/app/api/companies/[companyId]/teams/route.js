@@ -11,20 +11,8 @@ import mongoose from 'mongoose';
 // 🚨 [수정] context 대신 { params }를 인수로 받습니다.
 export async function GET(request, { params }) {
   try {
-    const token = getTokenFromRequest(request);
-    if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    const decoded = verifyToken(token);
-    if (!decoded) return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
     await connectDB();
-    
-    // 🟢 [수정] params에서 companyId 추출
-    const companyId = params.companyId; 
- 
-    // 회사관리자/슈퍼바이저만 허용
-    const user = await User.findById(decoded.userId);
-    if (!user || (user.role !== 'company_admin' && user.role !== 'supervisor')) {
-      return NextResponse.json({ error: '회사 관리자만 접근 가능합니다.' }, { status: 403 });
-    }
+    const companyId = params.companyId;
     const teams = await Team.find({ companyId }).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, teams });
   } catch (error) {

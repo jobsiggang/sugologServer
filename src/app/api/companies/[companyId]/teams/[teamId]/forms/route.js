@@ -60,46 +60,59 @@ export async function POST(request, { params }) {
         }
 
         const { formName, fields, fieldOptions, folderStructure, isActive } = await request.json();
-        
+
         // 필수 필드 검증
         if (!formName || !Array.isArray(fields)) {
             return NextResponse.json({ error: '양식명과 항목 정보가 필요합니다.' }, { status: 400 });
         }
 
         await connectDB();
-        
-        const companyId = params.companyId;
+
+        // Next.js 13+ dynamic API: params may be a Promise
+        const awaitedParams = typeof params.then === 'function' ? await params : params;
+        const companyId = awaitedParams.companyId;
+        const teamId = awaitedParams.teamId;
         const decodedCompanyId = decoded.companyId; // 토큰에 있는 ID
-        
+
         // 🚨 URL 파라미터 검증 (토큰과 일치하는지)
         if (decodedCompanyId !== companyId) {
             return NextResponse.json({ error: '접근 권한이 없습니다. 회사 ID가 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 중복 양식명 확인 (회사 내 유니크)
-        const exists = await Form.findOne({ companyId, formName });
+        // 중복 양식명 확인 (회사+팀 내 유니크)
+        const exists = await Form.findOne({ companyId, teamId, formName });
         if (exists) {
             return NextResponse.json({ error: '이미 존재하는 양식명입니다.' }, { status: 400 });
+        }
+
+        // fields: string[] 또는 object[] 모두 허용 → object[]로 변환
+        const normalizedFields = fields.map(f => {
+            if (typeof f === 'string') return { name: f, type: 'text' };
+            if (typeof f === 'object' && f !== null && f.name) return { name: f.name, type: f.type || 'text' };
+            return null;
+        }).filter(Boolean);
+        if (normalizedFields.length === 0) {
+            return NextResponse.json({ error: '항목 정보가 올바르지 않습니다.' }, { status: 400 });
         }
 
         // 새 양식 생성
         const newForm = new Form({
             companyId,
+            teamId,
             formName,
-            fields, // [필드명 배열]
-            fieldOptions: fieldOptions || {}, // { 필드명: [옵션 배열] }
-            folderStructure: folderStructure || [], // [폴더 필드명 배열]
+            fields: normalizedFields,
+            fieldOptions: fieldOptions || {},
+            folderStructure: folderStructure || [],
             isActive: isActive !== undefined ? isActive : true,
-            createdBy: decoded.userId,
-            teamId: decoded.teamId || null // 팀 정보 포함 (팀 관리자가 생성했다는 기록)
+            createdBy: decoded.userId
         });
-        
+
         await newForm.save();
 
-        return NextResponse.json({ 
-            success: true, 
-            message: '양식이 성공적으로 생성되었습니다.', 
-            form: newForm 
+        return NextResponse.json({
+            success: true,
+            message: '양식이 성공적으로 생성되었습니다.',
+            form: newForm
         }, { status: 201 });
 
     } catch (error) {

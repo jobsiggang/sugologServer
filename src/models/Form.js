@@ -17,14 +17,19 @@ const formSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  // fields: [{ type: String, required: true }],
+  // 필드명, 형식(일반, 날짜, 숫자 등) 포함 객체 배열로 변경
   fields: [{
-    type: String,
-    required: true
+    name: { type: String, required: true },
+    type: { type: String, enum: ['text', 'date', 'number'], default: 'text' }
   }],
-  // 항목별 옵션 리스트 (예: { "현장명": ["양주신도시", "옥정더퍼스트"], "공종코드": ["1", "2", "3"] })
+  // 항목별 옵션 리스트 및 타입 (예: { "현장명": { type: 'text', options: ["양주신도시", "옥정더퍼스트"] }, "공종코드": { type: 'number', options: ["1", "2", "3"] } })
   fieldOptions: {
     type: Map,
-    of: [String],
+    of: new mongoose.Schema({
+      type: { type: String, enum: ['text', 'date', 'number'], default: 'text' },
+      options: { type: [String], default: [] }
+    }, { _id: false }),
     default: new Map()
   },
   // 파일 저장 폴더 구조 (예: ["일자", "현장명", "위치", "공종"])

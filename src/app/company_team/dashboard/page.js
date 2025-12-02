@@ -22,6 +22,8 @@ export default function CompanyDashboard() {
     const userData = JSON.parse(localStorage.getItem('user'));
     if (!userData || userData.role !== 'team_admin') {
       alert('회사의 팀장만 접근 가능합니다.');
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
       router.push('/company_team/login');
       return;
     }
@@ -384,26 +386,13 @@ function GoogleSettings({ user }) {
               <strong>Google Sheets 템플릿 사본 만들기</strong>
               <p className="ml-5 text-blue-700">위 버튼을 클릭하여 사본을 생성합니다</p>
             </li>
-            <li>
-              <strong>Spreadsheet ID 복사</strong>
-              <p className="ml-5 text-blue-700">
-                생성된 시트의 URL에서 ID 부분을 복사합니다<br />
-                예: https://docs.google.com/spreadsheets/d/<span className="bg-yellow-200 px-1 rounded">12pF-9Y8c...</span>/edit
-              </p>
-            </li>
-            <li>
-              <strong>Google Apps Script 작성</strong>
-              <p className="ml-5 text-blue-700">
-                docs/GOOGLE_APPS_SCRIPT_V2.js 파일의 코드를 복사하여<br />
-                시트 메뉴의 확장 프로그램 &gt; Apps Script에 붙여넣기
-              </p>
-            </li>
-            <li>
+                <li>
               <strong>Apps Script 배포</strong>
               <p className="ml-5 text-blue-700">
+                확장 프로그램 &gt; Apps Script &gt;
                 배포 &gt; 새 배포 &gt; 웹 앱<br />
                 실행 사용자: 나<br />
-                액세스 권한: <span className="bg-yellow-200 px-1 rounded font-bold">모든 사용자 (익명 포함)</span> ⚠️
+                액세스 권한: <span className="bg-yellow-200 px-1 rounded font-bold">모든 사용자</span> ⚠️
               </p>
             </li>
             <li>
@@ -864,6 +853,7 @@ function FormManagement({ user }) {
       const data = await response.json();
       if (data.success) {
         setForms(data.forms);
+   
       }
     } catch (error) {
       console.error('입력양식 목록 조회 실패:', error);
@@ -1014,19 +1004,21 @@ function FormManagement({ user }) {
   const handleAddFieldOption = (fieldName) => {
     const optionValue = optionInputs[fieldName] || '';
     if (!optionValue.trim()) return;
-
     // 콤마로 구분된 옵션들을 배열로 변환
     const newOptions = optionValue.split(',').map(o => o.trim()).filter(o => o);
-    const currentOptions = (editData.fieldOptions && editData.fieldOptions[fieldName]) || [];
-
+    const prev = editData.fieldOptions && editData.fieldOptions[fieldName];
+    const prevType = (prev && prev.type) || 'text';
+    const prevOptions = (prev && prev.options) || [];
     setEditData({
       ...editData,
       fieldOptions: {
         ...editData.fieldOptions,
-        [fieldName]: [...currentOptions, ...newOptions]
+        [fieldName]: {
+          type: prevType,
+          options: [...prevOptions, ...newOptions]
+        }
       }
     });
-    
     setOptionInputs({
       ...optionInputs,
       [fieldName]: ''
@@ -1034,35 +1026,40 @@ function FormManagement({ user }) {
   };
 
   const handleRemoveFieldOption = (fieldName, optionIndex) => {
-    const options = [...(editData.fieldOptions[fieldName] || [])];
+    const prev = editData.fieldOptions && editData.fieldOptions[fieldName];
+    const prevType = (prev && prev.type) || 'text';
+    const prevOptions = (prev && prev.options) || [];
+    const options = [...prevOptions];
     options.splice(optionIndex, 1);
-    
     setEditData({
       ...editData,
       fieldOptions: {
         ...editData.fieldOptions,
-        [fieldName]: options
+        [fieldName]: {
+          type: prevType,
+          options
+        }
       }
     });
   };
 
-  const handleFieldsChange = (value) => {
-    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
-    const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
-    setEditData({ ...editData, fields: fieldsArray });
-  };
+  // const handleFieldsChange = (value) => {
+  //   // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
+  //   const fieldsArray = value.split(';').map(f => f.trim()).filter(f => f);
+  //   setEditData({ ...editData, fields: fieldsArray });
+  // };
 
-  const handleFieldOptionChange = (fieldName, value) => {
-    // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
-    const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
-    setEditData({
-      ...editData,
-      fieldOptions: {
-        ...editData.fieldOptions,
-        [fieldName]: optionsArray
-      }
-    });
-  };
+  // const handleFieldOptionChange = (fieldName, value) => {
+  //   // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)
+  //   const optionsArray = value.split(';').map(o => o.trim()).filter(o => o);
+  //   setEditData({
+  //     ...editData,
+  //     fieldOptions: {
+  //       ...editData.fieldOptions,
+  //       [fieldName]: optionsArray
+  //     }
+  //   });
+  // };
 
   const handleAddFolderItem = () => {
     const folderStructure = editData.folderStructure || [];
@@ -1125,7 +1122,7 @@ function FormManagement({ user }) {
                 <span className="text-sm text-gray-500 w-8 flex-shrink-0">{index + 1}</span>
                 <span className="text-sm font-medium truncate">{form.formName}</span>
                 <span className="text-xs text-gray-500">
-                  [{Array.isArray(form.fields) ? form.fields.join('; ') : ''}]
+                  [{Array.isArray(form.fields) ? form.fields.map(f => f.name).join('; ') : ''}]
                 </span>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
@@ -1187,7 +1184,7 @@ function FormManagement({ user }) {
                               key={idx}
                               className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full"
                             >
-                              {field}
+                              {field.name}
                               <button
                                 type="button"
                                 onClick={() => handleRemoveField(idx)}
@@ -1208,61 +1205,87 @@ function FormManagement({ user }) {
                           3. 항목별 자동 목록 추가 (선택사항)
                         </label>
                         <div className="space-y-3">
-                          {editData.fields.map((field, idx) => (
-                            <div key={idx} className="bg-gray-50 p-3 rounded">
-                              <label className="block text-xs font-medium text-gray-700 mb-2">
-                                {field}
-                              </label>
-                              <div className="flex gap-2 mb-2">
-                                <input
-                                  type="text"
-                                  value={optionInputs[field] || ''}
-                                  onChange={(e) => setOptionInputs({
-                                    ...optionInputs,
-                                    [field]: e.target.value
-                                  })}
-                                  onKeyPress={(e) => {
-                                    if (e.key === 'Enter') {
-                                      e.preventDefault();
-                                      handleAddFieldOption(field);
+                          {editData.fields.map((field, idx) => {
+                            const fieldName = field.name;
+                            const optionObj = editData.fieldOptions && editData.fieldOptions[fieldName];
+                            const optionType = (optionObj && optionObj.type) || 'text';
+                            const optionList = (optionObj && optionObj.options) || [];
+                            return (
+                              <div key={idx} className="bg-gray-50 p-3 rounded">
+                                <label className="block text-xs font-medium text-gray-700 mb-2">
+                                  {fieldName}
+                                </label>
+                                <div className="flex gap-2 mb-2 items-center">
+                                  <input
+                                    type="text"
+                                    value={optionInputs[fieldName] || ''}
+                                    onChange={(e) => setOptionInputs({
+                                      ...optionInputs,
+                                      [fieldName]: e.target.value
+                                    })}
+                                    onKeyPress={(e) => {
+                                      if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handleAddFieldOption(fieldName);
+                                      }
+                                    }}
+                                    className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    placeholder={
+                                      fieldName === '현장명' ? '예: 양주신도시, 옥정더퍼스트' :
+                                      fieldName === '공종' ? '예: 타일, 목공, 철근' :
+                                      '옵션을 콤마로 구분하여 입력'
                                     }
-                                  }}
-                                  className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                  placeholder={
-                                    field === '현장명' ? '예: 양주신도시, 옥정더퍼스트' :
-                                    field === '공종' ? '예: 타일, 목공, 철근' :
-                                    '옵션을 콤마로 구분하여 입력'
-                                  }
-                                />
-                                <button
-                                  type="button"
-                                  onClick={() => handleAddFieldOption(field)}
-                                  className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 whitespace-nowrap"
-                                >
-                                  + 추가
-                                </button>
-                              </div>
-                              {editData.fieldOptions && editData.fieldOptions[field] && editData.fieldOptions[field].length > 0 && (
-                                <div className="flex flex-wrap gap-1">
-                                  {editData.fieldOptions[field].map((option, optIdx) => (
-                                    <span
-                                      key={optIdx}
-                                      className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
-                                    >
-                                      {option}
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRemoveFieldOption(field, optIdx)}
-                                        className="text-green-600 hover:text-green-900 font-bold"
-                                      >
-                                        ×
-                                      </button>
-                                    </span>
-                                  ))}
+                                  />
+                                  <select
+                                    value={optionType}
+                                    onChange={e => {
+                                      setEditData({
+                                        ...editData,
+                                        fieldOptions: {
+                                          ...editData.fieldOptions,
+                                          [fieldName]: {
+                                            type: e.target.value,
+                                            options: optionList
+                                          }
+                                        }
+                                      });
+                                    }}
+                                    className="px-2 py-1 text-xs border border-gray-300 rounded"
+                                  >
+                                    <option value="text">텍스트</option>
+                                    <option value="date">날짜</option>
+                                    <option value="number">숫자</option>
+                                  </select>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleAddFieldOption(fieldName)}
+                                    className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 whitespace-nowrap"
+                                  >
+                                    + 추가
+                                  </button>
                                 </div>
-                              )}
-                            </div>
-                          ))}
+                                {optionList.length > 0 && (
+                                  <div className="flex flex-wrap gap-1">
+                                    {optionList.map((option, optIdx) => (
+                                      <span
+                                        key={optIdx}
+                                        className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-800 text-xs rounded"
+                                      >
+                                        {option}
+                                        <button
+                                          type="button"
+                                          onClick={() => handleRemoveFieldOption(fieldName, optIdx)}
+                                          className="text-green-600 hover:text-green-900 font-bold"
+                                        >
+                                          ×
+                                        </button>
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -1302,7 +1325,7 @@ function FormManagement({ user }) {
                                   <option value="">항목 선택</option>
                                   <option value="직원명">직원명</option>
                                   {editData.fields.map((field) => (
-                                    <option key={field} value={field}>{field}</option>
+                                    <option key={field.name} value={field.name}>{field.name}</option>
                                   ))}
                                 </select>
                               </div>
@@ -1365,7 +1388,7 @@ function FormManagement({ user }) {
                       <div>
                         <span className="text-gray-600 font-semibold">항목명:</span>
                         <span className="ml-2 text-blue-600">
-                          [{Array.isArray(form.fields) ? form.fields.join('; ') : ''}]
+                          [{Array.isArray(form.fields) ? form.fields.map(f => f.name).join('; ') : ''}]
                         </span>
                       </div>
                       

@@ -43,8 +43,8 @@ export default function CompanyAdminDashboard() {
     }
 
     const userData = JSON.parse(localStorage.getItem('user'));
-    if (!userData || (userData.role !== 'company_admin' && userData.role !== 'supervisor') || !userData.companyId) {
-      alert('회사 관리자 정보가 불완전합니다. 다시 로그인해주세요.');
+    if (!userData || (userData.role !== 'company_admin' ) || !userData.companyId) {
+      alert('회사 관리자만 접근 가능합니다.');
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       router.push('/company_admin/login');

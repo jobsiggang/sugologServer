@@ -1,5 +1,5 @@
 "use client";
-import ImageEditor from "@/components/ImageEditor";
+// import ImageEditor from "@/components/ImageEditor";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -64,7 +64,8 @@ export default function HomePage() {
         </div>
       </header>
       <main>
-        <ImageEditor author={user.name} userId={user._id} />
+        {/* <ImageEditor author={user.name} userId={user._id} /> */}
+        웹에서는 사진 업로드를 하지 않습니다. 앱에서 접속해 주세요
       </main>
     </div>
   );

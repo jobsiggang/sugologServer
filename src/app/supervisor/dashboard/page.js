@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Team from "@/models/Team";
-
 export default function SupervisorDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);

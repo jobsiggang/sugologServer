@@ -2,13 +2,13 @@ import "./globals.css";
 import { ReactNode } from "react";
 
 export const metadata = {
-  title: "현장사진 업로드",
-  description: "현장 사진 촬영 및 업로드 전용 앱",
-  applicationName: "현장사진 업로드",
+  title: "달개비",
+  description: "달개비 - 현장 사진 업로드 및 관리 앱",
+  applicationName: "달개비",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "현장사진",
+    title: "달개비",
   },
   icons: {
     icon: "/icons/icon-192.png",

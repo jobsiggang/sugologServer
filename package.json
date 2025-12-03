@@ -1,6 +1,7 @@
 {
-  "name": "fair_app",
+  "name": "dalgaebi",
   "version": "0.1.0",
+  "description": "달개비 - 현장 사진 업로드 및 관리 앱",
   "private": true,
   "scripts": {
     "dev": "next dev",

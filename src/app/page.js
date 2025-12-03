@@ -16,8 +16,7 @@ export default function HomePage() {
     }
     try {
       const userData = JSON.parse(userStr);
-      // 팀장과 직원만 접근 가능, 그 외는 모두 로그인 페이지로
-      
+  
       if ((userData.role === 'employee' || userData.role === 'team_admin') && userData.teamId) {
         setUser(userData);
       } else {
@@ -38,35 +37,36 @@ export default function HomePage() {
     router.push('/login');
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500 text-lg">로딩 중...</div>
-      </div>
-    );
-  }
-
-  // 직원(팀 소속)만 이미지 에디터 사용 가능
+  // 달개비꽃을 연상하는 랜딩페이지: 앱 소개 + 관리자 진입 버튼만
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b sticky top-0 z-50">
-        <div className="flex items-center justify-between px-4 py-2">
-          <div>
-            <h1 className="text-base font-bold text-gray-800">{user.teamName}</h1>
-            <p className="text-xs text-gray-500">{user.name} ({user.username})</p>
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#b3c6f7] via-[#e3e6fa] to-[#c9b7e7]">
+      <div className="flex flex-col items-center p-8 rounded-3xl shadow-xl bg-white/80 max-w-md w-full border border-[#b3c6f7]">
+        {/* 달개비꽃 심볼 */}
+        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" className="mb-4">
+          <circle cx="40" cy="40" r="36" fill="#b3c6f7" />
+          <ellipse cx="40" cy="32" rx="18" ry="24" fill="#c9b7e7" />
+          <ellipse cx="40" cy="48" rx="14" ry="18" fill="#e3e6fa" />
+          <circle cx="40" cy="40" r="8" fill="#7b6fd6" />
+        </svg>
+        <h1 className="text-3xl font-extrabold text-[#7b6fd6] mb-2 tracking-tight">달개비</h1>
+        <p className="text-base text-[#5a5a7a] mb-6 font-medium">현장 사진을 쉽고 안전하게 관리하는<br/>스마트 현장관리 플랫폼</p>
+        <div className="flex flex-col gap-3 w-full">
           <button
-            onClick={handleLogout}
-            className="px-2 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700"
+            className="w-full px-4 py-3 bg-[#7b6fd6] text-white rounded-xl hover:bg-[#5a5a7a] text-base font-semibold shadow"
+            onClick={() => router.replace('/company_admin/login')}
           >
-            로그아웃
+            회사 관리자 로그인
+          </button>
+          <button
+            className="w-full px-4 py-3 bg-[#b3c6f7] text-[#4a4a7a] rounded-xl hover:bg-[#a1b0e6] text-base font-semibold shadow"
+            onClick={() => router.replace('/company_team/login')}
+          >
+            팀장 관리자 로그인
           </button>
         </div>
-      </header>
-      <main>
-        {/* <ImageEditor author={user.name} userId={user._id} /> */}
-        웹에서는 사진 업로드를 하지 않습니다. 앱에서 접속해 주세요
-      </main>
+      </div>
+      <div className="mt-8 text-xs text-[#7b6fd6] opacity-70">© {new Date().getFullYear()} 달개비. All rights reserved.</div>
     </div>
+  );
   );
 }

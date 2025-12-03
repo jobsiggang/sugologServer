@@ -1,7 +1,7 @@
 {
-  "name": "현장사진 업로드",
-  "short_name": "현장사진",
-  "description": "현장 사진 촬영 및 업로드 전용 앱",
+  "name": "달개비",
+  "short_name": "달개비",
+  "description": "달개비 - 현장 사진 업로드 및 관리 앱",
   "start_url": "/login",
   "scope": "/",
   "display": "standalone",

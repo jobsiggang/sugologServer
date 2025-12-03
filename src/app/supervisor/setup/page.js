@@ -74,7 +74,7 @@ export default function AdminSetup() {
 
       if (data.success) {
         alert('슈퍼바이저 계정이 생성되었습니다.\n로그인 페이지로 이동합니다.');
-        router.push('/login');
+        router.push('/supervisor/login');
       } else {
         setError(data.error || '등록에 실패했습니다.');
       }

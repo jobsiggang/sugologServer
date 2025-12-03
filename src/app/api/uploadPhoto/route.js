@@ -135,14 +135,19 @@ export async function POST(req) {
             if (!data.success) throw new Error(data.error || `Google Drive 업로드 실패 (${i + 1})`);
             
             // 9. 개별 DB 기록
+            // 모든 값이 string이 되도록 변환
+            const safeFieldData = Object.fromEntries(
+                Object.entries(enrichedFieldData).map(([k, v]) => [k, typeof v === 'string' ? v : JSON.stringify(v)])
+            );
             const individualUploadRecord = await Upload.create({
                 userId: user._id,
                 companyId: user.companyId._id,
+                teamId: team._id,
                 formId: form._id,
                 formName: formName,
-                data: enrichedFieldData, 
-                imageCount: 1, 
-                imageUrls: [data.fileUrl], 
+                data: new Map(Object.entries(safeFieldData)),
+                imageCount: 1,
+                imageUrls: [data.fileUrl],
                 thumbnails: [`data:image/jpeg;base64,${base64Thumbnail}`],
                 folderPath: data.folderPath,
             });

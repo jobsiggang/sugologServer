@@ -4,39 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function HomePage() {
-  const [user, setUser] = useState(null);
   const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
-    if (!token || !userStr) {
-      router.replace('/login');
-      return;
-    }
-    try {
-      const userData = JSON.parse(userStr);
-  
-      if ((userData.role === 'employee' || userData.role === 'team_admin') && userData.teamId) {
-        setUser(userData);
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        router.replace('/login');
-      }
-    } catch {
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      router.replace('/login');
-    }
-  }, [router]);
-
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    router.push('/login');
-  };
-
   // 달개비꽃을 연상하는 랜딩페이지: 앱 소개 + 관리자 진입 버튼만
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-[#b3c6f7] via-[#e3e6fa] to-[#c9b7e7]">
@@ -48,8 +16,8 @@ export default function HomePage() {
           <ellipse cx="40" cy="48" rx="14" ry="18" fill="#e3e6fa" />
           <circle cx="40" cy="40" r="8" fill="#7b6fd6" />
         </svg>
-        <h1 className="text-3xl font-extrabold text-[#7b6fd6] mb-2 tracking-tight">달개비</h1>
-        <p className="text-base text-[#5a5a7a] mb-6 font-medium">현장 사진을 쉽고 안전하게 관리하는<br/>스마트 현장관리 플랫폼</p>
+        <h1 className="text-3xl font-extrabold text-[#7b6fd6] mb-2 tracking-tight">달개비 현장 기록</h1>
+        <p className="text-base text-[#5a5a7a] mb-6 font-medium">현장 사진을 쉽고 안전하게 기록하는<br/>스마트 현장기록 플랫폼</p>
         <div className="flex flex-col gap-3 w-full">
           <button
             className="w-full px-4 py-3 bg-[#7b6fd6] text-white rounded-xl hover:bg-[#5a5a7a] text-base font-semibold shadow"

@@ -68,5 +68,4 @@ export default function HomePage() {
       <div className="mt-8 text-xs text-[#7b6fd6] opacity-70">© {new Date().getFullYear()} 달개비. All rights reserved.</div>
     </div>
   );
-  );
 }

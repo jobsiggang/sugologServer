@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
+import Team from "@/models/Team";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
@@ -39,7 +40,6 @@ export async function GET(req) {
           name: company.name,
           description: company.description,
           isActive: company.isActive,
-          googleSetupCompleted: company.googleSettings?.setupCompleted || false,
           admin: admin ? { username: admin.username, name: admin.name } : null,
           createdAt: company.createdAt
         };
@@ -108,8 +108,6 @@ export async function POST(req) {
       description: companyDescription || '',
       googleSettings: {
         webAppUrl: '',
-        spreadsheetId: '',
-        driveFolderId: '',
         setupCompleted: false
       }
     });

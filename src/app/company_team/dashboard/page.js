@@ -7,6 +7,8 @@ export default function CompanyDashboard() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [activeTab, setActiveTab] = useState('employees');
+  const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
 
   useEffect(() => {
     checkAuth();
@@ -37,6 +39,42 @@ export default function CompanyDashboard() {
     router.push('/company_team/login');
   };
 
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    if (!passwordForm.oldPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
+      alert('모든 항목을 입력하세요.');
+      return;
+    }
+    if (passwordForm.newPassword.length < 6) {
+      alert('새 비밀번호는 최소 6자 이상이어야 합니다.');
+      return;
+    }
+    if (passwordForm.newPassword !== passwordForm.confirmPassword) {
+      alert('새 비밀번호와 확인이 일치하지 않습니다.');
+      return;
+    }
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('/api/team_admin/changePassword', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ oldPassword: passwordForm.oldPassword, newPassword: passwordForm.newPassword })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('비밀번호가 변경되었습니다. 다시 로그인 해주세요.');
+        handleLogout();
+      } else {
+        alert(data.error || '비밀번호 변경 실패');
+      }
+    } catch (error) {
+      alert('비밀번호 변경 중 오류가 발생했습니다.');
+    }
+  };
+
   if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -54,12 +92,20 @@ export default function CompanyDashboard() {
             <h1 className="text-lg font-bold text-gray-800">{user.companyName}</h1>
             <p className="text-xs text-gray-500">{user.name} 관리자</p>
           </div>
-          <button
-            onClick={handleLogout}
-            className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
-          >
-            로그아웃
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setShowPasswordForm((v) => !v)}
+              className="px-3 py-1.5 text-sm bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+            >
+              비밀번호 변경
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-3 py-1.5 text-sm bg-gray-600 text-white rounded-lg hover:bg-gray-700"
+            >
+              로그아웃
+            </button>
+          </div>
         </div>
 
         {/* 가로 탭 메뉴 */}
@@ -96,6 +142,60 @@ export default function CompanyDashboard() {
           </button>
         </div>
       </header>
+
+      {/* 비밀번호 변경 폼 */}
+      {showPasswordForm && (
+        <div className="max-w-md mx-auto bg-white p-4 mt-6 rounded shadow border border-gray-100">
+          <h3 className="text-sm font-bold mb-3 text-blue-600">비밀번호 변경</h3>
+          <form onSubmit={handlePasswordChange} className="space-y-3">
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">기존 비밀번호</label>
+              <input
+                type="password"
+                value={passwordForm.oldPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, oldPassword: e.target.value })}
+                className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-600 bg-gray-50 text-xs"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">새 비밀번호</label>
+              <input
+                type="password"
+                value={passwordForm.newPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, newPassword: e.target.value })}
+                className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-600 bg-gray-50 text-xs"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-gray-700 mb-1">새 비밀번호 확인</label>
+              <input
+                type="password"
+                value={passwordForm.confirmPassword}
+                onChange={e => setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })}
+                className="w-full px-2 py-1 border border-gray-300 rounded focus:ring-1 focus:ring-blue-600 bg-gray-50 text-xs"
+                required
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                type="submit"
+                className="flex-1 bg-blue-600 text-white py-1.5 rounded text-xs font-semibold hover:bg-blue-700 transition"
+              >
+                변경
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowPasswordForm(false)}
+                className="flex-1 bg-gray-200 text-gray-700 py-1.5 rounded text-xs font-semibold hover:bg-gray-300 transition"
+              >
+                취소
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
 
       {/* 메인 컨텐츠 영역 */}
       <main className="p-4">
@@ -1029,8 +1129,6 @@ function FormManagement({ user }) {
       fields: newFields
     });
   };
-
-  // ...existing code...
 
   const handleFieldsChange = (value) => {
     // 세미콜론으로 구분된 문자열을 배열로 변환 (레거시 지원)

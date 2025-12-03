@@ -3,6 +3,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
+import Team from "@/models/Team";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 import mongoose from 'mongoose';

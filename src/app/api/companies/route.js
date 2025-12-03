@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
-import Team from "@/models/Team";
 import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
@@ -119,7 +118,6 @@ export async function POST(req) {
       name: adminName,
       role: 'company_admin',
       companyId: company._id,
-      teamId: null // 회사 관리자는 팀이 없음
     });
 
     return NextResponse.json({ 

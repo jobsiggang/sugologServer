@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team',
     required: function() {
-      return this.role !== 'supervisor' ;
+      return this.role !== 'supervisor' && this.role !== 'company_admin';
     }
   },
   name: {

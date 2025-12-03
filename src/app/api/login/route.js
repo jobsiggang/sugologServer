@@ -37,16 +37,26 @@ export async function POST(req) {
     }
 
 
-    // 사용자 찾기 (회사+팀+username 조합)
+    // 역할별 로그인 검증
     let query = { username, isActive: true };
-    if (companyId) query.companyId = companyId;
-    if (teamId) query.teamId = teamId;
-    if (!companyId) query.role = 'supervisor'; // 회사 미지정 시 슈퍼바이저로 한정
+    if (!companyId && !teamId) {
+      // 슈퍼바이저 로그인
+      query.role = 'supervisor';
+    } else if (companyId && !teamId) {
+      // 회사관리자 로그인
+      query.companyId = companyId;
+      query.role = 'company_admin';
+    } else if (companyId && teamId) {
+      // 팀장/직원 로그인
+      query.companyId = companyId;
+      query.teamId = teamId;
+      // role은 프론트에서 넘기거나, 이후 user.role로 분기 처리
+    }
     console.log('Query:', JSON.stringify(query));
 
     let user;
     try {
-      user = await User.findOne(query).populate('companyId');
+      user = await User.findOne(query).populate('companyId').populate('teamId');
       console.log('User 조회 완료:', !!user);
     } catch (findError) {
       console.error('User 조회 실패:', findError);

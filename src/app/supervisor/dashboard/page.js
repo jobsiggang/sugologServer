@@ -51,7 +51,7 @@ export default function SupervisorDashboard() {
   const fetchCompanies = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/supervisor/companies', {
+      const response = await fetch('/api/companies', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -83,7 +83,7 @@ export default function SupervisorDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('/api/supervisor/companies', {
+      const response = await fetch('/api/companies', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,7 +138,7 @@ export default function SupervisorDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/supervisor/companies/${editingCompany._id}`, {
+      const response = await fetch(`/api/companies/${editingCompany._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -169,7 +169,7 @@ export default function SupervisorDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/supervisor/companies/${company._id}`, {
+      const response = await fetch(`/api/companies/${company._id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -199,7 +199,7 @@ export default function SupervisorDashboard() {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/supervisor/companies/${company._id}`, {
+      const response = await fetch(`/api/companies/${company._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

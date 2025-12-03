@@ -73,47 +73,66 @@ export async function POST(req) {
 try {
         // 💡 토큰 생성 시 사용한 필드 이름인 'userId'로 접근
         const user = await User.findById(decoded.userId) 
-            .select('username name role companyId isActive')
-            .populate('companyId', 'name'); 
+            .select('username name role companyId teamId isActive')
+            .populate('companyId', 'name')
+            .populate('teamId', 'name');
         
+
         if (!user) {
             return NextResponse.json({
                 success: false,
-                message: "사용자 정보를 찾을 수 없습니다." + decoded.userId, // 💡 출력 메시지도 수정
+                message: "사용자 정보를 찾을 수 없습니다." + decoded.userId,
             }, { status: 404 });
         }
 
-        // 🚨 isActive 상태 확인
-        if (user.isActive === false) {
-            return NextResponse.json({
-                success: false, 
-                message: "계정이 현재 비활성화 상태입니다. 관리자에게 문의하세요.",
-                user: { isActive: false }
-            }, { status: 403 }); // Forbidden
-        }
+        // 회사ID, 팀ID, 비활성화 여부 명확히 응답
+        const companyId = user.companyId?._id || user.companyId;
+        const companyName = user.companyId?.name || '';
+        const teamId = user.teamId?._id || user.teamId;
+        const teamName = user.teamId?.name || '';
 
-        // 5. 응답 생성
-        const userCompanyId = user.companyId?._id || user.companyId;
-        const userCompanyName = user.companyId?.name || '';
-        
-        const responseData = {
-            success: true,
-            user: {
-                userId: user._id,
-                username: user.username,
-                name: user.name,
-                role: user.role,
-                companyId: userCompanyId,
-                companyName: userCompanyName,
-                isActive: user.isActive, // true
-            },
-            // 토큰을 다시 보낼 필요는 없으나, 클라이언트에서 토큰 갱신 로직이 있다면 유지 가능
-            token: token, 
-            message: "사용자 세션 및 계정 활성 상태 확인 완료",
-        };
-        
-        console.log('✅ User status checked:', user.username, 'isActive:', user.isActive);
-        return NextResponse.json(responseData, { status: 200 });
+
+                // 🚨 isActive 상태 확인 및 상세 응답
+                if (user.isActive === false) {
+                    return NextResponse.json({
+                        success: false,
+                        message: "계정이 현재 비활성화 상태입니다. 관리자에게 문의하세요.",
+                        user: {
+                            _id: user._id,
+                            username: user.username,
+                            name: user.name,
+                            role: user.role,
+                            companyId,
+                            companyName,
+                            teamId,
+                            teamName,
+                            isActive: false
+                        }
+                    }, { status: 403 });
+                }
+
+
+                // 5. 응답 생성 (회사ID, 팀ID, 활성화 여부 포함)
+                const responseData = {
+                    success: true,
+                    role: user.role,
+                    user: {
+                        _id: user._id,
+                        username: user.username,
+                        name: user.name,
+                        role: user.role,
+                        companyId,
+                        companyName,
+                        teamId,
+                        teamName,
+                        isActive: true
+                    },
+                    token,
+                    message: "사용자 세션 및 계정 활성 상태 확인 완료",
+                };
+        
+                console.log('✅ User status checked:', user.username, 'isActive:', user.isActive);
+                return NextResponse.json(responseData, { status: 200 });
 
     } catch (error) {
         console.error('User status retrieval error:', error);

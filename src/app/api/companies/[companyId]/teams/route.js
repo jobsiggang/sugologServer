@@ -117,8 +117,14 @@ export async function PUT(request, { params }) {
       team.name = name;
     }
     if (description !== undefined) team.description = description;
-    if (isActive !== undefined) team.isActive = isActive;
-    await team.save();
+    if (isActive !== undefined) {
+        team.isActive = isActive;
+        await team.save();
+        // 팀 비활성화 시 팀원도 모두 비활성화
+        await User.updateMany({ teamId: team._id }, { isActive });
+    } else {
+        await team.save();
+    }
     return NextResponse.json({ success: true, team });
   } catch (error) {
     console.error('팀 수정 오류:', error);
@@ -145,16 +151,9 @@ export async function DELETE(request, { params }) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
     }
     
-    // 1. 팀에 속한 일반 사용자 수 확인
-    const userCount = await User.countDocuments({ teamId, role: { $ne: 'team_admin' } });
-    if (userCount > 0) {
-      return NextResponse.json({ error: `팀에 ${userCount}명의 일반 사용자가 등록되어 있습니다. 먼저 모든 사용자를 삭제해주세요.`, userCount }, { status: 400 });
-    }
-    
-    // 2. 🟢 [수정] 팀 관리자 계정 삭제
-    await User.deleteMany({ teamId, role: 'team_admin' });
-    
-    // 3. 팀 삭제
+    // 1. 팀에 속한 모든 사용자 삭제 (관리자/직원 모두)
+    await User.deleteMany({ teamId });
+    // 2. 팀 삭제
     await Team.findByIdAndDelete(teamId);
     return NextResponse.json({ success: true, message: '팀이 삭제되었습니다.' });
   } catch (error) {

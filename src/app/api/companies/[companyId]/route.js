@@ -90,10 +90,15 @@ export async function PUT(request, { params }) {
         // 데이터 업데이트
         if (name !== undefined) company.name = name;
         if (description !== undefined) company.description = description;
-        if (isActive !== undefined) company.isActive = isActive;
-        
-        await company.save();
-
+        if (isActive !== undefined) {
+            company.isActive = isActive;
+            await company.save();
+            // 회사 비활성화 시 하위 팀/직원 모두 비활성화
+            await Team.updateMany({ companyId: company._id }, { isActive });
+            await User.updateMany({ companyId: company._id }, { isActive });
+        } else {
+            await company.save();
+        }
         return NextResponse.json({ success: true, company });
 
     } catch (error) {
@@ -120,15 +125,9 @@ export async function DELETE(request, { params }) {
         
         await connectDB();
 
-        // 1. 회사에 등록된 사용자 확인
-        const userCount = await User.countDocuments({ companyId });
-        if (userCount > 0) {
-            return NextResponse.json({ 
-                error: `회사에 ${userCount}명의 사용자가 등록되어 있습니다. 먼저 모든 사용자를 삭제해야 합니다.`,
-                userCount
-            }, { status: 400 });
-        }
-
+        // 1. 하위 팀/직원 모두 삭제
+        await Team.deleteMany({ companyId });
+        await User.deleteMany({ companyId });
         // 2. 회사 삭제
         const deletedCompany = await Company.findByIdAndDelete(companyId);
 

@@ -41,7 +41,7 @@ export async function POST(req) {
     let query = { username, isActive: true };
     if (companyId) query.companyId = companyId;
     if (teamId) query.teamId = teamId;
-    if (!companyId) query.role = 'company_admin';
+    if (!companyId) query.role = 'supervisor'; // 회사 미지정 시 슈퍼바이저로 한정
     console.log('Query:', JSON.stringify(query));
 
     let user;

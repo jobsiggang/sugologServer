@@ -97,28 +97,20 @@ export async function POST(req) {
                 "업로드_시점": new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
             };
             
-            // 6. 🟢 [수정] 파일명 재구성 (폴더 구조 반영)
-            const folderNames = form.folderStructure || [];
-            let structuredFilename = folderNames
-                .map(key => enrichedFieldData[key] || '') 
-                .filter(Boolean)
-                .join('_');
-            
-            // 원본 파일 확장자 추가 (클라이언트가 보낸 리사이징된 파일의 확장자를 사용)
-            const originalExt = originalFilename.includes('.') ? originalFilename.substring(originalFilename.lastIndexOf('.')) : '.jpg';
-            
-            // 파일명에 인덱스 및 최종 확장자 추가
-            structuredFilename = `${structuredFilename}_${i + 1}${originalExt}`; 
+            // 폴더구조 항목명 값 기반 파일명 생성
+            const fileNameParts = Array.isArray(form.folderStructure) && form.folderStructure.length > 0 ? form.folderStructure : [form.formName];
+            let fileName = fileNameParts.map(f => enrichedFieldData[f] || f).filter(Boolean).join('_');
+            if (!fileName) fileName = `${form.formName}_${i + 1}`;
+            fileName += `_${Date.now()}.jpg`;
             
             
             // 7. GAS로 전송할 데이터 구조 완성
             const uploadData = {
                 base64Image: `data:image/jpeg;base64,${base64Image}`,
-                filename: structuredFilename, // 🟢 재구성된 파일명 사용
+                filename: fileName, // 폴더구조 기반 또는 양식명 기반 파일명
                 formName: formName,
                 fieldData: enrichedFieldData,
-                // folderStructure: form.folderStructure || [],
-                // 🟢 [수정] 시트명은 양식명과 일치하도록 단순화
+                folderStructure: fileNameParts, // 폴더구조가 없으면 [form.formName]
                 sheetName: formName 
             };
 

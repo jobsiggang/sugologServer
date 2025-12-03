@@ -92,8 +92,8 @@ export async function POST(req) {
                 ...fieldData,
                 "사용자": user.name,
                 "사용자명": user.username,
-                "회사명": user.companyId,
-                "팀명": user.teamId ? team.name : '',
+                "회사명": user.companyId.name,
+                // "팀명": user.teamId ? team.name : '',
                 "업로드_시점": new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }),
             };
             

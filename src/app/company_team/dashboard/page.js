@@ -1292,7 +1292,7 @@ function FormManagement({ user }) {
                                   className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-purple-500 text-sm"
                                 >
                                   <option value="">항목 선택</option>
-                                  <option value="직원명">직원명</option>
+                                  <option value="사용자명">사용자</option>
                                   {editData.fields.map((field) => (
                                     <option key={field.name} value={field.name}>{field.name}</option>
                                   ))}

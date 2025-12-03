@@ -114,13 +114,14 @@ export async function POST(req) {
       }
     });
 
-    // 회사 관리자 생성
+    // 회사 관리자 생성 (teamId: null 명시)
     const admin = await User.create({
       username: adminUsername,
       password: adminPassword,
       name: adminName,
       role: 'company_admin',
-      companyId: company._id
+      companyId: company._id,
+      teamId: null // 회사 관리자는 팀이 없음
     });
 
     return NextResponse.json({ 

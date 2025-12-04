@@ -406,7 +406,7 @@ function GoogleSettings({ user }) {
               <div className="mt-3 pt-3 border-t border-blue-300">
                 <p className="text-xs text-blue-700">
                   💡 <strong>참고:</strong> 시트 ID나 폴더 ID는 입력할 필요 없습니다. 
-                  Apps Script가 자동으로 연결된 시트를 사용하고 "공정한웍스" 폴더를 생성합니다.
+                  Apps Script가 자동으로 연결된 시트를 사용하고 "달개비현장" 폴더를 생성합니다.
                 </p>
               </div>
             </div>

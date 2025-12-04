@@ -1,8 +1,10 @@
+import mongoose from 'mongoose';
 // src/app/api/supervisor/companies/[companyId]/teams/teamId/googlesetting/route.js
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Company from "@/models/Company";
 import Team from "@/models/Team";
+import User from "@/models/User";
 import { verifyToken, getTokenFromRequest } from "@/lib/auth";
 
 // Google 설정 조회
@@ -65,6 +67,14 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '팀장만 접근할 수 있습니다.' }, { status: 403 });
     }
 
+        // teamId를 안전하게 ObjectId로 변환
+        function getValidObjectId(id) {
+          try {
+            return new mongoose.Types.ObjectId(id);
+          } catch {
+            return null;
+          }
+        }
     const { webAppUrl } = await request.json();
 
     await connectDB();
@@ -118,6 +128,8 @@ export async function PUT(request, { params }) {
 
 // Google 설정 테스트
 export async function POST(request, { params }) {
+        const teamId = getValidObjectId(params.teamId);
+        if (!teamId) return NextResponse.json({ error: '유효하지 않은 팀 ID' }, { status: 400 });
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
@@ -181,12 +193,14 @@ export async function POST(request, { params }) {
 
     // 429 에러 (Rate Limit) 처리 - 실제로는 성공했을 수 있음
     if (response.status === 429) {
+        const teamId = getValidObjectId(params.teamId);
+        if (!teamId) return NextResponse.json({ error: '유효하지 않은 팀 ID' }, { status: 400 });
       return NextResponse.json({
         success: true,
         warning: 'Google Apps Script 요청 제한에 도달했습니다. 하지만 요청은 처리되었을 가능성이 높습니다.',
         message: 'Google Drive와 Sheets를 직접 확인하여 테스트 파일이 저장되었는지 확인하세요.',
-        hint: '1-2분 후에 다시 시도하거나, Google Drive에서 "수고록" 폴더를 확인하세요.',
-        driveFolder: '수고록 / 2025-11-18 / 테스트현장',
+        hint: '1-2분 후에 다시 시도하거나, Google Drive에서 "달개비현장" 폴더를 확인하세요.',
+        driveFolder: '달개비현장 / 2025-11-18 / 테스트현장',
         expectedFile: 'test_connection.png'
       });
     }

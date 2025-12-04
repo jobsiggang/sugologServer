@@ -90,7 +90,7 @@ try {
         const companyName = user.companyId?.name || '';
         const teamId = user.teamId?._id || user.teamId;
         const teamName = user.teamId?.name || '';
-
+        console.log("user정보", user);
 
                 // 🚨 isActive 상태 확인 및 상세 응답
                 if (user.isActive === false) {

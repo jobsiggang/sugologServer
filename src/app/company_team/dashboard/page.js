@@ -22,7 +22,7 @@ export default function CompanyDashboard() {
     }
 
     const userData = JSON.parse(localStorage.getItem('user'));
-    console.log("userData.teamId:", userData.teamId);
+    console.log("userData", userData);
     if (!userData || userData.role !== 'team_admin') {
       alert('회사의 팀장만 접근 가능합니다.');
       localStorage.removeItem('token');
@@ -948,6 +948,7 @@ function FormManagement({ user }) {
   const fetchForms = async () => {
     try {
       const token = localStorage.getItem('token');
+      console.log("user.teamId:", user.teamId);
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/forms`, {
         headers: {
           'Authorization': `Bearer ${token}`

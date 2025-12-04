@@ -14,7 +14,16 @@ export async function GET(request, { params }) {
     await connectDB();
     const companyId = params.companyId;
     const teams = await Team.find({ companyId, isActive: true }).sort({ createdAt: -1 });
-    return NextResponse.json({ success: true, teams });
+     // 각 팀의 관리자 정보도 함께 조회
+        const adminUser = await User.findOne({ teamId, role: 'team_admin' }).select('name username');
+        
+        // 최종 데이터 구성
+        const result = {
+            ...teams.toObject(),
+            admin: adminUser ? { name: adminUser.name, username: adminUser.username } : null
+        };
+
+        return NextResponse.json({ success: true, teams: result });
   } catch (error) {
     console.error('팀 목록 조회 오류:', error);
     return NextResponse.json({ error: '팀 목록 조회 실패' }, { status: 500 });

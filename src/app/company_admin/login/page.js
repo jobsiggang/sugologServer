@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
@@ -8,19 +8,34 @@ export default function SupervisorLogin() {
   const [formData, setFormData] = useState({
     username: "",
     password: "",
+    companyId: ""
   });
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // 회사 목록 불러오기
+    const fetchCompanies = async () => {
+      try {
+        const response = await fetch("/api/companies", {
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("token") }
+        });
+        const data = await response.json();
+        if (data.success) setCompanies(data.companies);
+      } catch (error) {
+        // 실패 시 무시
+      }
+    };
+    fetchCompanies();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!formData.username || !formData.password) {
-      toast.error("아이디와 비밀번호를 입력해주세요.");
+    if (!formData.username || !formData.password || !formData.companyId) {
+      toast.error("아이디, 비밀번호, 회사를 모두 입력/선택해주세요.");
       return;
     }
-
     setLoading(true);
-
     try {
       const response = await fetch("/api/login", {
         method: "POST",
@@ -28,22 +43,17 @@ export default function SupervisorLogin() {
         body: JSON.stringify({
           username: formData.username,
           password: formData.password,
-       
+          companyId: formData.companyId
         }),
       });
-
       const data = await response.json();
-
       if (data.success) {
-        // 슈퍼바이저만 허용
         if (data.role !== 'company_admin') {
           toast.error("회사 관리자 계정만 로그인할 수 있습니다.");
           return;
         }
-
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
-        
         toast.success("로그인 성공!");
         router.replace("/company_admin");
       } else {
@@ -74,9 +84,22 @@ export default function SupervisorLogin() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              아이디
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">회사 선택</label>
+            <select
+              value={formData.companyId}
+              onChange={e => setFormData({ ...formData, companyId: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              disabled={loading}
+              required
+            >
+              <option value="">회사를 선택하세요</option>
+              {companies.map(company => (
+                <option key={company._id} value={company._id}>{company.name}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">아이디</label>
             <input
               type="text"
               value={formData.username}

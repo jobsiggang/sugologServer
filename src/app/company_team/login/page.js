@@ -112,7 +112,7 @@ export default function EmployeeLogin() {
         }
     };
 
-    // 메인 렌더링: 회사 선택 → 팀+로그인 동시 노출
+    // 회사명 입력, 조회, 팀 선택, 로그인까지 한 화면에서 처리
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-200 to-green-400">
             <Toaster position="top-center" />
@@ -121,22 +121,42 @@ export default function EmployeeLogin() {
                     <h1 className="text-3xl font-bold text-gray-800">현장 기록 시스템</h1>
                     <p className="text-gray-500 mt-2">팀장 로그인</p>
                 </div>
-                {/* 회사명 입력 */}
-                {!selectedCompany && (
-                    <form onSubmit={handleCompanyLookup} className="space-y-6">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">회사 이름</label>
+                <form
+                    onSubmit={selectedCompany ? handleSubmit : handleCompanyLookup}
+                    className="space-y-6"
+                >
+                    {/* 회사명 입력 */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">회사 이름</label>
+                        <div className="flex gap-2">
                             <input
                                 type="text"
                                 value={companyInput}
                                 onChange={(e) => setCompanyInput(e.target.value)}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
                                 placeholder="정확한 회사명 입력"
-                                disabled={loading}
+                                disabled={loading || !!selectedCompany}
                                 required
                             />
-                            {lookupError && <p className="mt-2 text-sm text-red-600">{lookupError}</p>}
+                            {selectedCompany && (
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        setSelectedCompany(null);
+                                        setTeams([]);
+                                        setSelectedTeamId('');
+                                        setFormData({ username: '', password: '' });
+                                    }}
+                                    className="text-xs px-3 py-2 bg-gray-200 rounded hover:bg-green-100 text-gray-600"
+                                >
+                                    변경
+                                </button>
+                            )}
                         </div>
+                        {lookupError && <p className="mt-2 text-sm text-red-600">{lookupError}</p>}
+                    </div>
+                    {/* 회사 조회 버튼 (회사 선택 전) */}
+                    {!selectedCompany && (
                         <button
                             type="submit"
                             disabled={loading || !companyInput}
@@ -144,68 +164,59 @@ export default function EmployeeLogin() {
                         >
                             {loading ? "회사 조회 중..." : "팀/로그인 입력"}
                         </button>
-                    </form>
-                )}
-                {/* 회사 선택 후: 팀 선택 + 로그인 폼 */}
-                {selectedCompany && (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                        <div className="flex items-center justify-between mb-2">
-                            <span className="text-base font-semibold text-green-700">{selectedCompany.name}</span>
-                            <button type="button" onClick={() => {
-                                setSelectedCompany(null);
-                                setTeams([]);
-                                setSelectedTeamId('');
-                                setFormData({ username: '', password: '' });
-                            }} className="text-xs text-gray-400 hover:text-green-600">회사 변경</button>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">소속 팀</label>
-                            <select
-                                value={selectedTeamId}
-                                onChange={(e) => setSelectedTeamId(e.target.value)}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                                disabled={loading || teams.length === 0}
-                                required
+                    )}
+                    {/* 회사 선택 후: 팀 선택 + 로그인 입력 */}
+                    {selectedCompany && (
+                        <>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">소속 팀</label>
+                                <select
+                                    value={selectedTeamId}
+                                    onChange={(e) => setSelectedTeamId(e.target.value)}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
+                                    disabled={loading || teams.length === 0}
+                                    required
+                                >
+                                    <option value="" disabled>팀을 선택하세요</option>
+                                    {teams.map((team) => (
+                                        <option key={team._id} value={team._id}>{team.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">아이디</label>
+                                <input
+                                    type="text"
+                                    value={formData.username}
+                                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
+                                    placeholder="팀장 아이디"
+                                    disabled={loading}
+                                    required
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                                <input
+                                    type="password"
+                                    value={formData.password}
+                                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
+                                    placeholder="비밀번호"
+                                    disabled={loading}
+                                    required
+                                />
+                            </div>
+                            <button
+                                type="submit"
+                                disabled={loading || !formData.username || !formData.password || !selectedTeamId}
+                                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold text-base hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
                             >
-                                <option value="" disabled>팀을 선택하세요</option>
-                                {teams.map((team) => (
-                                    <option key={team._id} value={team._id}>{team.name}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">아이디</label>
-                            <input
-                                type="text"
-                                value={formData.username}
-                                onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                                placeholder="팀장 아이디"
-                                disabled={loading}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
-                            <input
-                                type="password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                                placeholder="비밀번호"
-                                disabled={loading}
-                                required
-                            />
-                        </div>
-                        <button
-                            type="submit"
-                            disabled={loading || !formData.username || !formData.password || !selectedTeamId}
-                            className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold text-base hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                        >
-                            {loading ? "로그인 중..." : "로그인"}
-                        </button>
-                    </form>
-                )}
+                                {loading ? "로그인 중..." : "로그인"}
+                            </button>
+                        </>
+                    )}
+                </form>
             </div>
         </div>
     );

@@ -3,6 +3,7 @@ import connectDB from "@/lib/mongodb";
 import User from "@/models/User";
 import { generateToken } from "@/lib/auth";
 import Company from '@/models/Company';
+import Tema from '@/models/Team';
 
 export async function POST(req) {
   try {

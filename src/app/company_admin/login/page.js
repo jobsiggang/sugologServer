@@ -5,34 +5,43 @@ import toast, { Toaster } from "react-hot-toast";
 
 export default function SupervisorLogin() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    password: "",
-    companyId: ""
-  });
-  const [companies, setCompanies] = useState([]);
+  const [companyInput, setCompanyInput] = useState("");
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [formData, setFormData] = useState({ username: "", password: "" });
   const [loading, setLoading] = useState(false);
+  const [lookupError, setLookupError] = useState(null);
 
-  useEffect(() => {
-    // 회사 목록 불러오기
-    const fetchCompanies = async () => {
-      try {
-        const response = await fetch("/api/companies", {
-          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + localStorage.getItem("token") }
-        });
-        const data = await response.json();
-        if (data.success) setCompanies(data.companies);
-      } catch (error) {
-        // 실패 시 무시
+  // 회사명으로 회사 조회
+  const handleCompanyLookup = async (e) => {
+    e.preventDefault();
+    if (!companyInput) {
+      toast.error("회사명을 입력해주세요.");
+      return;
+    }
+    setLoading(true);
+    setLookupError(null);
+    try {
+      const response = await fetch(`/api/companies/lookup?name=${encodeURIComponent(companyInput)}`);
+      const data = await response.json();
+      if (data.success && data.company) {
+        setSelectedCompany(data.company);
+      } else {
+        setLookupError("일치하는 회사명을 찾을 수 없습니다.");
+        toast.error("회사 조회 실패");
       }
-    };
-    fetchCompanies();
-  }, []);
+    } catch (error) {
+      setLookupError("네트워크 오류가 발생했습니다.");
+      toast.error("조회 중 오류 발생");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // 로그인 인증
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.username || !formData.password || !formData.companyId) {
-      toast.error("아이디, 비밀번호, 회사를 모두 입력/선택해주세요.");
+    if (!selectedCompany || !formData.username || !formData.password) {
+      toast.error("모든 정보를 입력해주세요.");
       return;
     }
     setLoading(true);
@@ -43,7 +52,7 @@ export default function SupervisorLogin() {
         body: JSON.stringify({
           username: formData.username,
           password: formData.password,
-          companyId: formData.companyId
+          companyId: selectedCompany._id
         }),
       });
       const data = await response.json();
@@ -70,7 +79,6 @@ export default function SupervisorLogin() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-800">
       <Toaster position="top-center" />
-      
       <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
@@ -81,58 +89,82 @@ export default function SupervisorLogin() {
           <h1 className="text-3xl font-bold text-gray-800">회사 관리자 로그인</h1>
           <p className="text-gray-500 mt-2">회사 관리자 전용</p>
         </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={selectedCompany ? handleSubmit : handleCompanyLookup} className="space-y-6">
+          {/* 회사명 입력 */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">회사 선택</label>
-            <select
-              value={formData.companyId}
-              onChange={e => setFormData({ ...formData, companyId: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              disabled={loading}
-              required
+            <label className="block text-sm font-medium text-gray-700 mb-2">회사 이름</label>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={companyInput}
+                onChange={(e) => setCompanyInput(e.target.value)}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                placeholder="정확한 회사명 입력"
+                disabled={loading || !!selectedCompany}
+                required
+              />
+              {selectedCompany && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedCompany(null);
+                    setFormData({ username: "", password: "" });
+                  }}
+                  className="text-xs px-3 py-2 bg-gray-200 rounded hover:bg-blue-100 text-gray-600"
+                >
+                  변경
+                </button>
+              )}
+            </div>
+            {lookupError && <p className="mt-2 text-sm text-red-600">{lookupError}</p>}
+          </div>
+          {/* 회사 조회 버튼 (회사 선택 전) */}
+          {!selectedCompany && (
+            <button
+              type="submit"
+              disabled={loading || !companyInput}
+              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold text-base hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
-              <option value="">회사를 선택하세요</option>
-              {companies.map(company => (
-                <option key={company._id} value={company._id}>{company.name}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">아이디</label>
-            <input
-              type="text"
-              value={formData.username}
-              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="회사 관리자 아이디"
-              disabled={loading}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              비밀번호
-            </label>
-            <input
-              type="password"
-              value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="비밀번호"
-              disabled={loading}
-            />
-          </div>
-
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-          >
-            {loading ? "로그인 중..." : "로그인"}
-          </button>
+              {loading ? "회사 조회 중..." : "로그인 입력"}
+            </button>
+          )}
+          {/* 회사 선택 후: 로그인 입력 */}
+          {selectedCompany && (
+            <>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">아이디</label>
+                <input
+                  type="text"
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                  placeholder="회사 관리자 아이디"
+                  disabled={loading}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">비밀번호</label>
+                <input
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-base"
+                  placeholder="비밀번호"
+                  disabled={loading}
+                  required
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading || !formData.username || !formData.password}
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold text-base hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {loading ? "로그인 중..." : "로그인"}
+              </button>
+            </>
+          )}
         </form>
-
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-xs text-gray-500 text-center">
             ⚠️ 이 페이지는 회사 관리자 전용입니다.

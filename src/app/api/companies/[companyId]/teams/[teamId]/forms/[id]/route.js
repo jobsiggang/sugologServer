@@ -65,7 +65,7 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
-    const { formName, fields, folderStructure, isActive } = await request.json();
+    const { formName, fields, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = await request.json();
 
     await connectDB();
 
@@ -91,6 +91,11 @@ export async function PUT(request, { params }) {
     }
     if (folderStructure !== undefined) form.folderStructure = folderStructure;
     if (typeof isActive === 'boolean') form.isActive = isActive;
+    if (boardPosition !== undefined) form.boardPosition = boardPosition;
+    if (boardSize !== undefined) form.boardSize = boardSize;
+    if (boardBackground !== undefined) form.boardBackground = boardBackground;
+    if (boardFont !== undefined) form.boardFont = boardFont;
+    if (resolution !== undefined) form.resolution = resolution;
 
     await form.save();
 

@@ -1279,7 +1279,7 @@ function FormManagement({ user }) {
               <div className="px-4 py-4 bg-gray-50 border-t">
                 {editingId === form._id ? (
                   <div className="space-y-4">
-                    {/* 1. 양식명 */}
+                    {/* 1. 입력양식명 */}
                     <div>
                       <label className="block text-sm font-semibold text-gray-700 mb-1">
                         1. 입력양식명
@@ -1291,6 +1291,49 @@ function FormManagement({ user }) {
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="예: DL연간단가"
                       />
+                    </div>
+
+                    {/* 표 설정 및 해상도 설정 */}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">표 위치</label>
+                        <select value={editData.boardPosition} onChange={e => setEditData({ ...editData, boardPosition: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded">
+                          <option value="bottomLeft">좌하단</option>
+                          <option value="bottomRight">우하단</option>
+                          <option value="topLeft">좌상단</option>
+                          <option value="topRight">우상단</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">표 크기</label>
+                        <select value={editData.boardSize} onChange={e => setEditData({ ...editData, boardSize: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded">
+                          <option value="100%">100%</option>
+                          <option value="120%">120%</option>
+                          <option value="150%">150%</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">표 배경</label>
+                        <select value={editData.boardBackground} onChange={e => setEditData({ ...editData, boardBackground: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded">
+                          <option value="white">흰배경/검정글씨</option>
+                          <option value="black">검정배경/흰글씨</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">표 글꼴</label>
+                        <select value={editData.boardFont} onChange={e => setEditData({ ...editData, boardFont: e.target.value })} className="w-full px-2 py-1 border border-gray-300 rounded">
+                          <option value="System">시스템 기본</option>
+                          <option value="Malgun Gothic">맑은고딕</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-gray-700 mb-1">합성사진 해상도</label>
+                        <select value={editData.resolution} onChange={e => setEditData({ ...editData, resolution: Number(e.target.value) })} className="w-full px-2 py-1 border border-gray-300 rounded">
+                          <option value={1024}>1024</option>
+                          <option value={1280}>1280</option>
+                          <option value={1600}>1600</option>
+                        </select>
+                      </div>
                     </div>
 
                     {/* 2. 항목명 추가 */}

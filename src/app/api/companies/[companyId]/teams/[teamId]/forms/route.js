@@ -102,6 +102,7 @@ export async function POST(request, { params }) {
         }
 
         // 새 양식 생성
+        const { boardPosition, boardSize, boardBackground, boardFont, resolution } = await request.json();
         const newForm = new Form({
             companyId,
             teamId,
@@ -110,6 +111,11 @@ export async function POST(request, { params }) {
             fieldOptions: fieldOptions || {},
             folderStructure: folderStructure || [],
             isActive: isActive !== undefined ? isActive : true,
+            boardPosition,
+            boardSize,
+            boardBackground,
+            boardFont,
+            resolution,
             createdBy: decoded.userId
         });
 
@@ -142,7 +148,7 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: '팀 관리자 이상만 양식을 수정할 수 있습니다.' }, { status: 403 });
         }
 
-        const { formId, formName, fields, fieldOptions, folderStructure, isActive } = await request.json();
+        const { formId, formName, fields, fieldOptions, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = await request.json();
         
         if (!formId) {
             return NextResponse.json({ error: '양식 ID가 누락되었습니다.' }, { status: 400 });
@@ -177,6 +183,11 @@ export async function PUT(request, { params }) {
         if (fieldOptions !== undefined) form.fieldOptions = fieldOptions;
         if (folderStructure !== undefined) form.folderStructure = Array.isArray(folderStructure) ? folderStructure : [];
         if (isActive !== undefined) form.isActive = isActive;
+        if (boardPosition !== undefined) form.boardPosition = boardPosition;
+        if (boardSize !== undefined) form.boardSize = boardSize;
+        if (boardBackground !== undefined) form.boardBackground = boardBackground;
+        if (boardFont !== undefined) form.boardFont = boardFont;
+        if (resolution !== undefined) form.resolution = resolution;
         
         await form.save();
 

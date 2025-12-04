@@ -225,7 +225,7 @@ function GoogleSettings({ user }) {
   const fetchSettings = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/googlesettings`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/googlesettings`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -257,8 +257,8 @@ function GoogleSettings({ user }) {
     
     try {
       const token = localStorage.getItem('token');
-      console.log("PUT teamId:", user.teamId._id);
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/googlesettings`, {
+     
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/googlesettings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -287,8 +287,8 @@ function GoogleSettings({ user }) {
     setTesting(true);
     try {
       const token = localStorage.getItem('token');
-      console.log("POST teamId:", user.teamId._id);
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/googlesettings`, {
+      console.log("POST teamId:", user.teamId);
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/googlesettings`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -530,7 +530,7 @@ function EmployeeManagement({ user }) {
   const fetchEmployees = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/employees`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/employees`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -599,7 +599,7 @@ function EmployeeManagement({ user }) {
     try {
       const token = localStorage.getItem('token');
       const isNew = editingId === 'new';
-      const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId._id}/employees` : `/api/companies/${user.companyId}/teams/${user.teamId._id}/employees/${editingId}`;
+      const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/employees` : `/api/companies/${user.companyId}/teams/${user.teamId}/employees/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
       const dataToSend = { ...editData };
@@ -640,7 +640,7 @@ function EmployeeManagement({ user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/employees/${id}`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/employees/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`
@@ -665,7 +665,7 @@ function EmployeeManagement({ user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/employees/${id}`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/employees/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -948,7 +948,7 @@ function FormManagement({ user }) {
   const fetchForms = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/forms`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/forms`, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -1011,7 +1011,7 @@ function FormManagement({ user }) {
     try {
       const token = localStorage.getItem('token');
       const isNew = editingId === 'new';
-      const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId._id}/forms` : `/api/companies/${user.companyId}/teams/${user.teamId._id}/forms/${editingId}`;
+      const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/forms` : `/api/companies/${user.companyId}/teams/${user.teamId}/forms/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
       // fields를 스키마에 맞게 변환
@@ -1055,7 +1055,7 @@ function FormManagement({ user }) {
 
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId._id}/forms/${id}`, {
+      const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/forms/${id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`

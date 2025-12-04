@@ -128,7 +128,7 @@ export async function POST(req) {
         role: user.role,
         companyId: user.companyId?._id,
         companyName: user.companyId?.name,
-        teamId: user.teamId,
+        teamId: user.teamId?._id ,
         teamName: user.teamId?.name || undefined,
       },
       token,

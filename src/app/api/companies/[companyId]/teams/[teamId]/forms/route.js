@@ -65,7 +65,8 @@ export async function POST(request, { params }) {
             return NextResponse.json({ error: '팀 관리자 이상만 양식을 생성할 수 있습니다.' }, { status: 403 });
         }
 
-        const { formName, fields, fieldOptions, folderStructure, isActive } = await request.json();
+        const body = await request.json();
+        const { formName, fields, fieldOptions, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = body;
 
         // 필수 필드 검증
         if (!formName || !Array.isArray(fields)) {
@@ -102,7 +103,6 @@ export async function POST(request, { params }) {
         }
 
         // 새 양식 생성
-        const { boardPosition, boardSize, boardBackground, boardFont, resolution } = await request.json();
         const newForm = new Form({
             companyId,
             teamId,

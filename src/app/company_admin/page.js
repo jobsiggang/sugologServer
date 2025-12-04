@@ -33,11 +33,12 @@ export default function SupervisorEntry() {
         // 다른 역할은 회사 관리자 로그인 페이지로
         localStorage.removeItem('token');
         localStorage.removeItem('user');
-        router.push('/supervisor/login');
+        router.push('/');
       }
+        
     } catch (error) {
       console.error('Auth check error:', error);
-      router.push('/supervisor/login');
+      router.push('/');
     }
   };
 

@@ -936,7 +936,13 @@ function FormManagement({ user }) {
   const [forms, setForms] = useState([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState(null);
-  const [editData, setEditData] = useState({});
+  const [editData, setEditData] = useState({
+    boardPosition: 'bottomLeft',
+    boardSize: '100%',
+    boardBackground: 'white',
+    boardFont: 'Malgun Gothic',
+    resolution: 1024,
+  });
   const [expandedId, setExpandedId] = useState(null);
   const [fieldInput, setFieldInput] = useState('');
   const [optionInputs, setOptionInputs] = useState({});
@@ -972,7 +978,12 @@ function FormManagement({ user }) {
       formName: '',
       fields: [],
       folderStructure: [],
-      isActive: true
+      isActive: true,
+      boardPosition: 'bottomLeft',
+      boardSize: '100%',
+      boardBackground: 'white',
+      boardFont: 'Malgun Gothic',
+      resolution: 1024,
     };
     setForms([newForm, ...forms]);
     setEditingId('new');
@@ -991,8 +1002,50 @@ function FormManagement({ user }) {
             options: Array.isArray(f.options) ? f.options : []
           }))
         : [],
-      folderStructure: Array.isArray(form.folderStructure) ? form.folderStructure : []
+      folderStructure: Array.isArray(form.folderStructure) ? form.folderStructure : [],
+      boardPosition: form.boardPosition || 'bottomLeft',
+      boardSize: form.boardSize || '100%',
+      boardBackground: form.boardBackground || 'white',
+      boardFont: form.boardFont || 'Malgun Gothic',
+      resolution: form.resolution || 1024,
     });
+        // <div>
+        //   <label>합성사진 해상도</label>
+        //   <select value={editData.resolution} onChange={e => setEditData({ ...editData, resolution: Number(e.target.value) })}>
+        //     <option value={1024}>1024</option>
+        //     <option value={1280}>1280</option>
+        //     <option value={1600}>1600</option>
+        //   </select>
+        // </div>
+      // 폼 추가/수정 UI에 표 설정 항목 추가 (예시)
+      // <div>
+      //   <label>표 위치</label>
+      //   <select value={editData.boardPosition} onChange={e => setEditData({ ...editData, boardPosition: e.target.value })}>
+      //     <option value="bottomLeft">좌하단</option>
+      //     <option value="bottomRight">우하단</option>
+      //     <option value="topLeft">좌상단</option>
+      //     <option value="topRight">우상단</option>
+      //   </select>
+      // </div>
+      // <div>
+      //   <label>표 크기</label>
+      //   <select value={editData.boardSize} onChange={e => setEditData({ ...editData, boardSize: e.target.value })}>
+      //     <option value="100%">100%</option>
+      //     <option value="120%">120%</option>
+      //     <option value="150%">150%</option>
+      //   </select>
+      // </div>
+      // <div>
+      //   <label>표 배경</label>
+      //   <select value={editData.boardBackground} onChange={e => setEditData({ ...editData, boardBackground: e.target.value })}>
+      //     <option value="white">흰배경/검정글씨</option>
+      //     <option value="black">검정배경/흰글씨</option>
+      //   </select>
+      // </div>
+      // <div>
+      //   <label>표 글꼴</label>
+      //   <input type="text" value={editData.boardFont} onChange={e => setEditData({ ...editData, boardFont: e.target.value })} placeholder="예: Malgun Gothic" />
+      // </div>
     setFieldInput('');
     setOptionInputs({});
   };

@@ -4,6 +4,31 @@ import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function SupervisorLogin() {
+    useEffect(() => {
+      const token = localStorage.getItem('token');
+      const user = localStorage.getItem('user');
+      if (token && user) {
+        (async () => {
+          try {
+            const statusRes = await fetch('/api/userStatus', {
+              headers: {
+                'Authorization': `Bearer ${token}`
+              }
+            });
+            const statusData = await statusRes.json();
+            if (!statusData.success || statusData.isActive === false) {
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              toast.error('비활성화된 계정입니다. 관리자에게 문의하세요.');
+            } else {
+              router.replace('/company_admin');
+            }
+          } catch (err) {
+            toast.error('사용자 상태 확인 중 오류가 발생했습니다.');
+          }
+        })();
+      }
+    }, [router]);
   const router = useRouter();
   const [companyInput, setCompanyInput] = useState("");
   const [selectedCompany, setSelectedCompany] = useState(null);

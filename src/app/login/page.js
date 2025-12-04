@@ -22,8 +22,27 @@ export default function EmployeeLogin() {
 
     useEffect(() => {
         const token = localStorage.getItem('token');
-        if (token) {
-            router.replace('/');
+        const user = localStorage.getItem('user');
+        if (token && user) {
+            (async () => {
+                try {
+                    const statusRes = await fetch('/api/userStatus', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    const statusData = await statusRes.json();
+                    if (!statusData.success || statusData.isActive === false) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('user');
+                        toast.error('비활성화된 계정입니다. 관리자에게 문의하세요.');
+                    } else {
+                        router.replace('/');
+                    }
+                } catch (err) {
+                    toast.error('사용자 상태 확인 중 오류가 발생했습니다.');
+                }
+            })();
         }
     }, [router]);
 
@@ -118,8 +137,8 @@ export default function EmployeeLogin() {
             <Toaster position="top-center" />
             <div className="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-md mx-4">
                 <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-gray-800">현장 기록 시스템</h1>
-                    <p className="text-gray-500 mt-2">팀/직원 로그인</p>
+                    <h1 className="text-3xl font-bold text-gray-800">달개비 현장 기록 시스템</h1>
+                    <p className="text-gray-500 mt-2">팀장 로그인</p>
                 </div>
                 {/* 회사명 입력 */}
                 {!selectedCompany && (
@@ -180,7 +199,7 @@ export default function EmployeeLogin() {
                                 value={formData.username}
                                 onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base"
-                                placeholder="직원/팀장 아이디"
+                                placeholder="팀장 아이디"
                                 disabled={loading}
                                 required
                             />

@@ -25,6 +25,33 @@ const formSchema = new mongoose.Schema({
     options:[{ type: String }],
     type: { type: String, enum: ['text', 'date', 'number'], default: 'text' }
   }],
+  // 표 설정 추가
+  boardPosition: {
+    type: String,
+    enum: ['bottomLeft', 'bottomRight', 'topLeft', 'topRight'],
+    default: 'bottomLeft'
+  },
+  boardSize: {
+    type: String,
+    enum: ['100%', '120%', '150%'],
+    default: '100%'
+  },
+  boardBackground: {
+    type: String,
+    enum: ['white', 'black'],
+    default: 'white'
+  },
+  boardFont: {
+    type: String,
+    enum: ['System','Malgun Gothic'],
+    default: 'System'
+  },
+  // 합성사진 해상도 설정 추가
+  resolution: {
+    type: Number,
+    enum: [1024, 1280, 1600], // 기본 1024, 추천 1280, 1600
+    default: 1024
+  },
 
   // 파일 저장 폴더 구조 (예: ["일자", "현장명", "위치", "공종"])
   folderStructure: [{

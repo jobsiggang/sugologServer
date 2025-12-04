@@ -37,11 +37,15 @@ export async function GET(request, { params }) {
         // 2. 회사 관리자 정보 조회 (책임자 정보가 필요한 경우 populate 대신 별도 조회)
         // 회사 관리자 (company_admin)는 회사당 한 명이라고 가정
         const adminUser = await User.findOne({ companyId, role: 'company_admin' }).select('name username');
-        
+
+        // 3. 활성화된 팀 목록 조회
+        const activeTeams = await Team.find({ companyId, isActive: true }).select('name description isActive createdAt');
+
         // 최종 데이터 구성
         const result = {
             ...company.toObject(),
-            admin: adminUser ? { name: adminUser.name, username: adminUser.username } : null
+            admin: adminUser ? { name: adminUser.name, username: adminUser.username } : null,
+            teams: activeTeams
         };
 
         return NextResponse.json({ success: true, company: result });

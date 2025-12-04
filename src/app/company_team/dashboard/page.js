@@ -256,7 +256,7 @@ function GoogleSettings({ user }) {
     
     try {
       const token = localStorage.getItem('token');
-      
+      console.log("PUT teamId:", user.teamId);
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/googlesettings`, {
         method: 'PUT',
         headers: {
@@ -286,6 +286,7 @@ function GoogleSettings({ user }) {
     setTesting(true);
     try {
       const token = localStorage.getItem('token');
+      console.log("POST teamId:", user.teamId);
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/googlesettings`, {
         method: 'POST',
         headers: {

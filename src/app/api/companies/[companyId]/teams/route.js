@@ -11,16 +11,22 @@ import mongoose from 'mongoose';
 // 🚨 [수정] context 대신 { params }를 인수로 받습니다.
 export async function GET(request, { params }) {
   try {
-    const token = getTokenFromRequest(request);
-    if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
-    const decoded = verifyToken(token);
     await connectDB();
     const companyId = params.companyId;
     let teamQuery = { companyId };
-    // 권한에 따라 필터링
-    if (decoded.role !== 'company_admin' && decoded.role !== 'supervisor') {
+    let decoded = null;
+    const token = getTokenFromRequest(request);
+    if (token) {
+      decoded = verifyToken(token);
+    }
+    // 로그인 전(토큰 없음): 활성팀만 조회
+    if (!decoded) {
+      teamQuery.isActive = true;
+    } else if (decoded.role !== 'company_admin' && decoded.role !== 'supervisor') {
+      // 로그인 후, 관리자 미만: 활성팀만 조회
       teamQuery.isActive = true;
     }
+    // 관리자 이상: 전체 조회
     const teams = await Team.find(teamQuery).sort({ createdAt: -1 });
 
     // 각 팀장 정보도 함께 조회

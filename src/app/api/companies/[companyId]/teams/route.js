@@ -13,17 +13,31 @@ export async function GET(request, { params }) {
   try {
     await connectDB();
     const companyId = params.companyId;
-    const teams = await Team.find({ companyId, isActive: true }).sort({ createdAt: -1 });
-     // 각 팀의 관리자 정보도 함께 조회
-        const adminUser = await User.findOne({ teamId, role: 'team_admin' }).select('name username');
-        
-        // 최종 데이터 구성
-        const result = {
-            ...teams.toObject(),
-            admin: adminUser ? { name: adminUser.name, username: adminUser.username } : null
-        };
+    const teams = await Team.find({ companyId }).sort({ createdAt: -1 });
 
-        return NextResponse.json({ success: true, teams: result });
+    // 각 팀장 정보도 함께 조회
+    const teamsWithAdmin = await Promise.all(
+      teams.map(async (team) => {
+        const admin = await User.findOne({ 
+          teamId: team._id, 
+          role: 'team_admin' 
+        }).select('username name');
+        
+        return {
+          _id: team._id,
+          name: team.name,
+          description: team.description,
+          isActive: team.isActive,
+          admin: admin ? { username: admin.username, name: admin.name } : null,
+          createdAt: team.createdAt
+        };
+      })
+    );
+
+    return NextResponse.json({ 
+      success: true, 
+      teams: teamsWithAdmin 
+    });
   } catch (error) {
     console.error('팀 목록 조회 오류:', error);
     return NextResponse.json({ error: '팀 목록 조회 실패' }, { status: 500 });

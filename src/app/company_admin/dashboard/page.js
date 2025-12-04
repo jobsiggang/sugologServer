@@ -570,7 +570,7 @@ export default function CompanyAdminDashboard() {
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">팀명</th>
                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">설명</th>
-                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">책임자</th>
+                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">팀장</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
                         <th className="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">관리</th>
                       </tr>

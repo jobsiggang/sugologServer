@@ -58,7 +58,7 @@ export default function EmployeeLogin() {
     const fetchTeams = async (companyId) => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/companies/${companyId}/teams/list`);
+            const response = await fetch(`/api/companies/${companyId}/teams`);
             const data = await response.json();
             if (data.success) {
                 setTeams(data.teams);

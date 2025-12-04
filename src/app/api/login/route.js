@@ -117,6 +117,7 @@ export async function POST(req) {
     console.log('✅ 토큰 생성 완료');
 
     // 응답 생성
+    console.log('로그인teamid:', user.teamId);  
     const response = NextResponse.json({
       success: true,
       role: user.role,

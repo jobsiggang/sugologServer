@@ -67,14 +67,6 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '팀장만 접근할 수 있습니다.' }, { status: 403 });
     }
 
-        // teamId를 안전하게 ObjectId로 변환
-        function getValidObjectId(id) {
-          try {
-            return new mongoose.Types.ObjectId(id);
-          } catch {
-            return null;
-          }
-        }
     const { webAppUrl } = await request.json();
 
     await connectDB();
@@ -128,7 +120,8 @@ export async function PUT(request, { params }) {
 
 // Google 설정 테스트
 export async function POST(request, { params }) {
-        const teamId = getValidObjectId(params.teamId);
+  console.log('🚀 Test Google connection called for teamId:', params);
+        const teamId = params.teamId;
         if (!teamId) return NextResponse.json({ error: '유효하지 않은 팀 ID' }, { status: 400 });
   try {
     const token = getTokenFromRequest(request);
@@ -193,7 +186,7 @@ export async function POST(request, { params }) {
 
     // 429 에러 (Rate Limit) 처리 - 실제로는 성공했을 수 있음
     if (response.status === 429) {
-        const teamId = getValidObjectId(params.teamId);
+        const teamId = params.teamId;
         if (!teamId) return NextResponse.json({ error: '유효하지 않은 팀 ID' }, { status: 400 });
       return NextResponse.json({
         success: true,

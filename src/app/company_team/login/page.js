@@ -84,6 +84,7 @@ export default function EmployeeLogin() {
             return;
         }
         setLoading(true);
+        console.log("Submitting login for teamId:", selectedTeamId);
         try {
             const response = await fetch("/api/login", {
                 method: "POST",
@@ -96,6 +97,7 @@ export default function EmployeeLogin() {
                 }),
             });
             const data = await response.json();
+            console.log("Login response data:", data);
             if (data.success) {
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));

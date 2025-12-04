@@ -113,7 +113,7 @@ export async function POST(req) {
     console.log('Extracted teamId for token:', userTeamId);
 
     // JWT 토큰 생성
-    const token = generateToken(user._id, user.role, userCompanyId, userTeamId);
+    const token = generateToken(user._id, user.role, userCompanyId, userTeamId, user.isActive);
     console.log('✅ 토큰 생성 완료');
 
     // 응답 생성
@@ -130,6 +130,7 @@ export async function POST(req) {
         companyName: user.companyId?.name,
         teamId: user.teamId?._id ,
         teamName: user.teamId?.name || undefined,
+        isActive: user.isActive,
       },
       token,
     });

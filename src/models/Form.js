@@ -46,11 +46,15 @@ const formSchema = new mongoose.Schema({
     enum: ['System','Malgun Gothic'],
     default: 'System'
   },
-  // 합성사진 해상도 설정 추가
+  // 합성사진 해상도 설정 (가로*세로)
   resolution: {
-    type: Number,
-    enum: [1024, 1280, 1600], // 기본 1024, 추천 1280, 1600
-    default: 1024
+    type: { width: Number, height: Number },
+    default: { width: 1024, height: 768 },
+    enum: [
+      { width: 1024, height: 768 },
+      { width: 1280, height: 960 },
+      { width: 1600, height: 1200 }
+    ]
   },
 
   // 파일 저장 폴더 구조 (예: ["일자", "현장명", "위치", "공종"])

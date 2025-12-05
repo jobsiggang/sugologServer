@@ -1328,11 +1328,18 @@ function FormManagement({ user }) {
                       </div>
                       <div>
                         <label className="block text-sm font-semibold text-gray-700 mb-1">합성사진 해상도</label>
-                        <select value={editData.resolution} onChange={e => setEditData({ ...editData, resolution: Number(e.target.value) })} className="w-full px-2 py-1 border border-gray-300 rounded">
-                          <option value={1024}>1024</option>
-                          <option value={1280}>1280</option>
-                          <option value={1600}>1600</option>
-                        </select>
+<select
+  value={editData.resolution ? `${editData.resolution.width}x${editData.resolution.height}` : ''}
+  onChange={e => {
+    const [width, height] = e.target.value.split('x').map(Number);
+    setEditData({ ...editData, resolution: { width, height } });
+  }}
+  className="w-full px-2 py-1 border border-gray-300 rounded"
+>
+  <option value="1024x768">1024 x 768</option>
+  <option value="1280x960">1280 x 960</option>
+  <option value="1600x1200">1600 x 1200</option>
+</select>
                       </div>
                     </div>
 

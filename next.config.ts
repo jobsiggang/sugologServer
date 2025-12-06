@@ -1,11 +1,14 @@
 import type { NextConfig } from "next";
 import withPWA from "@ducanh2912/next-pwa";
 
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   images: {
     unoptimized: true,
   },
+  // Turbopack explicit config for Next.js 16+
+  turbopack: {},
 };
 
 export default withPWA({

@@ -25,7 +25,8 @@ export async function GET(request, { params }) {
 
         await connectDB();
         
-        const companyId = params.companyId;
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
 
         // 1. 회사 정보 조회
         const company = await Company.findById(companyId).select('-__v'); 
@@ -66,12 +67,13 @@ export async function PUT(request, { params }) {
         if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
         
         const decoded = verifyToken(token);
-        if (decoded.role !== 'supervisor') {
+        if (!decoded || decoded.role !== 'supervisor') {
             return NextResponse.json({ error: '슈퍼바이저만 수정할 수 있습니다.' }, { status: 403 });
         }
 
         const { name, description, isActive } = await request.json();
-        const companyId = params.companyId;
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
 
         if (!mongoose.Types.ObjectId.isValid(companyId)) {
             return NextResponse.json({ error: '유효하지 않은 회사 ID 형식입니다.' }, { status: 400 });
@@ -98,9 +100,9 @@ export async function PUT(request, { params }) {
         if (isActive !== undefined) {
             company.isActive = isActive;
             await company.save();
-            // 회사 비활성화 시 하위 팀/직원 모두 비활성화
+            // 회사 비활성화 시 하위 팀/직원 모두 비활성화 (supervisor 제외)
             await Team.updateMany({ companyId: company._id }, { isActive });
-            await User.updateMany({ companyId: company._id }, { isActive });
+            await User.updateMany({ companyId: company._id, role: { $ne: 'supervisor' } }, { isActive });
         } else {
             await company.save();
         }
@@ -122,17 +124,19 @@ export async function DELETE(request, { params }) {
         if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
         
         const decoded = verifyToken(token);
-        if (decoded.role !== 'supervisor') {
+        if (!decoded || decoded.role !== 'supervisor') {
             return NextResponse.json({ error: '슈퍼바이저만 삭제할 수 있습니다.' }, { status: 403 });
         }
         
-        const companyId = params.companyId;
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
         
         await connectDB();
 
-        // 1. 하위 팀/직원 모두 삭제
+        // 1. 하위 팀/직원 모두 삭제 (supervisor는 절대 삭제하지 않음)
         await Team.deleteMany({ companyId });
-        await User.deleteMany({ companyId });
+        // supervisor 제외 (role !== 'supervisor')
+        await User.deleteMany({ companyId, role: { $ne: 'supervisor' } });
         // 2. 회사 삭제
         const deletedCompany = await Company.findByIdAndDelete(companyId);
 

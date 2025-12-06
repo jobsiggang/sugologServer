@@ -12,7 +12,8 @@ import mongoose from 'mongoose';
 export async function GET(request, { params }) {
   try {
     await connectDB();
-    const companyId = params.companyId;
+    const resolvedParams = await params;
+    const companyId = resolvedParams.companyId;
     let teamQuery = { companyId };
     let decoded = null;
     const token = getTokenFromRequest(request);
@@ -78,7 +79,8 @@ export async function POST(request, { params }) {
       return NextResponse.json({ error: '비밀번호는 최소 6자 이상이어야 합니다.' }, { status: 400 });
     }
     await connectDB();
-    const companyId = params.companyId;
+    const resolvedParams = await params;
+    const companyId = resolvedParams.companyId;
  console.log('Company ID:', companyId);  
     // 1. 중복 체크
     const exists = await Team.findOne({ companyId, name });
@@ -140,7 +142,8 @@ export async function PUT(request, { params }) {
     }
     const { teamId, name, description, isActive } = await request.json();
     await connectDB();
-    const companyId = params.companyId; 
+    const resolvedParams = await params;
+    const companyId = resolvedParams.companyId;
     const team = await Team.findOne({ _id: teamId, companyId });
     if (!team) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
@@ -181,7 +184,8 @@ export async function DELETE(request, { params }) {
     }
     const { teamId } = await request.json();
     await connectDB();
-    const companyId = params.companyId; 
+    const resolvedParams = await params;
+    const companyId = resolvedParams.companyId;
     const team = await Team.findOne({ _id: teamId, companyId });
     if (!team) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });

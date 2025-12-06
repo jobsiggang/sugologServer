@@ -17,9 +17,13 @@ export async function GET(req) {
       return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
     }
 
+    console.log('GET /api/companies - decoded:', { userId: decoded.userId, role: decoded.role });
+
     await connectDB();
 
     const user = await User.findById(decoded.userId);
+    console.log('GET /api/companies - user found:', !!user, 'role:', user?.role);
+    
     if (!user || user.role !== 'supervisor') {
       return NextResponse.json({ error: '슈퍼바이저만 접근 가능합니다.' }, { status: 403 });
     }

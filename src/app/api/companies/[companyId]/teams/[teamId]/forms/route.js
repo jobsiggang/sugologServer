@@ -24,9 +24,10 @@ export async function GET(request, { params }) {
 
         await connectDB();
         
-
-        const companyId = params.companyId;
-        const teamId = params.teamId;
+        // Next.js 13+ dynamic API: params may be a Promise
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
+        const teamId = resolvedParams.teamId;
 
         // 🚨 URL 파라미터가 토큰 정보와 일치하는지 확인 (team_admin의 경우)
         if ((decoded.role === 'team_admin'|| decoded.role === 'employee') && (decoded.companyId !== companyId || decoded.teamId !== teamId)) {
@@ -81,9 +82,9 @@ export async function POST(request, { params }) {
         await connectDB();
 
         // Next.js 13+ dynamic API: params may be a Promise
-        const awaitedParams = typeof params.then === 'function' ? await params : params;
-        const companyId = awaitedParams.companyId;
-        const teamId = awaitedParams.teamId;
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
+        const teamId = resolvedParams.teamId;
         const decodedCompanyId = decoded.companyId; // 토큰에 있는 ID
 
         // 🚨 URL 파라미터 검증 (토큰과 일치하는지)
@@ -161,7 +162,9 @@ export async function PUT(request, { params }) {
         
         await connectDB();
         
-        const companyId = params.companyId;
+        // Next.js 13+ dynamic API: params may be a Promise
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
         
         // 🚨 URL 파라미터 검증
         if (decoded.companyId !== companyId) {
@@ -228,7 +231,9 @@ export async function DELETE(request, { params }) {
 
         await connectDB();
         
-        const companyId = params.companyId;
+        // Next.js 13+ dynamic API: params may be a Promise
+        const resolvedParams = await params;
+        const companyId = resolvedParams.companyId;
 
         // 🚨 URL 파라미터 검증
         if (decoded.companyId !== companyId) {

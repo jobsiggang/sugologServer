@@ -171,7 +171,11 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: '접근 권한이 없습니다. 회사 ID가 일치하지 않습니다.' }, { status: 403 });
         }
 
-        const form = await Form.findOne({ _id: formId, companyId });
+        // MongoDB ObjectId로 변환하여 쿼리 일관성 확보
+        const form = await Form.findOne({ 
+            _id: mongoose.Types.ObjectId.isValid(formId) ? new mongoose.Types.ObjectId(formId) : null, 
+            companyId: mongoose.Types.ObjectId.isValid(companyId) ? new mongoose.Types.ObjectId(companyId) : null 
+        });
         
         if (!form) {
             return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
@@ -240,8 +244,11 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: '접근 권한이 없습니다. 회사 ID가 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 해당 회사에 속한 양식 삭제
-        const deletedForm = await Form.findOneAndDelete({ _id: formId, companyId });
+        // 해당 회사에 속한 양식 삭제 (MongoDB ObjectId 변환)
+        const deletedForm = await Form.findOneAndDelete({ 
+            _id: mongoose.Types.ObjectId.isValid(formId) ? new mongoose.Types.ObjectId(formId) : null, 
+            companyId: mongoose.Types.ObjectId.isValid(companyId) ? new mongoose.Types.ObjectId(companyId) : null 
+        });
 
         if (!deletedForm) {
             return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });

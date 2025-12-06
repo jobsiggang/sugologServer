@@ -34,35 +34,7 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 403 });
         }
 
-        // 쿼리 파라미터에서 formId 확인 (특정 양식 조회 vs 목록 조회)
-        const { searchParams } = new URL(request.url);
-        const formId = searchParams.get('formId');
-
-        if (formId) {
-            // 특정 양식 조회
-            if (!mongoose.Types.ObjectId.isValid(formId)) {
-                return NextResponse.json({ error: '유효한 양식 ID가 아닙니다.' }, { status: 400 });
-            }
-
-            const form = await Form.findOne({
-                _id: new mongoose.Types.ObjectId(formId),
-                companyId: new mongoose.Types.ObjectId(companyId),
-                teamId: new mongoose.Types.ObjectId(teamId)
-            });
-
-            if (!form) {
-                return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
-            }
-
-            // 직원은 활성화된 양식만 조회 가능
-            if (decoded.role === 'employee' && !form.isActive) {
-                return NextResponse.json({ error: '접근할 수 없는 양식입니다.' }, { status: 403 });
-            }
-
-            return NextResponse.json({ success: true, form });
-        }
-
-        // 양식 목록 조회
+        // 팀장은 모든 양식, 직원은 활성화된 양식만 조회
         let formQuery = { companyId, teamId };
         if (decoded.role === 'employee') {
             formQuery.isActive = true;

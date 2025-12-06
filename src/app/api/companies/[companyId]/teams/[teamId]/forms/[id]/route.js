@@ -65,7 +65,13 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
+
     const { formName, fields, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = await request.json();
+    // resolution 값이 숫자면 객체로 변환 (항상 fixedResolution만 사용)
+    let fixedResolution = resolution;
+    if (typeof resolution === 'number') {
+      fixedResolution = { width: resolution, height: 768 };
+    }
 
     await connectDB();
 
@@ -94,15 +100,9 @@ export async function PUT(request, { params }) {
     if (boardPosition !== undefined) form.boardPosition = boardPosition;
     if (boardSize !== undefined) form.boardSize = boardSize;
     if (boardBackground !== undefined) form.boardBackground = boardBackground;
+
     if (boardFont !== undefined) form.boardFont = boardFont;
-      if (resolution !== undefined) {
-        // resolution 값이 숫자면 객체로 변환
-        if (typeof resolution === 'number') {
-          form.resolution = { width: resolution, height: 768 };
-        } else {
-          form.resolution = resolution;
-        }
-      }
+    if (fixedResolution !== undefined) form.resolution = fixedResolution;
 
     await form.save();
 

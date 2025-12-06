@@ -66,7 +66,12 @@ export async function POST(request, { params }) {
         }
 
         const body = await request.json();
-        const { formName, fields, fieldOptions, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = body;
+                const { formName, fields, fieldOptions, folderStructure, isActive, boardPosition, boardSize, boardBackground, boardFont, resolution } = body;
+
+                // resolution 값이 숫자면 객체로 변환
+                if (typeof body.resolution === 'number') {
+                    body.resolution = { width: body.resolution, height: 768 };
+                }
 
         // 필수 필드 검증
         if (!formName || !Array.isArray(fields)) {

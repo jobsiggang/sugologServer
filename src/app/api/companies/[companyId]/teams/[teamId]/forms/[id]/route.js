@@ -95,7 +95,14 @@ export async function PUT(request, { params }) {
     if (boardSize !== undefined) form.boardSize = boardSize;
     if (boardBackground !== undefined) form.boardBackground = boardBackground;
     if (boardFont !== undefined) form.boardFont = boardFont;
-    if (resolution !== undefined) form.resolution = resolution;
+      if (resolution !== undefined) {
+        // resolution 값이 숫자면 객체로 변환
+        if (typeof resolution === 'number') {
+          form.resolution = { width: resolution, height: 768 };
+        } else {
+          form.resolution = resolution;
+        }
+      }
 
     await form.save();
 

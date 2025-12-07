@@ -522,6 +522,7 @@ function EmployeeManagement({ user }) {
   const [expandedId, setExpandedId] = useState(null);
   const [uploads, setUploads] = useState({});
   const [loadingUploads, setLoadingUploads] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     fetchEmployees();
@@ -597,6 +598,7 @@ function EmployeeManagement({ user }) {
 
   const handleSave = async () => {
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const isNew = editingId === 'new';
       const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/employees` : `/api/companies/${user.companyId}/teams/${user.teamId}/employees/${editingId}`;
@@ -626,6 +628,8 @@ function EmployeeManagement({ user }) {
       }
     } catch (error) {
       alert('오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -639,6 +643,7 @@ function EmployeeManagement({ user }) {
     if (!confirm('정말 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/employees/${id}`, {
         method: 'DELETE',
@@ -656,6 +661,8 @@ function EmployeeManagement({ user }) {
       }
     } catch (error) {
       alert('삭제 실패');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -664,6 +671,7 @@ function EmployeeManagement({ user }) {
     if (!confirm(`정말 ${action}하시겠습니까?`)) return;
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/employees/${id}`, {
         method: 'PUT',
@@ -682,6 +690,8 @@ function EmployeeManagement({ user }) {
       }
     } catch (error) {
       alert(`${action} 실패`);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -782,9 +792,10 @@ function EmployeeManagement({ user }) {
                     <div className="flex gap-2 pt-2">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-2 bg-green-600 text-white text-sm rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
-                        💾 저장
+                        {isSaving ? '저장 중...' : '💾 저장'}
                       </button>
                       <button
                         onClick={handleCancel}
@@ -830,25 +841,26 @@ function EmployeeManagement({ user }) {
                       </button>
                       <button
                         onClick={() => handleToggleActive(emp._id, emp.isActive)}
+                        disabled={isSaving}
                         className={`flex-1 px-4 py-2 text-white text-sm rounded ${
                           emp.isActive 
-                            ? 'bg-yellow-600 hover:bg-yellow-700' 
-                            : 'bg-green-600 hover:bg-green-700'
-                        }`}
+                            ? 'bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-400' 
+                            : 'bg-green-600 hover:bg-green-700 disabled:bg-gray-400'
+                        } disabled:cursor-not-allowed`}
                       >
-                        {emp.isActive ? '⏸️ 비활성화' : '▶️ 활성화'}
+                        {isSaving ? '처리 중...' : (emp.isActive ? '⏸️ 비활성화' : '▶️ 활성화')}
                       </button>
                       <button
                         onClick={() => handleDelete(emp._id, emp)}
-                        disabled={emp.isActive}
+                        disabled={emp.isActive || isSaving}
                         className={`flex-1 px-4 py-2 text-white text-sm rounded ${
-                          emp.isActive
+                          emp.isActive || isSaving
                             ? 'bg-gray-300 cursor-not-allowed'
                             : 'bg-red-600 hover:bg-red-700'
                         }`}
                         title={emp.isActive ? '비활성화 후 삭제 가능' : '완전 삭제'}
                       >
-                        🗑️ 삭제
+                        {isSaving ? '처리 중...' : '🗑️ 삭제'}
                       </button>
                     </div>
 
@@ -946,6 +958,7 @@ function FormManagement({ user }) {
   const [expandedId, setExpandedId] = useState(null);
   const [fieldInput, setFieldInput] = useState('');
   const [optionInputs, setOptionInputs] = useState({});
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     fetchForms();
@@ -1063,6 +1076,7 @@ function FormManagement({ user }) {
 
   const handleSave = async () => {
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const isNew = editingId === 'new';
       const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/forms` : `/api/companies/${user.companyId}/teams/${user.teamId}/forms/${editingId}`;
@@ -1101,6 +1115,8 @@ function FormManagement({ user }) {
     } catch (error) {
       console.error('저장 오류:', error);
       alert('오류가 발생했습니다: ' + error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1108,6 +1124,7 @@ function FormManagement({ user }) {
     if (!confirm('정말 삭제하시겠습니까?')) return;
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${user.companyId}/teams/${user.teamId}/forms/${id}`, {
         method: 'DELETE',
@@ -1123,6 +1140,8 @@ function FormManagement({ user }) {
       }
     } catch (error) {
       alert('삭제 실패');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -1539,13 +1558,15 @@ function FormManagement({ user }) {
                     <div className="flex gap-2 pt-3 border-t">
                       <button
                         onClick={handleSave}
-                        className="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-3 bg-green-600 text-white font-semibold rounded hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
-                        💾 저장
+                        {isSaving ? '저장 중...' : '💾 저장'}
                       </button>
                       <button
                         onClick={handleCancel}
-                        className="flex-1 px-4 py-3 bg-gray-400 text-white font-semibold rounded hover:bg-gray-500"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-3 bg-gray-400 text-white font-semibold rounded hover:bg-gray-500 disabled:bg-gray-300 disabled:cursor-not-allowed"
                       >
                         ✖️ 취소
                       </button>
@@ -1610,16 +1631,18 @@ function FormManagement({ user }) {
                     <div className="flex gap-2 pt-2 border-t">
                       <button
                         onClick={() => handleEdit(form)}
-                        className="flex-1 px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+                        disabled={isSaving}
+                        className="flex-1 px-4 py-1.5 bg-blue-600 text-white text-sm rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                       >
-                        ✏️ 수정
+                        {isSaving ? '처리 중...' : '✏️ 수정'}
                       </button>
                       { !form.isActive ? (
                         <button
                           onClick={() => handleDelete(form._id)}
-                          className="flex-1 px-4 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                          disabled={isSaving}
+                          className="flex-1 px-4 py-1.5 bg-red-600 text-white text-sm rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
-                          🗑️ 삭제
+                          {isSaving ? '처리 중...' : '🗑️ 삭제'}
                         </button>
                       ) : (
                         <button

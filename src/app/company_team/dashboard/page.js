@@ -941,7 +941,7 @@ function FormManagement({ user }) {
     boardSize: '100%',
     boardBackground: 'white',
     boardFont: 'Malgun Gothic',
-    resolution: 1024,
+    resolution: { width: 1024, height: 768 },
   });
   const [expandedId, setExpandedId] = useState(null);
   const [fieldInput, setFieldInput] = useState('');
@@ -983,7 +983,7 @@ function FormManagement({ user }) {
       boardSize: '100%',
       boardBackground: 'white',
       boardFont: 'Malgun Gothic',
-      resolution: 1024,
+      resolution: { width: 1024, height: 768 },
     };
     setForms([newForm, ...forms]);
     setEditingId('new');
@@ -1007,7 +1007,7 @@ function FormManagement({ user }) {
       boardSize: form.boardSize || '100%',
       boardBackground: form.boardBackground || 'white',
       boardFont: form.boardFont || 'Malgun Gothic',
-      resolution: form.resolution || 1024,
+      resolution: form.resolution || { width: 1024, height: 768 },
     });
         // <div>
         //   <label>합성사진 해상도</label>

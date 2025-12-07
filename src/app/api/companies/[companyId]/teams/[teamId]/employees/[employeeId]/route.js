@@ -47,7 +47,6 @@ export async function GET(request, { params }) {
 
 // 직원 정보 수정
 export async function PUT(request, { params }) {
-  console.log("PUT params:", params);
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
@@ -63,7 +62,16 @@ export async function PUT(request, { params }) {
 
     await connectDB();
 
-    const employee = await User.findById(params.employeeId);
+    // Await params as it may be a Promise
+    const resolvedParams = await params;
+    const { companyId, teamId, employeeId } = resolvedParams;
+
+    // Verify URL params match token
+    if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
+      return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
+    }
+
+    const employee = await User.findById(employeeId);
     if (!employee) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -114,7 +122,16 @@ export async function DELETE(request, { params }) {
 
     await connectDB();
 
-    const employee = await User.findById(params.employeeId);
+    // Await params as it may be a Promise
+    const resolvedParams = await params;
+    const { companyId, teamId, employeeId } = resolvedParams;
+
+    // Verify URL params match token
+    if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
+      return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
+    }
+
+    const employee = await User.findById(employeeId);
     if (!employee) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -128,7 +145,7 @@ export async function DELETE(request, { params }) {
     }
 
     // Hard delete - DB에서 완전히 삭제
-    await User.findByIdAndDelete(params.employeeId);
+    await User.findByIdAndDelete(employeeId);
 
     return NextResponse.json({
       success: true,

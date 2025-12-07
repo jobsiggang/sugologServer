@@ -22,6 +22,11 @@ export default function SupervisorLogin() {
     setLoading(true);
 
     try {
+      // 1️⃣ 기존 세션 정보 강제 삭제 (다중 계정 충돌 방지)
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      sessionStorage.clear();
+
       const response = await fetch("/api/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -41,6 +46,7 @@ export default function SupervisorLogin() {
           return;
         }
 
+        // 2️⃣ 새 토큰 및 사용자 정보 저장
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
         

@@ -105,6 +105,11 @@ export default function EmployeeLogin() {
         setLoading(true);
         console.log("Submitting login for teamId:", selectedTeamId);
         try {
+            // 1️⃣ 기존 세션 정보 강제 삭제 (다중 계정 충돌 방지)
+            localStorage.removeItem("token");
+            localStorage.removeItem("user");
+            sessionStorage.clear();
+
             const response = await fetch("/api/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -118,6 +123,7 @@ export default function EmployeeLogin() {
             const data = await response.json();
             console.log("Login response data:", data);
             if (data.success) {
+                // 2️⃣ 새 토큰 및 사용자 정보 저장
                 localStorage.setItem("token", data.token);
                 localStorage.setItem("user", JSON.stringify(data.user));
                 toast.success("로그인 성공!");

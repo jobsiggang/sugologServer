@@ -85,47 +85,64 @@ export default function CompanyAdminDashboard() {
     }
   };
 
-  // 🟢 [수정] 팀 생성 함수
-  const handleAddTeam = async (e) => {
-    e.preventDefault();
+  // 🟢 [수정] 팀 생성 함수
+  const handleAddTeam = async (e) => {
+    e.preventDefault();
 
-    if (!formData.name || !formData.adminUsername || !formData.adminName || !formData.adminPassword) {
-      alert('모든 필수 항목을 입력해주세요.');
-      return;
-    }
+    if (!formData.name || !formData.adminUsername || !formData.adminName || !formData.adminPassword) {
+      alert('모든 필수 항목을 입력해주세요.');
+      return;
+    }
 
-    if (formData.adminPassword.length < 6) {
-      alert('비밀번호는 최소 6자 이상이어야 합니다.');
-      return;
-    }
+    if (formData.adminPassword.length < 6) {
+      alert('비밀번호는 최소 6자 이상이어야 합니다.');
+      return;
+    }
 
-    try {
-      const token = localStorage.getItem('token');
-      // API 경로: /api/companies/[companyId]/teams (POST)
-      const response = await fetch(`/api/companies/${user.companyId}/teams`, { 
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(formData)
-      });
+    // 중복 확인: 같은 회사에서 동일한 username이 있는지 확인
+    try {
+      const token = localStorage.getItem('token');
+      const checkResponse = await fetch(`/api/companies/${user.companyId}/check-username?username=${encodeURIComponent(formData.adminUsername)}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
 
-      const data = await response.json();
-      if (data.success) {
-        alert(`팀 "${data.team.name}"와 책임자 계정이 생성되었습니다.`);
-        setShowAddForm(false);
-        setFormData({ name: '', description: '', adminUsername: '', adminPassword: '', adminName: '' });
-        fetchTeams(user.companyId, token); // 목록 새로고침
-      } else {
-        alert(data.error || '팀 생성 실패');
-      }
-    } catch (error) {
-      alert('오류가 발생했습니다.');
-    }
-  };
+      const checkData = await checkResponse.json();
+      if (checkData.exists) {
+        alert(`이미 사용 중인 ID입니다: ${formData.adminUsername}`);
+        return;
+      }
+    } catch (error) {
+      console.error('중복 확인 오류:', error);
+      // 중복 확인 실패하면 계속 진행
+    }
 
-  const handleLogout = () => {
+    try {
+      const token = localStorage.getItem('token');
+      // API 경로: /api/companies/[companyId]/teams (POST)
+      const response = await fetch(`/api/companies/${user.companyId}/teams`, { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        alert(`팀 "${data.team.name}"와 책임자 계정이 생성되었습니다.`);
+        setShowAddForm(false);
+        setFormData({ name: '', description: '', adminUsername: '', adminPassword: '', adminName: '' });
+        fetchTeams(user.companyId, token); // 목록 새로고침
+      } else {
+        alert(data.error || '팀 생성 실패');
+      }
+    } catch (error) {
+      alert('오류가 발생했습니다.');
+    }
+  };  const handleLogout = () => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     router.push('/company_admin/login');

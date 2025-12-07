@@ -604,6 +604,27 @@ function EmployeeManagement({ user }) {
       const url = isNew ? `/api/companies/${user.companyId}/teams/${user.teamId}/employees` : `/api/companies/${user.companyId}/teams/${user.teamId}/employees/${editingId}`;
       const method = isNew ? 'POST' : 'PUT';
 
+      // 새로운 직원일 경우 중복 확인
+      if (isNew) {
+        try {
+          const checkResponse = await fetch(`/api/companies/${user.companyId}/check-username?username=${encodeURIComponent(editData.username)}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          });
+
+          const checkData = await checkResponse.json();
+          if (checkData.exists) {
+            alert(`이미 사용 중인 ID입니다: ${editData.username}`);
+            setIsSaving(false);
+            return;
+          }
+        } catch (error) {
+          console.error('중복 확인 오류:', error);
+          // 중복 확인 실패하면 계속 진행
+        }
+      }
+
       const dataToSend = { ...editData };
       if (!isNew && !dataToSend.password) {
         delete dataToSend.password;

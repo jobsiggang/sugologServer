@@ -23,11 +23,22 @@ export async function GET(request, { params }) {
         await connectDB();
 
         // 2. URL 파라미터 추출 및 토큰 정보와의 일치 확인
-        const { companyId, teamId } = params;
+        const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+        const { companyId, teamId } = resolvedParams;
 
         // 🚨 [핵심] companyId와 teamId가 토큰 정보와 완벽하게 일치해야 함 (문자열로 비교)
         const tokenCompanyId = decoded.companyId?.toString ? decoded.companyId.toString() : String(decoded.companyId);
         const tokenTeamId = decoded.teamId?.toString ? decoded.teamId.toString() : String(decoded.teamId);
+        
+        console.error(`🔍 권한 검증:`, {
+            tokenCompanyId,
+            paramsCompanyId: companyId,
+            tokenTeamId,
+            paramsTeamId: teamId,
+            match: tokenCompanyId === companyId && tokenTeamId === teamId,
+            decodedRole: decoded.role,
+            decodedUserId: decoded.userId
+        });
         
         if (tokenCompanyId !== companyId || tokenTeamId !== teamId) {
             console.error(`❌ 접근 권한 거부:`, {
@@ -36,7 +47,15 @@ export async function GET(request, { params }) {
                 tokenTeamId,
                 paramsTeamId: teamId
             });
-            return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
+            return NextResponse.json({ 
+                error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.',
+                debug: {
+                    tokenCompanyId,
+                    paramsCompanyId: companyId,
+                    tokenTeamId,
+                    paramsTeamId: teamId
+                }
+            }, { status: 403 });
         }
 
         // 3. 필터 설정 (토큰 정보 사용)
@@ -80,7 +99,8 @@ export async function POST(request, { params }) {
         await connectDB();
         
         // 2. URL 파라미터 추출 및 토큰 정보와의 일치 확인
-        const { companyId, teamId } = params;
+        const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+        const { companyId, teamId } = resolvedParams;
         
         // 🚨 [핵심] companyId와 teamId가 토큰 정보와 완벽하게 일치해야 함
         if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
@@ -140,7 +160,8 @@ export async function PUT(request, { params }) {
         await connectDB();
 
         // 2. URL 파라미터 추출 및 토큰 정보와의 일치 확인
-        const { companyId, teamId } = params;
+        const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+        const { companyId, teamId } = resolvedParams;
         
         // 🚨 [핵심] companyId와 teamId가 토큰 정보와 완벽하게 일치해야 함
         if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
@@ -193,7 +214,8 @@ export async function DELETE(request, { params }) {
         await connectDB();
 
         // 2. URL 파라미터 추출 및 토큰 정보와의 일치 확인
-        const { companyId, teamId } = params;
+        const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+        const { companyId, teamId } = resolvedParams;
         
         // 🚨 [핵심] companyId와 teamId가 토큰 정보와 완벽하게 일치해야 함
         if (decoded.companyId !== companyId || decoded.teamId !== teamId) {

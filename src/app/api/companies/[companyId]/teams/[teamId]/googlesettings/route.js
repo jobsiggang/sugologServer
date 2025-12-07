@@ -22,12 +22,22 @@ export async function GET(request, { params }) {
 
     await connectDB();
 
-    const company = await Company.findById(params.companyId);
+    // URL 파라미터 검증
+    const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+    const { companyId, teamId } = resolvedParams;
+    const tokenCompanyId = decoded.companyId?.toString ? decoded.companyId.toString() : String(decoded.companyId);
+    const tokenTeamId = decoded.teamId?.toString ? decoded.teamId.toString() : String(decoded.teamId);
+    
+    if (tokenCompanyId !== companyId || tokenTeamId !== teamId) {
+      return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
+    }
+
+    const company = await Company.findById(resolvedParams.companyId);
     if (!company) {
       return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    const team = await Team.findById(params.teamId);
+    const team = await Team.findById(resolvedParams.teamId);
     if (!team) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -71,12 +81,13 @@ export async function PUT(request, { params }) {
 
     await connectDB();
 
-    const company = await Company.findById(params.companyId);
+    const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+    const company = await Company.findById(resolvedParams.companyId);
     if (!company) {
       return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    const team = await Team.findById(params.teamId);
+    const team = await Team.findById(resolvedParams.teamId);
     if (!team) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
     }
@@ -120,9 +131,6 @@ export async function PUT(request, { params }) {
 
 // Google 설정 테스트
 export async function POST(request, { params }) {
-  console.log('🚀 Test Google connection called for teamId:', params);
-        const teamId = params.teamId;
-        if (!teamId) return NextResponse.json({ error: '유효하지 않은 팀 ID' }, { status: 400 });
   try {
     const token = getTokenFromRequest(request);
     if (!token) {
@@ -136,12 +144,13 @@ export async function POST(request, { params }) {
 
     await connectDB();
 
-    const company = await Company.findById(params.companyId);
+    const resolvedParams = await params; // ⭐ params가 Promise일 수 있음
+    const company = await Company.findById(resolvedParams.companyId);
     if (!company) {
       return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    const team = await Team.findById(params.teamId);
+    const team = await Team.findById(resolvedParams.teamId);
     if (!team) {
       return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
     }

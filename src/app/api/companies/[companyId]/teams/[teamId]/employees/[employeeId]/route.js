@@ -13,13 +13,17 @@ export async function GET(request, { params }) {
     }
 
     const decoded = verifyToken(token);
-    if (!decoded || !['supervisor', 'company_admin'].includes(decoded.role)) {
+    if (!decoded || !['supervisor', 'company_admin', 'team_admin'].includes(decoded.role)) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
     await connectDB();
 
-    const employee = await User.findById(params.employeeId)
+    // Await params as it may be a Promise
+    const resolvedParams = await params;
+    const { employeeId } = resolvedParams;
+
+    const employee = await User.findById(employeeId)
       .select('-password')
       .populate('companyId', 'name');
 
@@ -27,9 +31,10 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
     }
 
-    // 회사관리자는 자기 회사 직원만 조회 가능
+    // 팀장: 자기 회사, 자기 팀 직원만 조회 가능
     if (decoded.role === 'team_admin' && 
-        employee.companyId._id.toString() !== decoded.companyId.toString()) {
+        (employee.companyId.toString() !== decoded.companyId.toString() ||
+         employee.teamId.toString() !== decoded.teamId.toString())) {
       return NextResponse.json({ error: '접근 권한이 없습니다.' }, { status: 403 });
     }
 
@@ -66,8 +71,8 @@ export async function PUT(request, { params }) {
     const resolvedParams = await params;
     const { companyId, teamId, employeeId } = resolvedParams;
 
-    // Verify URL params match token
-    if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
+    // Verify URL params match token (convert ObjectId to string for comparison)
+    if (decoded.companyId.toString() !== companyId || decoded.teamId.toString() !== teamId) {
       return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
     }
 
@@ -126,8 +131,8 @@ export async function DELETE(request, { params }) {
     const resolvedParams = await params;
     const { companyId, teamId, employeeId } = resolvedParams;
 
-    // Verify URL params match token
-    if (decoded.companyId !== companyId || decoded.teamId !== teamId) {
+    // Verify URL params match token (convert ObjectId to string for comparison)
+    if (decoded.companyId.toString() !== companyId || decoded.teamId.toString() !== teamId) {
       return NextResponse.json({ error: '접근 권한이 없습니다. URL 정보가 토큰과 일치하지 않습니다.' }, { status: 403 });
     }
 

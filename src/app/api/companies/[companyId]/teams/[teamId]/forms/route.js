@@ -14,12 +14,12 @@ import mongoose from 'mongoose';
 export async function GET(request, { params }) {
     try {
         const token = getTokenFromRequest(request);
-        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 200 });
         const decoded = verifyToken(token);
         
         // 권한 확인: team_admin 이상 허용
         if (!decoded ) {
-            return NextResponse.json({ error: '로그인사용자만 접근 가능합니다.' }, { status: 403 });
+            return NextResponse.json({ error: '로그인사용자만 접근 가능합니다.' }, { status: 200 });
         }
 
         await connectDB();
@@ -31,7 +31,7 @@ export async function GET(request, { params }) {
 
         // 🚨 URL 파라미터가 토큰 정보와 일치하는지 확인 (team_admin의 경우)
         if ((decoded.role === 'team_admin'|| decoded.role === 'employee') && (decoded.companyId !== companyId || decoded.teamId !== teamId)) {
-            return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 403 });
+            return NextResponse.json({ error: 'URL 정보가 토큰 정보와 일치하지 않습니다.' }, { status: 200 });
         }
 
         // 팀장은 모든 양식, 직원은 활성화된 양식만 조회
@@ -47,7 +47,7 @@ export async function GET(request, { params }) {
 
     } catch (error) {
         console.error('양식 조회 오류:', error);
-        return NextResponse.json({ error: '양식 조회 실패' }, { status: 500 });
+        return NextResponse.json({ error: '양식 조회 실패' }, { status: 200 });
     }
 }
 
@@ -58,12 +58,12 @@ export async function GET(request, { params }) {
 export async function POST(request, { params }) {
     try {
         const token = getTokenFromRequest(request);
-        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 200 });
         const decoded = verifyToken(token);
         
         // 권한 확인: team_admin 이상 허용
         if (!decoded || !['team_admin', 'company_admin'].includes(decoded.role)) {
-            return NextResponse.json({ error: '팀 관리자 이상만 양식을 생성할 수 있습니다.' }, { status: 403 });
+            return NextResponse.json({ error: '팀 관리자 이상만 양식을 생성할 수 있습니다.' }, { status: 200 });
         }
 
         const body = await request.json();
@@ -71,7 +71,7 @@ export async function POST(request, { params }) {
 
         // 필수 필드 검증
         if (!formName || !Array.isArray(fields)) {
-            return NextResponse.json({ error: '양식명과 항목 정보가 필요합니다.' }, { status: 400 });
+            return NextResponse.json({ error: '양식명과 항목명을 입력해주세요.' }, { status: 200 });
         }
 
         await connectDB();
@@ -84,13 +84,13 @@ export async function POST(request, { params }) {
 
         // 🚨 URL 파라미터 검증 (토큰과 일치하는지)
         if (decodedCompanyId !== companyId) {
-            return NextResponse.json({ error: '접근 권한이 없습니다. 회사 ID가 일치하지 않습니다.' }, { status: 403 });
+            return NextResponse.json({ error: '접근 권한이 없습니다. 회사 ID가 일치하지 않습니다.' }, { status: 200 });
         }
 
         // 중복 양식명 확인 (회사+팀 내 유니크)
         const exists = await Form.findOne({ companyId, teamId, formName });
         if (exists) {
-            return NextResponse.json({ error: '이미 존재하는 양식명입니다.' }, { status: 400 });
+            return NextResponse.json({ error: '이미 존재하는 양식명입니다.' }, { status: 200 });
         }
 
         // fields: string[] 또는 object[] 모두 허용 → object[]로 변환
@@ -100,7 +100,7 @@ export async function POST(request, { params }) {
             return null;
         }).filter(Boolean);
         if (normalizedFields.length === 0) {
-            return NextResponse.json({ error: '항목 정보가 올바르지 않습니다.' }, { status: 400 });
+            return NextResponse.json({ error: '항목명을 입력해주세요.' }, { status: 200 });
         }
 
         // 새 양식 생성
@@ -130,7 +130,7 @@ export async function POST(request, { params }) {
 
     } catch (error) {
         console.error('양식 생성 오류:', error);
-        return NextResponse.json({ error: '양식 생성 중 오류가 발생했습니다.' }, { status: 500 });
+        return NextResponse.json({ error: '양식 생성 중 오류가 발생했습니다.' }, { status: 200 });
     }
 }
 

@@ -30,7 +30,7 @@ export async function GET() {
     console.error('Check supervisor error:', error);
     return NextResponse.json({ 
       error: '확인 중 오류가 발생했습니다.' 
-    }, { status: 500 });
+    }, { status: 200 });
   }
 }
 
@@ -43,7 +43,7 @@ export async function POST(request) {
     if (!setupEnabled) {
       return NextResponse.json({ 
         error: 'Setup is disabled. Set ENABLE_ADMIN_SETUP=true in environment variables.' 
-      }, { status: 403 });
+      }, { status: 200 });
     }
     
     await connectDB();
@@ -53,7 +53,7 @@ export async function POST(request) {
     if (existingSupervisor) {
       return NextResponse.json({ 
         error: '슈퍼바이저가 이미 등록되어 있습니다.' 
-      }, { status: 400 });
+      }, { status: 200 });
     }
 
     const body = await request.json();
@@ -64,13 +64,13 @@ export async function POST(request) {
     if (!username || !password || !name) {
       return NextResponse.json({ 
         error: '모든 항목을 입력해주세요.' 
-      }, { status: 400 });
+      }, { status: 200 });
     }
 
     if (password.length < 6) {
       return NextResponse.json({ 
         error: '비밀번호는 최소 6자 이상이어야 합니다.' 
-      }, { status: 400 });
+      }, { status: 200 });
     }
 
     // 슈퍼바이저 생성
@@ -95,6 +95,6 @@ export async function POST(request) {
     return NextResponse.json({ 
       error: '슈퍼바이저 등록 중 오류가 발생했습니다.',
       details: error.message
-    }, { status: 500 });
+    }, { status: 200 });
   }
 }

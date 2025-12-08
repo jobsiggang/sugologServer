@@ -30,13 +30,13 @@ export async function POST(req) {
         await connectDB();
 
         const user = await User.findById(decoded.userId).populate('companyId');
-        if (!user || !user.companyId) return NextResponse.json({ error: '사용자 또는 업체 정보를 찾을 수 없습니다.' }, { status: 404 });
+        if (!user || !user.companyId) return NextResponse.json({ success: false, error: '사용자 또는 업체 정보를 찾을 수 없습니다.' }, { status: 200 });
 
         // 팀 정보 조회 및 검증
         const teamId = decoded.teamId;
         if (!teamId) return NextResponse.json({ error: '팀 정보가 필요합니다.' }, { status: 400 });
         const team = await Team.findById(teamId);
-        if (!team) return NextResponse.json({ error: '팀 정보를 찾을 수 없습니다.' }, { status: 404 });
+        if (!team) return NextResponse.json({ success: false, error: '팀 정보를 찾을 수 없습니다.' }, { status: 200 });
         if (team.companyId.toString() !== user.companyId._id.toString()) {
             return NextResponse.json({ error: '팀이 회사에 속해있지 않습니다.' }, { status: 400 });
         }
@@ -59,7 +59,7 @@ export async function POST(req) {
 
         const form = await Form.findById(formId);
         if (!form) {
-            return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '양식을 찾을 수 없습니다.' }, { status: 200 });
         }
         
         const uploadedRecordIds = [];

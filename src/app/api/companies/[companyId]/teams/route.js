@@ -184,14 +184,12 @@ export async function DELETE(request, { params }) {
     }
     const { teamId } = await request.json();
     await connectDB();
-    const resolvedParams = await params;
-    const companyId = resolvedParams.companyId;
-    const team = await Team.findOne({ _id: teamId, companyId });
-    if (!team) {
-      return NextResponse.json({ error: '팀을 찾을 수 없습니다.' }, { status: 404 });
-    }
-    
-    // 1. 팀에 속한 모든 사용자 삭제 (관리자/직원 모두)
+    const resolvedParams = await params;
+    const companyId = resolvedParams.companyId;
+    const team = await Team.findOne({ _id: teamId, companyId });
+    if (!team) {
+      return NextResponse.json({ success: false, error: '팀을 찾을 수 없습니다.' }, { status: 200 });
+    }    // 1. 팀에 속한 모든 사용자 삭제 (관리자/직원 모두)
     await User.deleteMany({ teamId });
     // 2. 팀 삭제
     await Team.findByIdAndDelete(teamId);

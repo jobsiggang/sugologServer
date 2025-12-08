@@ -28,7 +28,7 @@ export async function GET(request, { params }) {
       .populate('companyId', 'name');
 
     if (!employee) {
-      return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ success: false, error: '직원을 찾을 수 없습니다.' }, { status: 200 });
     }
 
     // 팀장: 자기 회사, 자기 팀 직원만 조회 가능
@@ -78,7 +78,7 @@ export async function PUT(request, { params }) {
 
     const employee = await User.findById(employeeId);
     if (!employee) {
-      return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ success: false, error: '직원을 찾을 수 없습니다.' }, { status: 200 });
     }
 
     // 팀장: 자기 회사, 자기 팀 직원만 수정 가능
@@ -138,7 +138,7 @@ export async function DELETE(request, { params }) {
 
     const employee = await User.findById(employeeId);
     if (!employee) {
-      return NextResponse.json({ error: '직원을 찾을 수 없습니다.' }, { status: 404 });
+      return NextResponse.json({ success: false, error: '직원을 찾을 수 없습니다.' }, { status: 200 });
     }
 
     // 팀장: 자기 회사, 자기 팀 직원만 삭제 가능

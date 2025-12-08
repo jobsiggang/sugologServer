@@ -32,7 +32,7 @@ export async function GET(request, { params }) {
         const company = await Company.findById(companyId).select('-__v'); 
 
         if (!company) {
-            return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '회사를 찾을 수 없습니다.' }, { status: 200 });
         }
 
         // 2. 회사 관리자 정보 조회 (책임자 정보가 필요한 경우 populate 대신 별도 조회)
@@ -83,7 +83,7 @@ export async function PUT(request, { params }) {
 
         const company = await Company.findById(companyId);
         if (!company) {
-            return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '회사를 찾을 수 없습니다.' }, { status: 200 });
         }
 
         // 회사명 중복 검사
@@ -141,7 +141,7 @@ export async function DELETE(request, { params }) {
         const deletedCompany = await Company.findByIdAndDelete(companyId);
 
         if (!deletedCompany) {
-            return NextResponse.json({ error: '회사를 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '회사를 찾을 수 없습니다.' }, { status: 200 });
         }
 
         return NextResponse.json({ success: true, message: '회사가 성공적으로 삭제되었습니다.' });

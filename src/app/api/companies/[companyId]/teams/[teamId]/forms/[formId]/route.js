@@ -41,7 +41,7 @@ export async function GET(request, { params }) {
         });
 
         if (!form) {
-            return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '양식을 찾을 수 없습니다.' }, { status: 200 });
         }
 
         // 직원은 활성화된 양식만 조회 가능
@@ -98,7 +98,7 @@ export async function PUT(request, { params }) {
         });
         
         if (!form) {
-            return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '양식을 찾을 수 없습니다.' }, { status: 200 });
         }
 
         // 양식명 변경 시 중복 검사
@@ -169,7 +169,7 @@ export async function DELETE(request, { params }) {
         });
 
         if (!deletedForm) {
-            return NextResponse.json({ error: '양식을 찾을 수 없습니다.' }, { status: 404 });
+            return NextResponse.json({ success: false, error: '양식을 찾을 수 없습니다.' }, { status: 200 });
         }
 
         return NextResponse.json({ success: true, message: '양식이 성공적으로 삭제되었습니다.' });

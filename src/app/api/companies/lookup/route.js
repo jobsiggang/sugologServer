@@ -28,7 +28,7 @@ export async function GET(request) {
             return NextResponse.json({ 
                 success: false, 
                 error: '일치하는 회사를 찾을 수 없습니다.' 
-            }, { status: 404 });
+            }, { status: 200 });
         }
 
         // 3. 성공 응답

@@ -463,6 +463,7 @@ export default function CompanyAdminDashboard() {
                     placeholder="로그인 ID"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-1">💡 팀 등록 시 회사 내 중복 아이디 자동 검사</p>
                 </div>
                 <div>
                   <label className="block text-xs font-medium text-gray-700 mb-1">책임자 이름 <span className="text-red-500">*</span></label>

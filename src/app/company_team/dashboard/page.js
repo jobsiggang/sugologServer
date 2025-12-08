@@ -797,6 +797,7 @@ function EmployeeManagement({ user }) {
                         className="w-full px-3 py-2 border border-blue-400 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
                         placeholder="worker01"
                       />
+                      <p className="text-xs text-gray-500 mt-1">💡 직원 저장 시 회사 내 중복 아이디 자동 검사</p>
                     </div>
                     <div>
                       <label className="block text-xs text-gray-600 mb-1">

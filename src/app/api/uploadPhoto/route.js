@@ -24,9 +24,9 @@ export async function POST(req) {
     try {
         // 1. 인증 및 기본 설정 확인 (기존 로직 유지)
         const token = getTokenFromRequest(req);
-        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 401 });
+        if (!token) return NextResponse.json({ error: '인증이 필요합니다.' }, { status: 200 });
         const decoded = verifyToken(token);
-        if (!decoded) return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 401 });
+        if (!decoded) return NextResponse.json({ error: '유효하지 않은 토큰입니다.' }, { status: 200 });
         await connectDB();
 
         const user = await User.findById(decoded.userId).populate('companyId');
@@ -34,16 +34,16 @@ export async function POST(req) {
 
         // 팀 정보 조회 및 검증
         const teamId = decoded.teamId;
-        if (!teamId) return NextResponse.json({ error: '팀 정보가 필요합니다.' }, { status: 400 });
+        if (!teamId) return NextResponse.json({ error: '팀 정보가 필요합니다.' }, { status: 200 });
         const team = await Team.findById(teamId);
         if (!team) return NextResponse.json({ success: false, error: '팀 정보를 찾을 수 없습니다.' }, { status: 200 });
         if (team.companyId.toString() !== user.companyId._id.toString()) {
-            return NextResponse.json({ error: '팀이 회사에 속해있지 않습니다.' }, { status: 400 });
+            return NextResponse.json({ error: '팀이 회사에 속해있지 않습니다.' }, { status: 200 });
         }
 
         const SCRIPT_URL = team.googleSettings?.webAppUrl;
         if (!team.googleSettings?.setupCompleted || !SCRIPT_URL) {
-            return NextResponse.json({ error: '팀의 Google Apps Script가 설정되지 않았습니다. 관리자에게 문의하세요.' }, { status: 400 });
+            return NextResponse.json({ error: '팀의 Google Apps Script가 설정되지 않았습니다. 관리자에게 문의하세요.' }, { status: 200 });
         }
         
         // 2. MultiPart/form-data 파싱
@@ -54,7 +54,7 @@ export async function POST(req) {
         const formName = formData.get('formName');
         
         if (isNaN(totalCount) || totalCount < 1 || !formId) {
-             return NextResponse.json({ error: '유효한 totalCount 또는 formId 값이 누락되었습니다.' }, { status: 400 });
+             return NextResponse.json({ error: '유효한 totalCount 또는 formId 값이 누락되었습니다.' }, { status: 200 });
         }
 
         const form = await Form.findById(formId);
@@ -162,6 +162,6 @@ export async function POST(req) {
         return NextResponse.json({ 
             success: false, 
             error: err.message || '업로드 처리 중 오류가 발생했습니다.' 
-        }, { status: 500 });
+        }, { status: 200 });
     }
 }

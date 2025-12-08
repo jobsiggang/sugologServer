@@ -28,12 +28,12 @@ export async function POST(req) {
         return NextResponse.json({
             success: false,
             message: "인증 토큰이 필요합니다. 다시 로그인해주세요.",
-        }, { status: 401 });
+        }, { status: 200 });
     }
 
     // 클라이언트가 userId를 보내지 않은 경우
     if (!userId) {
-        return NextResponse.json({ success: false, message: "사용자 ID가 요청 본문에 없습니다." }, { status: 400 });
+        return NextResponse.json({ success: false, message: "사용자 ID가 요청 본문에 없습니다." }, { status: 200 });
     }
 
     let decoded;
@@ -48,14 +48,14 @@ export async function POST(req) {
             return NextResponse.json({
                 success: false,
                 message: "토큰 정보가 사용자 ID와 일치하지 않거나 유효하지 않습니다.",
-            }, { status: 401 });
+            }, { status: 200 });
         }
     } catch (tokenError) {
         console.error('Token verification error:', tokenError);
         return NextResponse.json({
             success: false,
             message: "세션이 만료되었습니다. 다시 로그인해주세요.",
-        }, { status: 401 });
+        }, { status: 200 });
     }
 
     // 3. MongoDB 연결
@@ -66,7 +66,7 @@ export async function POST(req) {
         return NextResponse.json({
             success: false,
             message: "데이터베이스 연결에 실패했습니다.",
-        }, { status: 503 });
+        }, { status: 200 });
     }
 
     // 4. 사용자 정보 조회 및 isActive 상태 확인
@@ -75,43 +75,39 @@ try {
         const user = await User.findById(decoded.userId) 
             .select('username name role companyId teamId isActive')
             .populate('companyId', 'name')
-            .populate('teamId', 'name');
-        
+            .populate('teamId', 'name');
+        
 
-        if (!user) {
-            return NextResponse.json({
-                success: false,
-                message: "사용자 정보를 찾을 수 없습니다." + decoded.userId,
-            }, { status: 404 });
-        }
-
-        // 회사ID, 팀ID, 비활성화 여부 명확히 응답
+        if (!user) {
+            return NextResponse.json({
+                success: false,
+                message: "사용자 정보를 찾을 수 없습니다." + decoded.userId,
+            }, { status: 200 });
+        }        // 회사ID, 팀ID, 비활성화 여부 명확히 응답
         const companyId = user.companyId?._id || user.companyId;
         const companyName = user.companyId?.name || '';
         const teamId = user.teamId?._id || user.teamId;
         const teamName = user.teamId?.name || '';
         console.log("user정보", user);
 
-                // 🚨 isActive 상태 확인 및 상세 응답
-                if (user.isActive === false) {
-                    return NextResponse.json({
-                        success: false,
-                        message: "계정이 현재 비활성화 상태입니다. 관리자에게 문의하세요.",
-                        user: {
-                            _id: user._id,
-                            username: user.username,
-                            name: user.name,
-                            role: user.role,
-                            companyId,
-                            companyName,
-                            teamId,
-                            teamName,
-                            isActive: false
-                        }
-                    }, { status: 403 });
-                }
-
-
+                // 🚨 isActive 상태 확인 및 상세 응답
+                if (user.isActive === false) {
+                    return NextResponse.json({
+                        success: false,
+                        message: "계정이 현재 비활성화 상태입니다. 관리자에게 문의하세요.",
+                        user: {
+                            _id: user._id,
+                            username: user.username,
+                            name: user.name,
+                            role: user.role,
+                            companyId,
+                            companyName,
+                            teamId,
+                            teamName,
+                            isActive: false
+                        }
+                    }, { status: 200 });
+                }
                 // 5. 응답 생성 (회사ID, 팀ID, 활성화 여부 포함)
                 const responseData = {
                     success: true,
@@ -140,6 +136,6 @@ try {
             success: false,
             message: "사용자 상태 조회 중 오류가 발생했습니다.",
             error: error.message,
-        }, { status: 500 });
+        }, { status: 200 });
     }
 }

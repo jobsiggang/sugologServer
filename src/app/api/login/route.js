@@ -19,7 +19,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "아이디와 비밀번호를 입력해주세요.",
-      }, { status: 400 });
+      }, { status: 200 });
     }
 
     // MongoDB 연결 (타임아웃 추가)
@@ -34,7 +34,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "데이터베이스 연결에 실패했습니다. 잠시 후 다시 시도해주세요.",
-      }, { status: 503 });
+      }, { status: 200 });
     }
 
 
@@ -64,7 +64,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "사용자 조회 중 오류가 발생했습니다.",
-      }, { status: 500 });
+      }, { status: 200 });
     }
 
     if (user) {
@@ -81,7 +81,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "아이디 또는 비밀번호가 올바르지 않습니다.",
-      }, { status: 401 });
+      }, { status: 200 });
     }
 
     // 비밀번호 확인
@@ -95,7 +95,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "비밀번호 확인 중 오류가 발생했습니다.",
-      }, { status: 500 });
+      }, { status: 200 });
     }
 
     if (!isPasswordValid) {
@@ -103,7 +103,7 @@ export async function POST(req) {
       return NextResponse.json({
         success: false,
         message: "아이디 또는 비밀번호가 올바르지 않습니다.",
-      }, { status: 401 });
+      }, { status: 200 });
     }
 
     // companyId를 안전하게 추출
@@ -156,13 +156,13 @@ export async function POST(req) {
       return NextResponse.json({ 
         success: false, 
         message: "데이터베이스 연결 오류입니다. 잠시 후 다시 시도해주세요.",
-      }, { status: 503 });
+      }, { status: 200 });
     }
     
     return NextResponse.json({ 
       success: false, 
       message: "로그인 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
       error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    }, { status: 500 });
+    }, { status: 200 });
   }
 }

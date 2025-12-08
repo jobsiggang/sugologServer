@@ -8,6 +8,7 @@ export default function SupervisorDashboard() {
   const [activeTab, setActiveTab] = useState('companies');
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
   const [editingCompany, setEditingCompany] = useState(null);
   const [showEditForm, setShowEditForm] = useState(false);
@@ -83,6 +84,7 @@ export default function SupervisorDashboard() {
     }
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch('/api/companies', {
         method: 'POST',
@@ -110,6 +112,8 @@ export default function SupervisorDashboard() {
       }
     } catch (error) {
       alert('오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -138,6 +142,7 @@ export default function SupervisorDashboard() {
     }
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${editingCompany._id}`, {
         method: 'PUT',
@@ -160,6 +165,8 @@ export default function SupervisorDashboard() {
     } catch (error) {
       console.error('회사 수정 오류:', error);
       alert('회사 수정 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -169,6 +176,7 @@ export default function SupervisorDashboard() {
     }
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${company._id}`, {
         method: 'DELETE',
@@ -187,6 +195,8 @@ export default function SupervisorDashboard() {
     } catch (error) {
       console.error('회사 삭제 오류:', error);
       alert('회사 삭제 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -199,6 +209,7 @@ export default function SupervisorDashboard() {
     }
 
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch(`/api/companies/${company._id}`, {
         method: 'PUT',
@@ -219,6 +230,8 @@ export default function SupervisorDashboard() {
     } catch (error) {
       console.error('상태 변경 오류:', error);
       alert('상태 변경 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -247,6 +260,7 @@ export default function SupervisorDashboard() {
       return;
     }
     try {
+      setIsSaving(true);
       const token = localStorage.getItem('token');
       const response = await fetch('/api/supervisor/changePassword', {
         method: 'PUT',
@@ -265,6 +279,8 @@ export default function SupervisorDashboard() {
       }
     } catch (error) {
       alert('비밀번호 변경 중 오류가 발생했습니다.');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -353,14 +369,16 @@ export default function SupervisorDashboard() {
             <div className="flex gap-2 pt-2">
               <button
                 type="submit"
-                className="flex-1 bg-blue-600 text-white py-1.5 rounded text-xs font-semibold hover:bg-blue-700 transition"
+                disabled={isSaving}
+                className="flex-1 bg-blue-600 text-white py-1.5 rounded text-xs font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                변경
+                {isSaving ? '변경 중...' : '변경'}
               </button>
               <button
                 type="button"
                 onClick={() => setShowPasswordForm(false)}
-                className="flex-1 bg-gray-200 text-gray-700 py-1.5 rounded text-xs font-semibold hover:bg-gray-300 transition"
+                disabled={isSaving}
+                className="flex-1 bg-gray-200 text-gray-700 py-1.5 rounded text-xs font-semibold hover:bg-gray-300 transition disabled:bg-gray-100 disabled:cursor-not-allowed"
               >
                 취소
               </button>
@@ -457,14 +475,16 @@ export default function SupervisorDashboard() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium"
+                  disabled={isSaving}
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  회사 및 관리자 등록
+                  {isSaving ? '등록 중...' : '회사 및 관리자 등록'}
                 </button>
                 <button
                   type="button"
                   onClick={() => setShowAddForm(false)}
-                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium"
+                  disabled={isSaving}
+                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium disabled:bg-gray-200 disabled:cursor-not-allowed"
                 >
                   취소
                 </button>
@@ -521,9 +541,10 @@ export default function SupervisorDashboard() {
               <div className="flex gap-3 pt-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium"
+                  disabled={isSaving}
+                  className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  수정 완료
+                  {isSaving ? '수정 중...' : '수정 완료'}
                 </button>
                 <button
                   type="button"
@@ -531,7 +552,8 @@ export default function SupervisorDashboard() {
                     setShowEditForm(false);
                     setEditingCompany(null);
                   }}
-                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium"
+                  disabled={isSaving}
+                  className="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-400 font-medium disabled:bg-gray-200 disabled:cursor-not-allowed"
                 >
                   취소
                 </button>
@@ -605,7 +627,8 @@ export default function SupervisorDashboard() {
                                 e.stopPropagation();
                                 handleEdit(company);
                               }}
-                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700"
+                              disabled={isSaving}
+                              className="px-2 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                               title="수정"
                             >
                               ✏️
@@ -615,11 +638,12 @@ export default function SupervisorDashboard() {
                                 e.stopPropagation();
                                 handleToggleActive(company);
                               }}
+                              disabled={isSaving}
                               className={`px-2 py-1 text-xs rounded ${
                                 company.isActive
-                                  ? 'bg-orange-600 text-white hover:bg-orange-700'
-                                  : 'bg-green-600 text-white hover:bg-green-700'
-                              }`}
+                                  ? 'bg-orange-600 text-white hover:bg-orange-700 disabled:bg-gray-400'
+                                  : 'bg-green-600 text-white hover:bg-green-700 disabled:bg-gray-400'
+                              } disabled:cursor-not-allowed`}
                               title={company.isActive ? '비활성화' : '활성화'}
                             >
                               {company.isActive ? '🔒' : '🔓'}
@@ -629,7 +653,8 @@ export default function SupervisorDashboard() {
                                 e.stopPropagation();
                                 handleDelete(company);
                               }}
-                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700"
+                              disabled={isSaving}
+                              className="px-2 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                               title="삭제"
                             >
                               🗑️
